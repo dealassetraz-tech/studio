@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Mail, Menu, X } from "lucide-react";
+import { Mail, Menu } from "lucide-react";
 import { AssetrazLogo } from "./assetraz-logo";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -15,45 +14,15 @@ import {
 
 const navLinks = [
   { href: "/#how-it-works", label: "How It Works" },
-  { href: "/verify", label: "Verify Property" },
+  { href: "/login", label: "Verify Property" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/analytics", label: "Analytics" },
+  { href: "/api", label: "API" },
   { href: "/contact", label: "Contact", icon: <Mail className="h-4 w-4" /> },
 ];
-
-const loggedOutNavLinks = [
-  { href: "/#how-it-works", label: "How It Works" },
-  { href: "/contact", label: "Contact", icon: <Mail className="h-4 w-4" /> },
-  { href: "/login", label: "Login" },
-  { href: "/signup", label: "Sign Up" },
-];
-
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<{ name: string; initial: string } | null>(null);
-
-  // Simulate authentication check
-  useEffect(() => {
-    // In a real app, you'd check for a token, session, etc.
-    // For now, we'll set it to false by default.
-    const loggedIn = false; 
-    setIsLoggedIn(loggedIn);
-    if (loggedIn) {
-      // In a real app, you'd fetch user data from your backend
-      // For example: setUser({ name: "Jane Doe", initial: "J" });
-      setUser({ name: "Jane Doe", initial: "J" });
-    }
-  }, []);
-
-  const currentNavLinks = isLoggedIn ? navLinks : [
-    { href: "/#how-it-works", label: "How It Works" },
-    { href: "/contact", label: "Contact" },
-  ];
-  
-  const mobileNavLinks = isLoggedIn ? navLinks : loggedOutNavLinks;
-
 
   return (
     <header className="bg-background shadow-sm sticky top-0 z-50">
@@ -69,7 +38,7 @@ export function Header() {
             </Link>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            {currentNavLinks.map((link) => (
+            {navLinks.map((link) => (
                <Link key={link.href} href={link.href} className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
                 {link.icon}
                 {link.label}
@@ -77,23 +46,14 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-4">
-             {isLoggedIn && user ? (
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground">{user.initial}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium hidden sm:inline">{user.name}</span>
-                </div>
-             ) : (
-                <div className="hidden md:flex items-center gap-2">
-                    <Button variant="ghost" asChild>
-                        <Link href="/login">Login</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/signup">Sign Up</Link>
-                    </Button>
-                </div>
-             )}
+             <div className="hidden md:flex items-center gap-2">
+                <Button variant="ghost" asChild>
+                    <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                </Button>
+            </div>
              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
                 <Button variant="ghost" size="icon">
@@ -111,13 +71,21 @@ export function Header() {
                   </Link>
                 </SheetHeader>
                  <nav className="flex flex-col gap-4 text-lg font-medium">
-                    {mobileNavLinks.map((link) => (
+                    {navLinks.map((link) => (
                       <Link key={link.href} href={link.href} className="flex items-center gap-2 text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                         {link.icon}
                         {link.label}
                       </Link>
                     ))}
                   </nav>
+                  <div className="flex items-center gap-2 mt-6">
+                    <Button variant="ghost" asChild className="w-full">
+                        <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
+                    </Button>
+                    <Button asChild className="w-full">
+                        <Link href="/signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                    </Button>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
