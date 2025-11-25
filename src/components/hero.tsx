@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export function Hero() {
   return (
@@ -18,9 +19,11 @@ export function Hero() {
                 placeholder="Enter Property ID or Address" 
                 className="h-12 text-base"
             />
-            <Button size="lg" className="h-12 w-full sm:w-auto">
-                Verify Property Now
-                <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="lg" className="h-12 w-full sm:w-auto" asChild>
+                <Link href="/login">
+                  Verify Property Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
             </Button>
         </div>
       </div>

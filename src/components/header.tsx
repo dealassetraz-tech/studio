@@ -15,7 +15,7 @@ import {
 
 const navLinks = [
   { href: "/#how-it-works", label: "How It Works" },
-  { href: "/verify", label: "Verify Property" },
+  { href: "/login", label: "Verify Property" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/analytics", label: "Analytics" },
   { href: "/contact", label: "Contact", icon: <Mail className="h-4 w-4" /> },
