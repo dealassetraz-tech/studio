@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-       <body className={`${inter.variable} ${spaceGrotesk.variable}`}>{children}</body>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+       <body className="font-sans">{children}</body>
     </html>
   );
 }
