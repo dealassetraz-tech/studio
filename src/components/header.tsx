@@ -32,13 +32,19 @@ const loggedOutNavLinks = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<{ name: string; initial: string } | null>(null);
 
   // Simulate authentication check
   useEffect(() => {
     // In a real app, you'd check for a token, session, etc.
     // For now, we'll just toggle it for demonstration.
     // You can change this to `true` to see the logged-in state.
-    setIsLoggedIn(true); 
+    const loggedIn = true; 
+    setIsLoggedIn(loggedIn);
+    if (loggedIn) {
+      // In a real app, you'd fetch user data from your backend
+      setUser({ name: "Demo User", initial: "D" });
+    }
   }, []);
 
   const currentNavLinks = isLoggedIn ? navLinks : [
@@ -71,12 +77,12 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-4">
-             {isLoggedIn ? (
+             {isLoggedIn && user ? (
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground">D</AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground">{user.initial}</AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium hidden sm:inline">Admin User</span>
+                  <span className="text-sm font-medium hidden sm:inline">{user.name}</span>
                 </div>
              ) : (
                 <div className="hidden md:flex items-center gap-2">
