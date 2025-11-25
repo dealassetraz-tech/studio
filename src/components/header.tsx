@@ -18,7 +18,7 @@ const navLinks = [
   { href: "/verify", label: "Verify Property" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/analytics", label: "Analytics" },
-  { href: "#api", label: "API" },
+  { href: "/api", label: "API" },
   { href: "#contact", label: "Contact", icon: <Mail className="h-4 w-4" /> },
 ];
 
