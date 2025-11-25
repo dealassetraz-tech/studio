@@ -35,6 +35,8 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     // Handle login logic here
+    // On successful login, you would typically set a session/token
+    // and then redirect.
     router.push("/verify");
   }
 
@@ -69,6 +71,11 @@ export function LoginForm() {
                     <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
+                     <div className="text-right">
+                        <Link href="#" className="text-sm text-primary hover:underline">
+                            Forgot password?
+                        </Link>
+                    </div>
                     <FormMessage />
                     </FormItem>
                 )}
