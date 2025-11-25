@@ -16,6 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signUpWithEmail } from "@/lib/firebase/auth";
+import { useState } from "react";
+import { Alert, AlertDescription } from "./ui/alert";
+
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -25,6 +29,8 @@ const formSchema = z.object({
 
 export function SignupForm() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,10 +40,18 @@ export function SignupForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle signup logic here
-    router.push("/verify");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setError(null);
+    try {
+      await signUpWithEmail(values.email, values.password, values.name);
+      router.push("/verify");
+    } catch (e: any) {
+      if (e.code === 'auth/email-already-in-use') {
+        setError("This email is already in use. Please try another one.");
+      } else {
+        setError(e.message);
+      }
+    }
   }
 
   return (
@@ -47,6 +61,11 @@ export function SignupForm() {
             <CardDescription>Get started with ASSETRAZ today.</CardDescription>
         </CardHeader>
         <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField

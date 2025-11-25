@@ -16,6 +16,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signInWithEmail } from "@/lib/firebase/auth";
+import { useState } from "react";
+import { Alert, AlertDescription } from "./ui/alert";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address."),
@@ -24,6 +27,8 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,12 +37,24 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle login logic here
-    // On successful login, you would typically set a session/token
-    // and then redirect.
-    router.push("/verify");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setError(null);
+    try {
+      await signInWithEmail(values.email, values.password);
+      router.push("/verify");
+    } catch (e: any) {
+      switch (e.code) {
+        case 'auth/user-not-found':
+          setError("No user found with this email. Please sign up.");
+          break;
+        case 'auth/wrong-password':
+          setError("Incorrect password. Please try again.");
+          break;
+        default:
+          setError("An unexpected error occurred. Please try again.");
+          break;
+      }
+    }
   }
 
   return (
@@ -47,6 +64,11 @@ export function LoginForm() {
             <CardDescription>Sign in to continue to ASSETRAZ</CardDescription>
         </CardHeader>
         <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
