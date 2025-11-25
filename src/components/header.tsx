@@ -37,13 +37,13 @@ export function Header() {
   // Simulate authentication check
   useEffect(() => {
     // In a real app, you'd check for a token, session, etc.
-    // For now, we'll just toggle it for demonstration.
-    // You can change this to `true` to see the logged-in state.
-    const loggedIn = true; 
+    // For now, we'll set it to false by default.
+    const loggedIn = false; 
     setIsLoggedIn(loggedIn);
     if (loggedIn) {
       // In a real app, you'd fetch user data from your backend
-      setUser({ name: "Demo User", initial: "D" });
+      // For example: setUser({ name: "Jane Doe", initial: "J" });
+      setUser({ name: "Jane Doe", initial: "J" });
     }
   }, []);
 
