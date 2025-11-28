@@ -8,12 +8,14 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { app } from '@/lib/firebase/config';
+import { createUserProfile } from './firestore';
 
 const auth = getAuth(app);
 
 export async function signUpWithEmail(email: string, password: string, displayName: string) {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(userCredential.user, { displayName });
+  await createUserProfile(userCredential.user);
   return userCredential.user;
 }
 
