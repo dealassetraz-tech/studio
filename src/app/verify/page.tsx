@@ -1,5 +1,4 @@
 import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { VerificationForm } from "@/components/verification-form";
 
 export default function VerifyPage() {
@@ -11,7 +10,6 @@ export default function VerifyPage() {
           <VerificationForm />
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

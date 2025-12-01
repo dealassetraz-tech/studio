@@ -1,5 +1,4 @@
 import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { ApiDocumentation } from "@/components/api-documentation";
 
 export default function ApiPage() {
@@ -9,7 +8,6 @@ export default function ApiPage() {
       <main className="flex-grow">
         <ApiDocumentation />
       </main>
-      <Footer />
     </div>
   );
 }

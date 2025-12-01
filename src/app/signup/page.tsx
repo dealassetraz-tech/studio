@@ -1,5 +1,4 @@
 import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { SignupForm } from "@/components/signup-form";
 
 export default function SignupPage() {
@@ -9,7 +8,6 @@ export default function SignupPage() {
       <main className="flex-grow flex items-center justify-center">
         <SignupForm />
       </main>
-      <Footer />
     </div>
   );
 }
