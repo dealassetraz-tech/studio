@@ -19,7 +19,7 @@ export function Hero() {
                     ASSETRAZ UK connects to official sources to confirm that a property exists, who owns it, and what its history looks like – in one standardised report for agents, platforms and professionals.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                    <Button size="lg" className="h-12 w-full sm:w-auto bg-white text-background hover:bg-gray-200" asChild>
+                    <Button size="lg" className="h-12 w-full sm:w-auto bg-white text-blue-900 hover:bg-gray-200" asChild>
                     <Link href="/verify">
                         Start a verification
                         <ArrowRight className="ml-2 h-5 w-5" />
