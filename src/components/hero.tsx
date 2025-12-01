@@ -7,7 +7,7 @@ import { HowItWorksNew } from "./how-it-works-new";
 
 export function Hero() {
   return (
-    <section className="relative bg-gradient-to-br from-[#2A3E90] to-[#6042A4] py-16 md:py-24 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-[#2A3E90] to-[#6042A4] py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[url(/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto px-4 relative">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -21,7 +21,7 @@ export function Hero() {
                 <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
                     <Button size="lg" className="h-12 w-full sm:w-auto bg-white text-background hover:bg-gray-200" asChild>
                     <Link href="/verify">
-                        Start a demo verification
+                        Start a verification
                         <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                     </Button>

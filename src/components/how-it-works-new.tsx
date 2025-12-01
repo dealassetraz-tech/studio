@@ -35,10 +35,6 @@ export function HowItWorksNew() {
                     </div>
                 </div>
             ))}
-            <div className="mt-6 p-4 rounded-lg bg-black/20 text-center text-sm text-purple-200">
-                <p><strong>Demo only</strong></p>
-                <p>This site shows the workflow and sample output. Live usage requires official API keys and a commercial agreement.</p>
-            </div>
         </CardContent>
     </Card>
   );
