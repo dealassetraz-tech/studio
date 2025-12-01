@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { HowItWorksNew } from "./how-it-works-new";
+import { useUser } from "@/firebase";
 
 export function Hero() {
+  const { user, loading } = useUser();
+  const verificationHref = !loading && user ? "/verify" : "/auth?type=signup";
+
   return (
     <section className="relative bg-gradient-to-br from-[#2A3E90] to-[#6042A4] py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[url(/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
@@ -20,7 +24,7 @@ export function Hero() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
                     <Button size="lg" className="h-12 w-full sm:w-auto bg-white text-blue-900 hover:bg-gray-200" asChild>
-                    <Link href="/verify">
+                    <Link href={verificationHref}>
                         Start a verification
                         <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
