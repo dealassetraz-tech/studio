@@ -1,5 +1,3 @@
-"use client";
-
 import { FileText, Banknote, Building, Search, GitBranch, FileJson } from "lucide-react";
 
 const features = [

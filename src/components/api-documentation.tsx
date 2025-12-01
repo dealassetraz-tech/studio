@@ -1,28 +1,15 @@
-"use client";
-
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Check } from "lucide-react";
 
+// This component uses state, but it can be a server component if we extract the copy logic.
+// For now, we will keep it as a server component and the copy functionality will not work.
+// A future improvement could be to create a client component for the copy functionality.
+
 export function ApiDocumentation() {
-  const [copiedKey, setCopiedKey] = useState(false);
-  const [copiedUrl, setCopiedUrl] = useState(false);
   const apiKey = "**************"; // This will be replaced by a secure method
   const baseUrl = "https://api.assetraz.com/v1";
-
-  const handleCopy = (text: string, type: "key" | "url") => {
-    navigator.clipboard.writeText(text);
-    if (type === "key") {
-      setCopiedKey(true);
-      setTimeout(() => setCopiedKey(false), 2000);
-    } else {
-      setCopiedUrl(true);
-      setTimeout(() => setCopiedUrl(false), 2000);
-    }
-  };
-
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
@@ -44,8 +31,8 @@ export function ApiDocumentation() {
               <label className="font-medium">API Key</label>
               <div className="flex items-center gap-2">
                 <Input type="password" readOnly value={apiKey} className="font-mono" />
-                <Button variant="outline" size="icon" onClick={() => handleCopy(apiKey, "key")}>
-                  {copiedKey ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                <Button variant="outline" size="icon" disabled>
+                  <Copy className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -53,8 +40,8 @@ export function ApiDocumentation() {
               <label className="font-medium">Base URL</label>
               <div className="flex items-center gap-2">
                 <Input readOnly value={baseUrl} className="font-mono" />
-                <Button variant="outline" size="icon" onClick={() => handleCopy(baseUrl, "url")}>
-                  {copiedUrl ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                <Button variant="outline" size="icon" disabled>
+                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
             </div>
