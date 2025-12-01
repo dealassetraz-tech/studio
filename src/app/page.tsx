@@ -5,9 +5,9 @@ import { WhyProfessionals } from "@/components/why-professionals";
 
 export default function Home() {
   return (
-    <div className="bg-background text-foreground">
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
       <Header />
-      <main>
+      <main className="flex-grow">
         <Hero />
         <WhyProfessionals />
         <EndToEndSteps />
