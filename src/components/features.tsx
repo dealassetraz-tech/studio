@@ -1,4 +1,4 @@
-import { FileText, Banknote, Building, Search } from "lucide-react";
+import { FileText, Banknote, Building, Search, GitBranch, FileJson } from "lucide-react";
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -41,6 +41,25 @@ const features = [
     imageHint: PlaceHolderImages.find(p => p.id === 'feature-deeper-visibility-icon')?.imageHint || '',
     className: "md:col-span-2 bg-accent/20",
   },
+  {
+    title: "Auditable outputs",
+    description: "Every check has an ID, timestamp and trail.",
+    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-auditable-outputs-icon')?.imageUrl || '',
+    imageHint: PlaceHolderImages.find(p => p.id === 'feature-auditable-outputs-icon')?.imageHint || '',
+    className: "md:col-span-2 bg-yellow-50",
+  },
+  {
+    title: "Reports & API payloads",
+    description: "Each verification produces both human-readable and machine-readable outputs, so you can store them in files or systems.",
+    details: [
+      "Branded PDF summary report",
+      "JSON payload with structured data",
+      "Unique verification ID & timestamp",
+    ],
+    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-reports-payloads-icon')?.imageUrl || '',
+    imageHint: PlaceHolderImages.find(p => p.id === 'feature-reports-payloads-icon')?.imageHint || '',
+    className: "bg-white",
+  },
 ];
 
 export function Features() {
@@ -58,17 +77,9 @@ export function Features() {
 
             <div className="grid md:grid-cols-3 gap-8">
                 {features.map((feature) => (
-                    <div key={feature.title} className={`rounded-xl p-8 ${feature.className}`}>
-                        {feature.title === "Transparent history" || feature.title === "Deeper visibility" ? (
-                             <div className="flex flex-col items-center justify-center h-full text-center">
-                                <div className="relative w-24 h-24 mb-4">
-                                    <Image src={feature.imageUrl} alt={feature.title} layout="fill" objectFit="contain" data-ai-hint={feature.imageHint} />
-                                </div>
-                                <h2 className="text-2xl font-semibold text-foreground">{feature.title}</h2>
-                                <p className="text-muted-foreground mt-2">{feature.description}</p>
-                            </div>
-                        ) : (
-                            <div>
+                    <div key={feature.title} className={`rounded-xl p-8 shadow-lg ${feature.className}`}>
+                        {feature.details ? (
+                             <div>
                                 <div className="relative w-16 h-16 mb-4">
                                      <Image src={feature.imageUrl} alt={feature.title} layout="fill" objectFit="contain" data-ai-hint={feature.imageHint} />
                                 </div>
@@ -82,6 +93,14 @@ export function Features() {
                                         </li>
                                     ))}
                                 </ul>
+                            </div>
+                        ) : (
+                           <div className="flex flex-col items-center justify-center h-full text-center">
+                                <div className="relative w-24 h-24 mb-4">
+                                    <Image src={feature.imageUrl} alt={feature.title} layout="fill" objectFit="contain" data-ai-hint={feature.imageHint} />
+                                </div>
+                                <h2 className="text-2xl font-semibold text-foreground">{feature.title}</h2>
+                                <p className="text-muted-foreground mt-2">{feature.description}</p>
                             </div>
                         )}
                     </div>
