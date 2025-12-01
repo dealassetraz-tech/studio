@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, LogOut, User, Settings } from "lucide-react";
-import { AssetrazLogo } from "./assetraz-logo";
 import { useState } from "react";
 import {
   Sheet,
@@ -24,6 +23,7 @@ import { useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/firebase";
+import { AssetrazLogo } from "./assetraz-logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -51,26 +51,21 @@ export function Header() {
   const userInitials = userName?.charAt(0) || "U";
 
   return (
-    <header className="bg-transparent absolute top-0 left-0 w-full z-50">
+    <header className="bg-background/95 backdrop-blur-sm sticky top-0 z-50 border-b">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2.5">
-                <div className="bg-white p-1.5 rounded-md">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-background">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
-                        <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></polyline>
-                    </svg>
-                </div>
+                <AssetrazLogo />
               <div>
-                <span className="text-xl font-bold text-white">ASSETRAZ UK</span>
-                <p className="text-xs text-purple-200">Property & Owner Verification</p>
+                <span className="text-xl font-bold text-foreground">ASSETRAZ UK</span>
+                <p className="text-xs text-muted-foreground">Property & Owner Verification</p>
               </div>
             </Link>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-purple-200">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-foreground">
             {navLinks.map((link) => (
-               <Link key={link.href} href={link.href} className="flex items-center gap-1 hover:text-white transition-colors">
+               <Link key={link.href} href={link.href} className="flex items-center gap-1 hover:text-primary transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -113,22 +108,22 @@ export function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                    <Button asChild className="bg-white text-background hover:bg-gray-200">
+                    <Button asChild>
                         <Link href="/verify">Start Verification</Link>
                     </Button>
                 )}
             </div>
              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" className="text-white hover:text-white hover:bg-white/10">
+                <Button variant="ghost" size="icon">
                   <Menu />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background text-white">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background text-foreground">
                 <SheetHeader>
                   <Link href="/" className="flex items-center gap-2 mb-4" onClick={() => setIsMenuOpen(false)}>
-                    <AssetrazLogo className="h-8 w-8 text-white" />
+                    <AssetrazLogo />
                     <div>
                       <span className="text-xl font-bold">ASSETRAZ</span>
                     </div>
@@ -154,7 +149,7 @@ export function Header() {
                             </div>
                         </div>
                     ) : (
-                        <Button asChild className="w-full bg-white text-background hover:bg-gray-200">
+                        <Button asChild className="w-full">
                             <Link href="/verify" onClick={() => setIsMenuOpen(false)}>Start Verification</Link>
                         </Button>
                     )}
