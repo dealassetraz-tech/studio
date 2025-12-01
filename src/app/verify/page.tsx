@@ -9,10 +9,10 @@ export default function VerifyPage() {
         <div className="container mx-auto px-4 py-12 md:py-20">
           <div className="text-center max-w-3xl mx-auto mb-8">
             <h1 className="text-4xl md:text-5xl font-bold">
-              Demo: Property Verification
+              Property Verification
             </h1>
             <p className="text-lg text-muted-foreground mt-2">
-              Enter sample details to see how the verification flow and report layout would look.
+              Enter property details to run a verification.
             </p>
           </div>
           <VerificationForm />

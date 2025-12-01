@@ -14,10 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "./ui/checkbox";
-import { AlertCircle } from "lucide-react";
 import React from "react";
 
 const formSchema = z.object({
@@ -155,7 +153,7 @@ export function VerificationForm() {
             )}
             
             <div className="p-6 bg-secondary/30 rounded-lg">
-                <FormLabel className="text-muted-foreground font-semibold tracking-wider">INCLUDE CHECKS (DEMO)</FormLabel>
+                <FormLabel className="text-muted-foreground font-semibold tracking-wider">INCLUDE CHECKS</FormLabel>
                 <div className="space-y-4 mt-4">
                     <FormField
                         control={form.control}
@@ -218,16 +216,8 @@ export function VerificationForm() {
             </div>
 
             <Button type="submit" size="lg" className="w-full">
-                Run demo verification
+                Run verification
             </Button>
-            
-            <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800">
-              <AlertCircle className="h-4 w-4 !text-yellow-600" />
-              <AlertTitle className="font-bold">Demo mode only</AlertTitle>
-              <AlertDescription>
-                This front-end simulates a result. A production deployment must call real APIs (HM Land Registry, Companies House, etc.) from a secure backend.
-              </AlertDescription>
-            </Alert>
           </form>
         </Form>
       </CardContent>
