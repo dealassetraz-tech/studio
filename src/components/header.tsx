@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Mail, Menu, LogOut, User, Settings } from "lucide-react";
+import { Menu, LogOut, User, Settings } from "lucide-react";
 import { AssetrazLogo } from "./assetraz-logo";
 import { useState } from "react";
 import {
@@ -27,11 +27,11 @@ import { useAuth } from "@/firebase";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/verify", label: "Verify" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/api", label: "API" },
-  { href: "/contact", label: "Contact", icon: <Mail className="h-4 w-4" /> },
+  { href: "/verify", label: "Verify Property" },
+  { href: "/features", label: "Features" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Header() {
@@ -51,22 +51,26 @@ export function Header() {
   const userInitials = userName?.charAt(0) || "U";
 
   return (
-    <header className="bg-background/95 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+    <header className="bg-transparent absolute top-0 left-0 w-full z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <AssetrazLogo className="h-8 w-8 text-primary" />
+            <Link href="/" className="flex items-center gap-2.5">
+                <div className="bg-white p-1.5 rounded-md">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-background">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
+                        <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></polyline>
+                    </svg>
+                </div>
               <div>
-                <span className="text-xl font-bold">ASSETRAZ</span>
-                <p className="text-xs text-muted-foreground">Global Property Verification Platform</p>
+                <span className="text-xl font-bold text-white">ASSETRAZ UK</span>
+                <p className="text-xs text-purple-200">Property & Owner Verification</p>
               </div>
             </Link>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-purple-200">
             {navLinks.map((link) => (
-               <Link key={link.href} href={link.href} className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
-                {link.icon}
+               <Link key={link.href} href={link.href} className="flex items-center gap-1 hover:text-white transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -109,27 +113,22 @@ export function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                    <>
-                        <Button variant="ghost" asChild>
-                            <Link href="/login">Login</Link>
-                        </Button>
-                        <Button asChild>
-                            <Link href="/signup">Sign Up</Link>
-                        </Button>
-                    </>
+                    <Button asChild className="bg-white text-background hover:bg-gray-200">
+                        <Link href="/verify">Start Verification</Link>
+                    </Button>
                 )}
             </div>
              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-white hover:text-white hover:bg-white/10">
                   <Menu />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background text-white">
                 <SheetHeader>
                   <Link href="/" className="flex items-center gap-2 mb-4" onClick={() => setIsMenuOpen(false)}>
-                    <AssetrazLogo className="h-8 w-8 text-primary" />
+                    <AssetrazLogo className="h-8 w-8 text-white" />
                     <div>
                       <span className="text-xl font-bold">ASSETRAZ</span>
                     </div>
@@ -137,8 +136,7 @@ export function Header() {
                 </SheetHeader>
                  <nav className="flex flex-col gap-4 text-lg font-medium">
                     {navLinks.map((link) => (
-                      <Link key={link.href} href={link.href} className="flex items-center gap-2 text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                        {link.icon}
+                      <Link key={link.href} href={link.href} className="flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                         {link.label}
                       </Link>
                     ))}
@@ -156,14 +154,9 @@ export function Header() {
                             </div>
                         </div>
                     ) : (
-                        <>
-                            <Button variant="ghost" asChild className="w-full">
-                                <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
-                            </Button>
-                            <Button asChild className="w-full">
-                                <Link href="/signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
-                            </Button>
-                        </>
+                        <Button asChild className="w-full bg-white text-background hover:bg-gray-200">
+                            <Link href="/verify" onClick={() => setIsMenuOpen(false)}>Start Verification</Link>
+                        </Button>
                     )}
                 </div>
               </SheetContent>
