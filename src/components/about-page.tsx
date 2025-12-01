@@ -31,6 +31,44 @@ export function AboutPage() {
           </CardContent>
         </Card>
       </div>
+      <div className="max-w-6xl mx-auto text-center mt-16 md:mt-24">
+        <h2 className="text-3xl md:text-4xl font-bold">Our Core Values</h2>
+        <p className="text-lg text-muted-foreground mt-2 max-w-3xl mx-auto">
+          The principles that guide our work and our commitment to the UK property market.
+        </p>
+        <div className="grid md:grid-cols-3 gap-8 mt-12 text-left">
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Data Integrity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                We are committed to providing the most accurate and reliable property data by connecting directly to official sources.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Radical Transparency</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                We believe in making property information clear and accessible to empower professionals and protect consumers.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Customer-Centric Innovation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                We build tools that solve real-world problems, designing our products with the professional workflow at the forefront.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
