@@ -17,6 +17,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "./ui/checkbox";
 import React from "react";
+import { VerifyPropertyInput, VerifyPropertyOutput, verifyProperty } from "@/ai/flows/verify-property";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   verificationMethod: z.enum(["title", "postcode", "address"]),
@@ -28,7 +30,13 @@ const formSchema = z.object({
   localData: z.boolean().default(false),
 });
 
-export function VerificationForm() {
+type VerificationFormProps = {
+    onVerify: (data: VerifyPropertyOutput) => void;
+    setIsLoading: (isLoading: boolean) => void;
+    isLoading: boolean;
+}
+
+export function VerificationForm({ onVerify, setIsLoading, isLoading }: VerificationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,9 +50,28 @@ export function VerificationForm() {
 
   const verificationMethod = form.watch("verificationMethod");
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle form submission
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    
+    // In a real application, you would perform validation and data cleaning here.
+    const input: VerifyPropertyInput = {
+      propertyIdentifier: values.titleNumber || values.postcode || values.address || '',
+      identifierType: values.verificationMethod,
+      checks: {
+        pricePaid: values.pricePaid,
+        companyOwnership: values.companyOwnership,
+        localData: values.localData,
+      }
+    };
+    
+    try {
+      const report = await verifyProperty(input);
+      onVerify(report);
+    } catch (error) {
+      console.error("Verification failed:", error);
+      setIsLoading(false);
+      // You should show an error to the user here.
+    }
   }
 
   return (
@@ -215,8 +242,9 @@ export function VerificationForm() {
                 </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full">
-                Run verification
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? 'Verifying...' : 'Run verification'}
             </Button>
           </form>
         </Form>
