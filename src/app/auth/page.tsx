@@ -1,12 +1,12 @@
 import { Header } from "@/components/header";
-import { SignupForm } from "@/components/signup-form";
+import { AuthForm } from "@/components/auth-form";
 
-export default function SignupPage() {
+export default function AuthPage() {
   return (
     <div className="bg-background text-foreground flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow flex items-center justify-center">
-        <SignupForm />
+        <AuthForm />
       </main>
     </div>
   );

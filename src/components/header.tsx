@@ -109,7 +109,7 @@ export function Header() {
                   </DropdownMenu>
                 ) : (
                     <Button asChild>
-                        <Link href="/verify">Start Verification</Link>
+                        <Link href="/auth">Start Verification</Link>
                     </Button>
                 )}
             </div>
@@ -150,7 +150,7 @@ export function Header() {
                         </div>
                     ) : (
                         <Button asChild className="w-full">
-                            <Link href="/verify" onClick={() => setIsMenuOpen(false)}>Start Verification</Link>
+                            <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Start Verification</Link>
                         </Button>
                     )}
                 </div>
