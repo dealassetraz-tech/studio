@@ -5,6 +5,42 @@
       "description": "A placeholder for a user's avatar image.",
       "imageUrl": "https://images.unsplash.com/photo-1590086782792-42dd2350140d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjQwMzQxODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
+    },
+    {
+      "id": "feature-title-reg-icon",
+      "description": "An icon representing title and registration.",
+      "imageUrl": "https://images.unsplash.com/photo-1487274910620-1add53247020?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZG9jdW1lbnQlMjBwYXBlcnxlbnwwfHx8fDE3NjQ1MzM3MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "document paper"
+    },
+    {
+      "id": "feature-one-source",
+      "description": "An image representing a single source of truth.",
+      "imageUrl": "https://images.unsplash.com/photo-1760441981883-53f65ff71b88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxob3VzZSUyMGhvbWV8ZW58MHx8fHwxNzY0NTYyODk0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "house home"
+    },
+    {
+      "id": "feature-price-history-icon",
+      "description": "An icon representing price paid history.",
+      "imageUrl": "https://images.unsplash.com/photo-1641477432647-087a19458829?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtb25leSUyMGNvaW58ZW58MHx8fHwxNzY0NTYyODk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "money coin"
+    },
+    {
+      "id": "feature-price-history-chart",
+      "description": "An image of a chart for price history.",
+      "imageUrl": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2hhcnQlMjBncmFwaHxlbnwwfHx8fDE3NjQ0ODg1MDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chart graph"
+    },
+    {
+      "id": "feature-company-ownership-icon",
+      "description": "An icon representing company ownership.",
+      "imageUrl": "https://images.unsplash.com/photo-1617217999565-6831686cdc91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxidWlsZGluZyUyMG9mZmljZXxlbnwwfHx8fDE3NjQ0NTc0OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "building office"
+    },
+    {
+      "id": "feature-company-ownership-data",
+      "description": "An image representing connected data for company ownership.",
+      "imageUrl": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYXRhJTIwY29ubmVjdGlvbnxlbnwwfHx8fDE3NjQ1MzQ2NzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "data connection"
     }
   ]
 }
