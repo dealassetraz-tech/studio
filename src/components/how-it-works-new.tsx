@@ -18,10 +18,10 @@ const steps = [
 export function HowItWorksNew() {
   return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-        <CardHeader>
+        <CardHeader className="p-8">
             <CardTitle className="text-2xl">How ASSETRAZ UK works</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 p-8 pt-0">
             {steps.map((step, index) => (
                 <div key={index} className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-purple-300 ring-2 ring-white/20">

@@ -10,8 +10,8 @@ export function Hero() {
     <section className="relative bg-gradient-to-br from-[#2A3E90] to-[#6042A4] py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[url(/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto px-4 relative">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="text-center md:text-left">
+        <div className="grid md:grid-cols-5 gap-12 items-center">
+            <div className="md:col-span-3 text-center md:text-left">
                 <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
                     Verify UK property & ownership before the deal moves.
                 </h1>
@@ -32,7 +32,7 @@ export function Hero() {
                     </Button>
                 </div>
             </div>
-            <div>
+            <div className="md:col-span-2">
                 <HowItWorksNew />
             </div>
         </div>
