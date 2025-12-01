@@ -16,5 +16,3 @@ export async function createUserProfile(user: User) {
     createdAt: serverTimestamp(),
   }, { merge: true });
 }
-
-export { db };

@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  signOut as firebaseSignOut
 } from 'firebase/auth';
 import { app } from '@/lib/firebase/config';
 import { createUserProfile } from './firestore';
@@ -25,7 +26,7 @@ export async function signInWithEmail(email: string, password: string) {
 }
 
 export async function signOut() {
-  await auth.signOut();
+  await firebaseSignOut(auth);
 }
 
 export function useAuth() {
