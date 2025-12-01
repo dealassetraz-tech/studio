@@ -1,64 +1,37 @@
+"use client";
+
 import { FileText, Banknote, Building, Search, GitBranch, FileJson } from "lucide-react";
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const features = [
   {
-    title: "Transparent history",
-    description: "Understand how a property has moved over time.",
-    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-price-history-chart')?.imageUrl || '',
-    imageHint: PlaceHolderImages.find(p => p.id === 'feature-price-history-chart')?.imageHint || '',
-    className: "md:col-span-2 bg-secondary/30",
+    icon: <FileText className="w-8 h-8 text-primary" />,
+    title: "Title & registration",
+    description: "Verify that a property exists at the UK Land Registry and see current title & ownership details.",
   },
   {
+    icon: <Banknote className="w-8 h-8 text-primary" />,
     title: "Price paid history",
     description: "Access historical transaction data and basic analytics so your teams can spot anomalies early.",
-    details: [
-      "List of historic sale prices and dates",
-      "Simple appreciation / time-on-market signals",
-      "Support for valuation & risk decisions",
-    ],
-    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-price-history-icon')?.imageUrl || '',
-    imageHint: PlaceHolderImages.find(p => p.id === 'feature-price-history-icon')?.imageHint || '',
-    className: "bg-white",
   },
   {
+    icon: <Building className="w-8 h-8 text-primary" />,
     title: "Company ownership",
     description: "When the proprietor is a company, ASSETRAZ pulls company records and shows the ownership structure.",
-    details: [
-      "Company registration & status",
-      "Persons with significant control (PSC)",
-      "Basic filing and age indicators",
-    ],
-    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-company-ownership-icon')?.imageUrl || '',
-    imageHint: PlaceHolderImages.find(p => p.id === 'feature-company-ownership-icon')?.imageHint || '',
-    className: "bg-white",
   },
-   {
+  {
+    icon: <Search className="w-8 h-8 text-primary" />,
     title: "Deeper visibility",
-    description: "Support AML and compliance checks.",
-    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-deeper-visibility-icon')?.imageUrl || '',
-    imageHint: PlaceHolderImages.find(p => p.id === 'feature-deeper-visibility-icon')?.imageHint || '',
-    className: "md:col-span-2 bg-accent/20",
+    description: "Support AML and compliance checks with a single source of truth for property and ownership information.",
   },
   {
+    icon: <GitBranch className="w-8 h-8 text-primary" />,
     title: "Auditable outputs",
-    description: "Every check has an ID, timestamp and trail.",
-    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-auditable-outputs-icon')?.imageUrl || '',
-    imageHint: PlaceHolderImages.find(p => p.id === 'feature-auditable-outputs-icon')?.imageHint || '',
-    className: "md:col-span-2 bg-yellow-50",
+    description: "Every check has an ID, timestamp and trail, giving you a permanent record for compliance.",
   },
   {
+    icon: <FileJson className="w-8 h-8 text-primary" />,
     title: "Reports & API payloads",
     description: "Each verification produces both human-readable and machine-readable outputs, so you can store them in files or systems.",
-    details: [
-      "Branded PDF summary report",
-      "JSON payload with structured data",
-      "Unique verification ID & timestamp",
-    ],
-    imageUrl: PlaceHolderImages.find(p => p.id === 'feature-reports-payloads-icon')?.imageUrl || '',
-    imageHint: PlaceHolderImages.find(p => p.id === 'feature-reports-payloads-icon')?.imageHint || '',
-    className: "bg-white",
   },
 ];
 
@@ -75,34 +48,14 @@ export function Features() {
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {features.map((feature) => (
-                    <div key={feature.title} className={`rounded-xl p-8 shadow-lg ${feature.className}`}>
-                        {feature.details ? (
-                             <div>
-                                <div className="relative w-16 h-16 mb-4">
-                                     <Image src={feature.imageUrl} alt={feature.title} layout="fill" objectFit="contain" data-ai-hint={feature.imageHint} />
-                                </div>
-                                <h2 className="text-2xl font-semibold text-foreground mb-2">{feature.title}</h2>
-                                <p className="text-muted-foreground mb-4">{feature.description}</p>
-                                <ul className="space-y-2 text-muted-foreground">
-                                    {feature.details?.map(detail => (
-                                        <li key={detail} className="flex items-start">
-                                            <span className="text-primary mr-2 mt-1">&#8226;</span>
-                                            <span>{detail}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ) : (
-                           <div className="flex flex-col items-center justify-center h-full text-center">
-                                <div className="relative w-24 h-24 mb-4">
-                                    <Image src={feature.imageUrl} alt={feature.title} layout="fill" objectFit="contain" data-ai-hint={feature.imageHint} />
-                                </div>
-                                <h2 className="text-2xl font-semibold text-foreground">{feature.title}</h2>
-                                <p className="text-muted-foreground mt-2">{feature.description}</p>
-                            </div>
-                        )}
+                    <div key={feature.title} className="bg-secondary/30 rounded-xl p-8 shadow-lg transition-shadow hover:shadow-xl flex flex-col">
+                        <div className="flex-shrink-0 w-12 h-12 mb-6 bg-primary/10 rounded-lg flex items-center justify-center">
+                            {feature.icon}
+                        </div>
+                        <h2 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h2>
+                        <p className="text-muted-foreground flex-grow">{feature.description}</p>
                     </div>
                 ))}
             </div>
