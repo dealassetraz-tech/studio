@@ -21,19 +21,19 @@
     {
       "id": "feature-price-history-icon",
       "description": "An icon representing price paid history.",
-      "imageUrl": "https://images.unsplash.com/photo-1641477432647-087a19458829?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtb25leSUyMGNvaW58ZW58MHx8fHwxNzY0NTYyODk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1633279689595-3b0e2610ad9e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb25leSUyMGNvaW58ZW58MHx8fHwxNzY0NTYyODk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "money coin"
     },
     {
       "id": "feature-price-history-chart",
       "description": "An image of a chart for price history.",
-      "imageUrl": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2hhcnQlMjBncmFwaHxlbnwwfHx8fDE3NjQ0ODg1MDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1762279389020-eeeb69c25813?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaGFydCUyMGdyYXBofGVufDB8fHx8MTc2NDQ4ODUwMHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "chart graph"
     },
     {
       "id": "feature-company-ownership-icon",
       "description": "An icon representing company ownership.",
-      "imageUrl": "https://images.unsplash.com/photo-1617217999565-6831686cdc91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxidWlsZGluZyUyMG9mZmljZXxlbnwwfHx8fDE3NjQ0NTc0OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxidWlsZGluZyUyMG9mZmljZXxlbnwwfHx8fDE3NjQ0NTc0OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "building office"
     },
     {
@@ -41,6 +41,12 @@
       "description": "An image representing connected data for company ownership.",
       "imageUrl": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYXRhJTIwY29ubmVjdGlvbnxlbnwwfHx8fDE3NjQ1MzQ2NzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "data connection"
+    },
+    {
+      "id": "feature-deeper-visibility-icon",
+      "description": "An icon representing deeper visibility and compliance checks.",
+      "imageUrl": "https://images.unsplash.com/photo-1490127252417-7c393f993ee4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtYWduaWZ5aW5nJTIwZ2xhc3N8ZW58MHx8fHwxNzY0NTE0OTcyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "magnifying glass"
     }
   ]
 }
