@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Mail, Menu, LogOut, User, Settings } from "lucide-react";
 import { AssetrazLogo } from "./assetraz-logo";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -20,9 +20,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useAuth, signOut } from "@/lib/firebase/auth";
-import type { User as FirebaseUser } from "firebase/auth";
+import { useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/firebase";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -35,20 +36,15 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, loading } = useUser();
   const auth = useAuth();
-  const [user, setUser] = useState<FirebaseUser | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-    return () => unsubscribe();
-  }, [auth]);
-
   const handleLogout = async () => {
-    await signOut();
-    router.push("/");
+    if (auth) {
+      await signOut(auth);
+      router.push("/");
+    }
   };
   
   const userName = user?.displayName || "User";
@@ -77,12 +73,12 @@ export function Header() {
           </nav>
           <div className="flex items-center gap-4">
              <div className="hidden md:flex items-center gap-2">
-                {user ? (
+                {!loading && user ? (
                    <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                         <Avatar>
-                          <AvatarImage src="/placeholder-user.jpg" alt={userName} />
+                          <AvatarImage src={user.photoURL ?? ''} alt={userName} />
                           <AvatarFallback>{userInitials}</AvatarFallback>
                         </Avatar>
                       </Button>
@@ -148,10 +144,10 @@ export function Header() {
                     ))}
                   </nav>
                   <div className="flex flex-col gap-2 mt-6">
-                    {user ? (
+                    {!loading && user ? (
                         <div className="flex items-center gap-4 p-2 rounded-md bg-muted">
                              <Avatar>
-                                <AvatarImage src="/placeholder-user.jpg" alt={userName} />
+                                <AvatarImage src={user.photoURL ?? ''} alt={userName} />
                                 <AvatarFallback>{userInitials}</AvatarFallback>
                             </Avatar>
                             <div>

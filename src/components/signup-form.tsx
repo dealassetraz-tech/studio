@@ -16,9 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signUpWithEmail } from "@/lib/firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
+import { useAuth, useFirestore } from "@/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 
 const formSchema = z.object({
@@ -30,6 +32,8 @@ const formSchema = z.object({
 export function SignupForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,14 +46,27 @@ export function SignupForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setError(null);
+    if (!auth || !firestore) return;
+
     try {
-      await signUpWithEmail(values.email, values.password, values.name);
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: values.name });
+
+      const userRef = doc(firestore, 'users', user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: values.name,
+        createdAt: serverTimestamp(),
+      }, { merge: true });
+
       router.push("/verify");
     } catch (e: any) {
       if (e.code === 'auth/email-already-in-use') {
         setError("This email is already in use. Please try another one.");
       } else {
-        setError(e.message);
+        setError("An unexpected error occurred. Please try again.");
       }
     }
   }

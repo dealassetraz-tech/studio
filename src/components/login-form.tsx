@@ -16,9 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signInWithEmail } from "@/lib/firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
+import { useAuth } from "@/firebase";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address."),
@@ -28,6 +29,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,8 +41,9 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setError(null);
+    if (!auth) return;
     try {
-      await signInWithEmail(values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       router.push("/verify");
     } catch (e: any) {
       switch (e.code) {
@@ -49,6 +52,9 @@ export function LoginForm() {
           break;
         case 'auth/wrong-password':
           setError("Incorrect password. Please try again.");
+          break;
+        case 'auth/invalid-credential':
+          setError("Invalid credentials. Please try again.");
           break;
         default:
           setError("An unexpected error occurred. Please try again.");
