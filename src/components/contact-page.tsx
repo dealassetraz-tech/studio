@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required."),
-  email: z.string().email("Invalid email address."),
-  subject: z.string().min(1, "Subject is required."),
+  fullName: z.string().min(1, "Full name is required."),
+  workEmail: z.string().email("Invalid email address."),
+  organisation: z.string().min(1, "Organisation is required."),
+  interest: z.string().min(1, "Please select an interest."),
   message: z.string().min(1, "Message is required."),
 });
 
@@ -28,9 +29,10 @@ export function ContactPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
+      fullName: "",
+      workEmail: "",
+      organisation: "",
+      interest: "General enquiry",
       message: "",
     },
   });
@@ -44,55 +46,73 @@ export function ContactPage() {
     <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold">Contact Us</h1>
-            <p className="text-lg text-muted-foreground mt-2">We'd love to hear from you. Let's get in touch.</p>
+            <h1 className="text-4xl md:text-5xl font-bold">Get in touch</h1>
+            <p className="text-lg text-muted-foreground mt-2 max-w-3xl mx-auto">
+              Interested in piloting ASSETRAZ UK with your organisation, or integrating the API into your platform? Leave your details and we'll follow up.
+            </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
             <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle>Send a Message</CardTitle>
-                    <CardDescription>Fill out the form and we'll get back to you as soon as possible.</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="p-8">
                      <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Full Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="John Doe" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
-                            <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Email Address</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="you@example.com" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
-                        </div>
+                        <FormField
+                          control={form.control}
+                          name="fullName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Full name</FormLabel>
+                              <FormControl>
+                                  <Input placeholder="Jane Smith" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="workEmail"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Work email</FormLabel>
+                              <FormControl>
+                                  <Input placeholder="jane@agency.co.uk" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="organisation"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Organisation</FormLabel>
+                              <FormControl>
+                                  <Input placeholder="Example Estates Ltd" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                         <FormField
                             control={form.control}
-                            name="subject"
+                            name="interest"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Subject</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Subject of your message" {...field} />
-                                </FormControl>
+                                <FormLabel>What are you interested in?</FormLabel>
+                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select an interest" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="General enquiry">General enquiry</SelectItem>
+                                        <SelectItem value="Pilot program">Pilot program</SelectItem>
+                                        <SelectItem value="API integration">API integration</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                                 </FormItem>
                             )}
@@ -105,7 +125,7 @@ export function ContactPage() {
                               <FormLabel>Message</FormLabel>
                               <FormControl>
                                 <Textarea
-                                  placeholder="Tell us more..."
+                                  placeholder="Tell us a bit about your use case..."
                                   className="resize-none"
                                   rows={5}
                                   {...field}
@@ -116,51 +136,30 @@ export function ContactPage() {
                           )}
                         />
                         <Button type="submit" className="w-full">
-                          Send Message
+                          Send message
                         </Button>
                       </form>
                     </Form>
                 </CardContent>
             </Card>
-            <div className="space-y-8">
-                <Card className="shadow-lg">
-                    <CardContent className="p-6">
-                        <h3 className="text-xl font-semibold mb-4">Contact Information</h3>
-                        <div className="space-y-4 text-muted-foreground">
-                            <div className="flex items-center gap-4">
-                                <Mail className="h-6 w-6 text-primary"/>
-                                <span>support@assetraz.com</span>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Phone className="h-6 w-6 text-primary"/>
-                                <span>+91 123 456 7890</span>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <MapPin className="h-6 w-6 text-primary mt-1"/>
-                                <span>123 Tech Park, Innovation Drive, Bangalore, Karnataka, 560100, India</span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="shadow-lg">
-                    <CardContent className="p-6">
-                        <h3 className="text-xl font-semibold mb-4">Office Hours</h3>
-                        <div className="space-y-2 text-muted-foreground">
-                            <div className="flex justify-between">
-                                <span>Monday - Friday</span>
-                                <span className="font-medium">9:00 AM - 6:00 PM</span>
-                            </div>
-                             <div className="flex justify-between">
-                                <span>Saturday</span>
-                                <span className="font-medium">10:00 AM - 3:00 PM</span>
-                            </div>
-                             <div className="flex justify-between">
-                                <span>Sunday</span>
-                                <span className="font-medium">Closed</span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="space-y-8 pt-8 text-muted-foreground">
+                <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">Integration & pilots</h3>
+                    <ul className="space-y-2 list-disc list-inside">
+                        <li>Estate agencies doing 20+ completions per month</li>
+                        <li>Portals / marketplaces that want "verified" badges</li>
+                        <li>Conveyancing firms exploring automation</li>
+                    </ul>
+                </div>
+                 <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">Implementation notes</h3>
+                     <ul className="space-y-2 list-disc list-inside">
+                        <li>A production version would include:</li>
+                        <li className="ml-4">Secure backend calling official UK data sources</li>
+                        <li className="ml-4">Authentication & rate limiting for API use</li>
+                        <li className="ml-4">Data retention & audit policies compliant with UK GDPR</li>
+                    </ul>
+                </div>
             </div>
         </div>
       </div>
