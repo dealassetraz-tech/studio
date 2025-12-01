@@ -49,7 +49,7 @@ export function VerificationForm() {
 
   return (
     <Card className="max-w-3xl mx-auto shadow-2xl">
-      <CardContent className="p-8">
+      <CardContent className="p-4 sm:p-8">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
@@ -68,7 +68,7 @@ export function VerificationForm() {
                         <FormControl>
                             <div className="flex items-center w-full p-4 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
                                 <RadioGroupItem value="title" />
-                                <FormLabel className="font-normal ml-3">
+                                <FormLabel className="font-normal ml-3 cursor-pointer">
                                     Title number
                                     <p className="text-xs text-muted-foreground">e.g. DN123456</p>
                                 </FormLabel>
@@ -79,7 +79,7 @@ export function VerificationForm() {
                         <FormControl>
                            <div className="flex items-center w-full p-4 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
                                 <RadioGroupItem value="postcode" />
-                                <FormLabel className="font-normal ml-3">
+                                <FormLabel className="font-normal ml-3 cursor-pointer">
                                     Postcode
                                     <p className="text-xs text-muted-foreground">e.g. SW1A 1AA</p>
                                 </FormLabel>
@@ -90,7 +90,7 @@ export function VerificationForm() {
                         <FormControl>
                            <div className="flex items-center w-full p-4 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
                                 <RadioGroupItem value="address" />
-                                <FormLabel className="font-normal ml-3">
+                                <FormLabel className="font-normal ml-3 cursor-pointer">
                                     Full address
                                     <p className="text-xs text-muted-foreground">Street + city + postcode</p>
                                 </FormLabel>

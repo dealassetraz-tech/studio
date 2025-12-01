@@ -12,8 +12,10 @@ export function Analytics() {
                 </p>
             </div>
         </div>
-        <Charts />
         <Stats />
+        <div className="mt-8">
+          <Charts />
+        </div>
     </div>
   );
 }

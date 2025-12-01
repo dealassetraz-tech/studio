@@ -48,7 +48,7 @@ export function Header() {
   };
   
   const userName = user?.displayName || "User";
-  const userInitials = userName?.charAt(0) || "U";
+  const userInitials = userName?.charAt(0)?.toUpperCase() || "U";
 
   return (
     <header className="bg-background/95 backdrop-blur-sm sticky top-0 z-50 border-b">
@@ -59,7 +59,7 @@ export function Header() {
                 <AssetrazLogo />
               <div>
                 <span className="text-xl font-bold text-foreground">ASSETRAZ UK</span>
-                <p className="text-xs text-muted-foreground">Property & Owner Verification</p>
+                <p className="text-xs text-muted-foreground hidden sm:block">Property & Owner Verification</p>
               </div>
             </Link>
           </div>
@@ -141,16 +141,16 @@ export function Header() {
                       </Link>
                     ))}
                   </nav>
-                  <div className="flex flex-col gap-2 mt-6">
+                  <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-2 mt-6">
                     {!loading && user ? (
-                        <div className="flex items-center gap-4 p-2 rounded-md bg-muted">
+                        <div className="flex items-center gap-4 p-2 rounded-md border">
                              <Avatar>
                                 <AvatarImage src={user.photoURL ?? ''} alt={userName} />
                                 <AvatarFallback>{userInitials}</AvatarFallback>
                             </Avatar>
-                            <div>
-                                <p className="font-semibold">{userName}</p>
-                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                            <div className="truncate">
+                                <p className="font-semibold truncate">{userName}</p>
+                                <p className="text-sm text-muted-foreground truncate">{user.email}</p>
                             </div>
                         </div>
                     ) : (
