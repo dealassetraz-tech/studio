@@ -21,7 +21,7 @@ export function HowItWorksNew() {
         <CardHeader className="p-8">
             <CardTitle className="text-2xl">How ASSETRAZ UK works</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-8 p-8 pt-0">
+        <CardContent className="space-y-8 p-8 pt-0 py-12">
             {steps.map((step, index) => (
                 <div key={index} className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-purple-300 ring-2 ring-white/20">
