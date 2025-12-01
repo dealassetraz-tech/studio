@@ -15,9 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { useAuth, useFirestore } from "@/firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -32,10 +32,18 @@ type FormSchema = z.infer<typeof formSchema>;
 
 export function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
-  const [isNewUser, setIsNewUser] = useState<boolean | null>(null);
+  const [authType, setAuthType] = useState<'login' | 'signup'>('signup');
   const auth = useAuth();
   const firestore = useFirestore();
+
+  useEffect(() => {
+    const type = searchParams.get('type');
+    if (type === 'login' || type === 'signup') {
+        setAuthType(type);
+    }
+  }, [searchParams]);
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -54,7 +62,8 @@ export function AuthForm() {
     } catch (e: any) {
        switch (e.code) {
         case 'auth/user-not-found':
-          setIsNewUser(true);
+          setError("No account found with this email. Please sign up.");
+          setAuthType('signup');
           break;
         case 'auth/wrong-password':
           setError("Incorrect password. Please try again.");
@@ -91,8 +100,8 @@ export function AuthForm() {
       router.push("/verify");
     } catch (e: any) {
       if (e.code === 'auth/email-already-in-use') {
-        setError("This email is already in use. Please try to sign in.");
-        setIsNewUser(false);
+        setError("This email is already in use. Please sign in.");
+        setAuthType('login');
       } else {
         setError("An unexpected error occurred during sign-up. Please try again.");
       }
@@ -101,18 +110,20 @@ export function AuthForm() {
 
   async function onSubmit(values: FormSchema) {
     setError(null);
-    if (isNewUser) {
+    if (authType === 'signup') {
         await handleSignUp(values);
     } else {
         await handleSignIn(values);
     }
   }
+  
+  const isSignUp = authType === 'signup';
 
   return (
     <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
-            <CardTitle>{isNewUser ? 'Create an Account' : 'Sign In or Sign Up'}</CardTitle>
-            <CardDescription>{isNewUser ? 'Welcome! Please provide your name to continue.' : 'Enter your email and password to continue to ASSETRAZ'}</CardDescription>
+            <CardTitle>{isSignUp ? 'Create an Account' : 'Sign In'}</CardTitle>
+            <CardDescription>{isSignUp ? 'Welcome! Please provide your details to continue.' : 'Enter your email and password to access your account.'}</CardDescription>
         </CardHeader>
         <CardContent>
             {error && (
@@ -122,7 +133,7 @@ export function AuthForm() {
             )}
             <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {isNewUser && (
+                {isSignUp && (
                      <FormField
                         control={form.control}
                         name="name"
@@ -159,7 +170,7 @@ export function AuthForm() {
                     <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
-                    {!isNewUser && (
+                    {!isSignUp && (
                         <div className="text-right">
                             <Link href="#" className="text-sm text-primary hover:underline">
                                 Forgot password?
@@ -171,16 +182,20 @@ export function AuthForm() {
                 )}
                 />
                 <Button type="submit" className="w-full">
-                    {isNewUser ? 'Sign Up' : 'Continue'}
+                    {isSignUp ? 'Sign Up' : 'Sign In'}
                 </Button>
             </form>
             </Form>
-
-            {isNewUser === false && (
-                 <p className="mt-6 text-center text-sm text-muted-foreground">
-                    New user? We'll create an account for you.
-                </p>
-            )}
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+                {isSignUp ? "Already have an account?" : "Don't have an account?"}{' '}
+                <Link 
+                    href={isSignUp ? "/auth?type=login" : "/auth?type=signup"} 
+                    className="text-primary hover:underline font-medium"
+                    onClick={() => setError(null)}
+                >
+                    {isSignUp ? "Sign In" : "Sign Up"}
+                </Link>
+            </p>
         </CardContent>
     </Card>
   );

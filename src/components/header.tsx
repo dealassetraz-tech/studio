@@ -108,9 +108,14 @@ export function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                    <Button asChild>
-                        <Link href="/auth">Start Verification</Link>
-                    </Button>
+                    <>
+                        <Button variant="ghost" asChild>
+                            <Link href="/auth?type=login">Login</Link>
+                        </Button>
+                        <Button asChild>
+                            <Link href="/auth?type=signup">Sign Up</Link>
+                        </Button>
+                    </>
                 )}
             </div>
              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -149,9 +154,14 @@ export function Header() {
                             </div>
                         </div>
                     ) : (
-                        <Button asChild className="w-full">
-                            <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Start Verification</Link>
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button variant="ghost" asChild className="w-full">
+                                <Link href="/auth?type=login" onClick={() => setIsMenuOpen(false)}>Login</Link>
+                            </Button>
+                            <Button asChild className="w-full">
+                                <Link href="/auth?type=signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                            </Button>
+                        </div>
                     )}
                 </div>
               </SheetContent>
