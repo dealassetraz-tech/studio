@@ -95,6 +95,7 @@ export function AuthForm() {
         email: user.email,
         displayName: values.name,
         createdAt: serverTimestamp(),
+        hasActiveSubscription: false,
       }, { merge: true });
 
       router.push("/verify");

@@ -22,9 +22,13 @@
           "type": "string",
           "format": "date-time",
           "description": "The timestamp when the user profile was created."
+        },
+        "hasActiveSubscription": {
+          "type": "boolean",
+          "description": "Indicates if the user has an active subscription."
         }
       },
-      "required": ["uid", "email", "createdAt"]
+      "required": ["uid", "email", "createdAt", "hasActiveSubscription"]
     }
   },
   "auth": {

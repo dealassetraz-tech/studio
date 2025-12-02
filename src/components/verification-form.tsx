@@ -20,6 +20,9 @@ import { Checkbox } from "./ui/checkbox";
 import React from "react";
 import { VerifyPropertyInput, VerifyPropertyOutput, verifyProperty } from "@/ai/flows/verify-property";
 import { Loader2 } from "lucide-react";
+import { useFirestore, useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   verificationMethod: z.enum(["title", "postcode", "address"]),
@@ -47,6 +50,10 @@ type VerificationFormProps = {
 }
 
 export function VerificationForm({ onVerify, setIsLoading, isLoading }: VerificationFormProps) {
+  const router = useRouter();
+  const { user } = useUser();
+  const firestore = useFirestore();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,33 +72,51 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    
-    let propertyIdentifier = '';
-    if (values.verificationMethod === 'title') {
-        propertyIdentifier = values.titleNumber || '';
-    } else if (values.verificationMethod === 'postcode') {
-        propertyIdentifier = values.postcode || '';
-    } else if (values.verificationMethod === 'address') {
-        propertyIdentifier = `${values.street}, ${values.city}, ${values.postcode}`;
+
+    if (!user || !firestore) {
+      // Not signed in, redirect to login
+      router.push('/auth?type=login');
+      setIsLoading(false);
+      return;
     }
 
-    const input: VerifyPropertyInput = {
-      propertyIdentifier: propertyIdentifier,
-      identifierType: values.verificationMethod,
-      checks: {
-        pricePaid: values.pricePaid,
-        companyOwnership: values.companyOwnership,
-        localData: values.localData,
-      }
-    };
+    // Check for active subscription
+    const userDocRef = doc(firestore, "users", user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists() && userDoc.data().hasActiveSubscription) {
+        // User has an active subscription, proceed with verification.
+        let propertyIdentifier = '';
+        if (values.verificationMethod === 'title') {
+            propertyIdentifier = values.titleNumber || '';
+        } else if (values.verificationMethod === 'postcode') {
+            propertyIdentifier = values.postcode || '';
+        } else if (values.verificationMethod === 'address') {
+            propertyIdentifier = `${values.street}, ${values.city}, ${values.postcode}`;
+        }
     
-    try {
-      const report = await verifyProperty(input);
-      onVerify(report);
-    } catch (error) {
-      console.error("Verification failed:", error);
-      setIsLoading(false);
-      // You should show an error to the user here.
+        const input: VerifyPropertyInput = {
+          propertyIdentifier: propertyIdentifier,
+          identifierType: values.verificationMethod,
+          checks: {
+            pricePaid: values.pricePaid,
+            companyOwnership: values.companyOwnership,
+            localData: values.localData,
+          }
+        };
+        
+        try {
+          const report = await verifyProperty(input);
+          onVerify(report);
+        } catch (error) {
+          console.error("Verification failed:", error);
+          setIsLoading(false);
+          // You should show an error to the user here.
+        }
+    } else {
+        // No active subscription, redirect to pricing page.
+        router.push('/pricing');
+        setIsLoading(false);
     }
   }
 
