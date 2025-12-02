@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Inter, Space_Grotesk } from 'next/font/google';
-import { FirebaseProvider } from '@/firebase/provider';
+import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
 import { Footer } from '@/components/footer';
 
@@ -21,12 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
        <body className="font-sans flex flex-col min-h-screen">
-        <FirebaseProvider>
+        <FirebaseClientProvider>
           <div className="flex-grow">
             {children}
           </div>
           <Footer />
-        </FirebaseProvider>
+        </FirebaseClientProvider>
         <Toaster />
       </body>
     </html>
