@@ -4,22 +4,16 @@
 import { Header } from "@/components/header";
 import { VerificationForm } from "@/components/verification-form";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
 import { VerificationReport } from "@/components/verification-report";
 
 export default function VerifyPage() {
   const [report, setReport] = useState<VerifyPropertyOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleVerification = async (data: VerifyPropertyOutput) => {
     setReport(data);
     setIsLoading(false);
-    // This is a temporary way to show the report. 
-    // In a real app, you would likely save the report and get an ID.
-    const reportId = data.propertyDetails.titleNumber || 'report';
-    router.push(`/verify/report/${reportId}`, { scroll: false });
   };
   
   if (report) {
