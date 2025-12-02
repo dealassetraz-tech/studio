@@ -56,16 +56,13 @@ export function AuthForm() {
   });
 
   const handleSuccessfulAuth = async (userId: string) => {
-    const subscriptionStatus = await checkSubscriptionStatus({ userId });
-    console.log('Subscription Status:', subscriptionStatus);
-    // You can now use the status to redirect or show a message
-    // For example:
-    // if (subscriptionStatus.status !== 'ACTIVE_SUBSCRIPTION') {
-    //   router.push('/pricing');
-    // } else {
-    //   router.push('/verify');
-    // }
-     router.push("/verify");
+    const subStatus = await checkSubscriptionStatus({ userId });
+
+    if (subStatus.action === 'REDIRECT_TO_PRICING') {
+      router.push('/pricing');
+    } else {
+      router.push('/verify');
+    }
   };
 
   const handleSignIn = async (values: FormSchema) => {
@@ -109,6 +106,9 @@ export function AuthForm() {
         email: user.email,
         displayName: values.name,
         createdAt: serverTimestamp(),
+        isSubscribed: false,
+        plan: 'none',
+        subscriptionExpiry: null
       });
       await handleSuccessfulAuth(user.uid);
     } catch (e: any) {

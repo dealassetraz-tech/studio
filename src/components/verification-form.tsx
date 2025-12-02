@@ -20,6 +20,10 @@ import { Checkbox } from "./ui/checkbox";
 import React from "react";
 import { VerifyPropertyInput, VerifyPropertyOutput, verifyProperty } from "@/ai/flows/verify-property";
 import { Loader2 } from "lucide-react";
+import { useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { checkSubscriptionStatus } from "@/ai/flows/check-subscription-status";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   verificationMethod: z.enum(["title", "postcode", "address"]),
@@ -47,6 +51,10 @@ type VerificationFormProps = {
 }
 
 export function VerificationForm({ onVerify, setIsLoading, isLoading }: VerificationFormProps) {
+  const { user } = useUser();
+  const router = useRouter();
+  const { toast } = useToast();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,8 +72,27 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
   const verificationMethod = form.watch("verificationMethod");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+      router.push('/auth?type=login');
+      return;
+    }
+    
     setIsLoading(true);
 
+    const subStatus = await checkSubscriptionStatus({ userId: user.uid });
+
+    if (subStatus.action === 'REDIRECT_TO_PRICING') {
+      toast({
+        title: "Subscription Required",
+        description: `Your status is: ${subStatus.status}. Please upgrade your plan.`,
+        variant: "destructive",
+      });
+      router.push('/pricing');
+      setIsLoading(false);
+      return;
+    }
+    
+    // Proceed with verification if subscription is active
     let propertyIdentifier = '';
     if (values.verificationMethod === 'title') {
         propertyIdentifier = values.titleNumber || '';
@@ -90,7 +117,11 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
       onVerify(report);
     } catch (error) {
       console.error("Verification failed:", error);
-      // You should show an error to the user here.
+      toast({
+        title: "Verification Failed",
+        description: "An unexpected error occurred during verification.",
+        variant: "destructive",
+      })
     } finally {
         setIsLoading(false);
     }

@@ -13,7 +13,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { initializeFirebase } from '@/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Input Schema
 const CheckSubscriptionStatusInputSchema = z.object({
@@ -23,8 +23,8 @@ export type CheckSubscriptionStatusInput = z.infer<typeof CheckSubscriptionStatu
 
 // Output Schema
 const CheckSubscriptionStatusOutputSchema = z.object({
-  status: z.enum(['NEW_USER', 'NOT_SUBSCRIBED', 'ACTIVE_SUBSCRIPTION', 'EXPIRED_SUBSCRIPTION']),
-  message: z.string(),
+  status: z.enum(['NEW_USER_NO_SUBSCRIPTION', 'NO_SUBSCRIPTION', 'ACTIVE_SUBSCRIPTION', 'SUBSCRIPTION_EXPIRED']),
+  action: z.enum(['REDIRECT_TO_PRICING', 'ALLOW_PDF_DOWNLOAD']),
 });
 export type CheckSubscriptionStatusOutput = z.infer<typeof CheckSubscriptionStatusOutputSchema>;
 
@@ -48,52 +48,44 @@ const checkSubscriptionStatusFlow = ai.defineFlow(
     const { firestore } = initializeFirebase();
     const userDocRef = doc(firestore, 'users', userId);
 
-    try {
-      const userDoc = await getDoc(userDocRef);
+    const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists() || !userDoc.data().hasOwnProperty('isSubscribed')) {
-        // NEW_USER
-        await setDoc(userDocRef, {
-          isSubscribed: false,
-          plan: 'none',
-          subscriptionExpiry: null,
-        }, { merge: true });
-        return {
-          status: 'NEW_USER',
-          message: 'Please choose a subscription plan.',
-        };
-      }
-
-      const userData = userDoc.data();
-      const { isSubscribed, subscriptionExpiry } = userData;
-
-      if (!isSubscribed) {
-        // NOT_SUBSCRIBED
-        return {
-          status: 'NOT_SUBSCRIBED',
-          message: 'User does not have a subscription.',
-        };
-      }
-
-      if (subscriptionExpiry && subscriptionExpiry.toDate() > new Date()) {
-        // ACTIVE_SUBSCRIPTION
-        return {
-          status: 'ACTIVE_SUBSCRIPTION',
-          message: 'Subscription is active.',
-        };
-      } else {
-        // EXPIRED_SUBSCRIPTION
-        return {
-          status: 'EXPIRED_SUBSCRIPTION',
-          message: 'Subscription expired. Please renew.',
-        };
-      }
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-      // Fallback for any errors during Firestore operation
+    if (!userDoc.exists() || !userDoc.data().hasOwnProperty('isSubscribed')) {
+      // NEW_USER
+      await setDoc(userDocRef, {
+        isSubscribed: false,
+        plan: 'none',
+        subscriptionExpiry: null,
+      }, { merge: true });
       return {
-        status: 'NOT_SUBSCRIBED',
-        message: 'Could not determine subscription status.',
+        status: 'NEW_USER_NO_SUBSCRIPTION',
+        action: 'REDIRECT_TO_PRICING',
+      };
+    }
+
+    const userData = userDoc.data();
+    const { isSubscribed, subscriptionExpiry } = userData;
+
+    if (!isSubscribed) {
+      // NOT_SUBSCRIBED
+      return {
+        status: 'NO_SUBSCRIPTION',
+        action: 'REDIRECT_TO_PRICING',
+      };
+    }
+
+    // subscriptionExpiry is a Firestore Timestamp, so we need to convert it to a Date
+    if (subscriptionExpiry && subscriptionExpiry.toDate() > new Date()) {
+      // ACTIVE_SUBSCRIPTION
+      return {
+        status: 'ACTIVE_SUBSCRIPTION',
+        action: 'ALLOW_PDF_DOWNLOAD',
+      };
+    } else {
+      // EXPIRED_SUBSCRIPTION
+      return {
+        status: 'SUBSCRIPTION_EXPIRED',
+        action: 'REDIRECT_TO_PRICING',
       };
     }
   }
