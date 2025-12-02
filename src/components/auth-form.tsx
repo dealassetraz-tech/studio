@@ -21,7 +21,6 @@ import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { useAuth, useFirestore } from "@/firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { checkSubscriptionStatus } from "@/ai/flows/check-subscription-status";
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -55,29 +54,11 @@ export function AuthForm() {
     },
   });
 
-  const handleSuccessfulAuth = async (userId: string) => {
-    try {
-      const subscriptionStatus = await checkSubscriptionStatus({ userId });
-      console.log('Subscription Status:', subscriptionStatus);
-      // You can now use the status to redirect or show a message
-      // For example:
-      // if (subscriptionStatus.status === 'NOT_SUBSCRIBED' || subscriptionStatus.status === 'EXPIRED_SUBSCRIPTION') {
-      //   router.push('/pricing');
-      // } else {
-      //   router.push('/verify');
-      // }
-       router.push("/verify");
-    } catch(e: any) {
-        console.error("Failed to check subscription status:", e);
-        setError("Could not verify your subscription status. Please try again.");
-    }
-  }
-
   const handleSignIn = async (values: FormSchema) => {
     if (!auth) return;
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      await handleSuccessfulAuth(userCredential.user.uid);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      router.push("/verify");
     } catch (e: any) {
        switch (e.code) {
         case 'auth/user-not-found':
@@ -114,9 +95,8 @@ export function AuthForm() {
         email: user.email,
         displayName: values.name,
         createdAt: serverTimestamp(),
-      }, { merge: true });
-
-      await handleSuccessfulAuth(user.uid);
+      });
+      router.push("/verify");
     } catch (e: any) {
       if (e.code === 'auth/email-already-in-use') {
         setError("This email is already in use. Please sign in.");
