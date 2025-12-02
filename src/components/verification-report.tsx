@@ -26,24 +26,8 @@ const getAlertIcon = (level: 'info' | 'warning' | 'critical') => {
 
 export function VerificationReport({ report }: VerificationReportProps) {
 
-  const handleDownload = () => {
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(report, null, 2)
-    )}`;
-    const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = `verification-report-${report.verificationId}.json`;
-    link.click();
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="text-right">
-          <Button onClick={handleDownload}>
-            <Download className="mr-2 h-4 w-4" />
-            Download Report
-          </Button>
-        </div>
        <Card className="shadow-lg">
         <CardHeader>
           <div className="flex items-center gap-4">
@@ -121,7 +105,7 @@ export function VerificationReport({ report }: VerificationReportProps) {
           </CardHeader>
           <CardContent className="space-y-4">
              <div>
-                <p className="text-sm text-muted-foreground">Company Name</p>
+                <p className="text-muted-foreground">Company Name</p>
                 <p className="font-semibold">{report.companyDetails.companyName}</p>
               </div>
                <div>

@@ -6,6 +6,8 @@ import { VerificationForm } from "@/components/verification-form";
 import { useState } from "react";
 import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
 import { VerificationReport } from "@/components/verification-report";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
 export default function VerifyPage() {
   const [report, setReport] = useState<VerifyPropertyOutput | null>(null);
@@ -16,18 +18,37 @@ export default function VerifyPage() {
     setIsLoading(false);
   };
   
+  const handleDownload = () => {
+    if (!report) return;
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(report, null, 2)
+    )}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = `verification-report-${report.verificationId}.json`;
+    link.click();
+  };
+
   if (report) {
     return (
      <div className="bg-secondary/50 text-foreground flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12 md:py-20">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-2">
-              Verification Report
-            </h1>
-            <p className="text-lg text-muted-foreground text-center mb-8">
-              A summary of the checks performed on the property.
-            </p>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-4">
+               <div>
+                 <h1 className="text-4xl md:text-5xl font-bold text-left">
+                  Verification Report
+                </h1>
+                <p className="text-lg text-muted-foreground text-left mt-1">
+                  A summary of the checks performed on the property.
+                </p>
+               </div>
+                <Button onClick={handleDownload}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Report
+                </Button>
+            </div>
            <VerificationReport report={report} />
         </div>
       </main>
