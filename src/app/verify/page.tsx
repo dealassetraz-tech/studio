@@ -20,13 +20,56 @@ export default function VerifyPage() {
   
   const handleDownload = () => {
     if (!report) return;
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(report, null, 2)
-    )}`;
+
+    let reportText = `ASSETRAZ UK - Verification Report\n`;
+    reportText += `====================================\n\n`;
+    reportText += `Report ID: ${report.verificationId}\n`;
+    reportText += `Timestamp: ${new Date(report.timestamp).toLocaleString()}\n\n`;
+
+    reportText += `--- Property Details ---\n`;
+    reportText += `Title Number: ${report.propertyDetails.titleNumber}\n`;
+    reportText += `Address: ${report.propertyDetails.address}\n`;
+    reportText += `Tenure: ${report.propertyDetails.tenure}\n\n`;
+
+    reportText += `--- Ownership ---\n`;
+    reportText += `Ownership Type: ${report.ownership.ownershipType}\n`;
+    reportText += `Proprietors:\n`;
+    report.ownership.proprietors.forEach(p => {
+      reportText += `  - ${p}\n`;
+    });
+    reportText += `\n`;
+
+    if (report.companyDetails) {
+      reportText += `--- Company Details ---\n`;
+      reportText += `Company Name: ${report.companyDetails.companyName}\n`;
+      reportText += `Company Number: ${report.companyDetails.companyNumber}\n`;
+      reportText += `Directors:\n`;
+      report.companyDetails.directors.forEach(d => {
+        reportText += `  - ${d}\n`;
+      });
+      reportText += `\n`;
+    }
+
+    if (report.pricePaidHistory && report.pricePaidHistory.length > 0) {
+      reportText += `--- Price Paid History ---\n`;
+      report.pricePaidHistory.forEach(h => {
+        reportText += `Date: ${new Date(h.date).toLocaleDateString()}, Price: ${h.price}\n`;
+      });
+      reportText += `\n`;
+    }
+
+    reportText += `--- Alerts & Notices ---\n`;
+    report.alerts.forEach(a => {
+      reportText += `[${a.level.toUpperCase()}] ${a.message}\n`;
+    });
+    
+    const blob = new Blob([reportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = `verification-report-${report.verificationId}.json`;
+    link.href = url;
+    link.download = `verification-report-${report.verificationId}.txt`;
     link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (report) {
