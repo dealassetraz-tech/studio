@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,10 +25,19 @@ const formSchema = z.object({
   verificationMethod: z.enum(["title", "postcode", "address"]),
   titleNumber: z.string().optional(),
   postcode: z.string().optional(),
-  address: z.string().optional(),
+  street: z.string().optional(),
+  city: z.string().optional(),
   pricePaid: z.boolean().default(false),
   companyOwnership: z.boolean().default(false),
   localData: z.boolean().default(false),
+}).refine(data => {
+    if (data.verificationMethod === 'title') return !!data.titleNumber;
+    if (data.verificationMethod === 'postcode') return !!data.postcode;
+    if (data.verificationMethod === 'address') return !!data.street && !!data.city && !!data.postcode;
+    return false;
+}, {
+    message: "Please fill in the required fields for the selected verification method.",
+    path: ["titleNumber"], // you can pick any field to show the error
 });
 
 type VerificationFormProps = {
@@ -42,6 +52,9 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
     defaultValues: {
       verificationMethod: "title",
       titleNumber: "DN123456",
+      postcode: "SW1A 2AA",
+      street: "10 Downing Street",
+      city: "London",
       pricePaid: true,
       companyOwnership: true,
       localData: false,
@@ -53,9 +66,17 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     
-    // In a real application, you would perform validation and data cleaning here.
+    let propertyIdentifier = '';
+    if (values.verificationMethod === 'title') {
+        propertyIdentifier = values.titleNumber || '';
+    } else if (values.verificationMethod === 'postcode') {
+        propertyIdentifier = values.postcode || '';
+    } else if (values.verificationMethod === 'address') {
+        propertyIdentifier = `${values.street}, ${values.city}, ${values.postcode}`;
+    }
+
     const input: VerifyPropertyInput = {
-      propertyIdentifier: values.titleNumber || values.postcode || values.address || '',
+      propertyIdentifier: propertyIdentifier,
       identifierType: values.verificationMethod,
       checks: {
         pricePaid: values.pricePaid,
@@ -119,7 +140,7 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
                                 <RadioGroupItem value="address" />
                                 <FormLabel className="font-normal ml-3 cursor-pointer">
                                     Full address
-                                    <p className="text-xs text-muted-foreground">Street + city + postcode</p>
+                                    <p className="text-xs text-muted-foreground">Street, city & postcode</p>
                                 </FormLabel>
                             </div>
                         </FormControl>
@@ -155,7 +176,7 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
                   <FormItem>
                     <FormLabel className="text-muted-foreground font-semibold tracking-wider">POSTCODE</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. SW1A 1AA" {...field} />
+                      <Input placeholder="e.g. SW1A 2AA" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -164,20 +185,50 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
             )}
 
              {verificationMethod === "address" && (
-                <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-muted-foreground font-semibold tracking-wider">FULL ADDRESS</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Street, City, Postcode" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+                <div className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="street"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-muted-foreground font-semibold tracking-wider">STREET</FormLabel>
+                                <FormControl>
+                                <Input placeholder="e.g. 10 Downing Street" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="city"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-muted-foreground font-semibold tracking-wider">CITY</FormLabel>
+                                <FormControl>
+                                <Input placeholder="e.g. London" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
+                     <FormField
+                        control={form.control}
+                        name="postcode"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="text-muted-foreground font-semibold tracking-wider">POSTCODE</FormLabel>
+                            <FormControl>
+                            <Input placeholder="e.g. SW1A 2AA" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+              )}
             
             <div className="p-6 bg-secondary/30 rounded-lg">
                 <FormLabel className="text-muted-foreground font-semibold tracking-wider">INCLUDE CHECKS</FormLabel>
