@@ -22,6 +22,19 @@
           "type": "string",
           "format": "date-time",
           "description": "The timestamp when the user profile was created."
+        },
+        "isSubscribed": {
+            "type": "boolean",
+            "description": "Indicates if the user has an active subscription."
+        },
+        "plan": {
+            "type": "string",
+            "description": "The user's current subscription plan."
+        },
+        "subscriptionExpiry": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "The expiration date of the user's subscription."
         }
       },
       "required": ["uid", "email", "createdAt"]
