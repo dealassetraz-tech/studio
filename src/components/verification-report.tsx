@@ -1,10 +1,12 @@
+
 'use client';
 
 import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, BadgeCheck, Building, Calendar, FileText, Home, Landmark, List, Siren, User, Users } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Building, Calendar, Download, FileText, Home, Landmark, List, Siren, User, Users } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 
 type VerificationReportProps = {
   report: VerifyPropertyOutput;
@@ -23,8 +25,25 @@ const getAlertIcon = (level: 'info' | 'warning' | 'critical') => {
 
 
 export function VerificationReport({ report }: VerificationReportProps) {
+
+  const handleDownload = () => {
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(report, null, 2)
+    )}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = `verification-report-${report.verificationId}.json`;
+    link.click();
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      <div className="text-right">
+          <Button onClick={handleDownload}>
+            <Download className="mr-2 h-4 w-4" />
+            Download Report
+          </Button>
+        </div>
        <Card className="shadow-lg">
         <CardHeader>
           <div className="flex items-center gap-4">
