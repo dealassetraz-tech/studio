@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -10,7 +11,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 // Input Schema
 const VerifyPropertyInputSchema = z.object({
@@ -103,6 +104,14 @@ const verifyPropertyFlow = ai.defineFlow(
         {
           level: 'warning',
           message: 'No restrictions on title found.',
+        },
+        {
+          level: 'critical',
+          message: 'Litigation risk detected: Pending boundary dispute (Case #2024-C08-1138).',
+        },
+         {
+          level: 'critical',
+          message: 'Outstanding charge found: A mortgage from Barclays Bank PLC is registered against this title.',
         },
       ],
     };
