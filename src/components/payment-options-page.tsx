@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CreditCard, Banknote, Landmark } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const paymentOptions = [
   {
@@ -26,12 +26,15 @@ const paymentOptions = [
 
 export function PaymentOptionsPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const plan = searchParams.get('plan');
 
     const handleOptionClick = (optionName: string) => {
         // In a real app, this would navigate to a specific payment flow
         console.log(`Selected payment option: ${optionName}`);
         // For this demo, we can just log it or navigate to a generic success page
-        router.push('/payment/success');
+        const successUrl = plan ? `/payment/success?plan=${encodeURIComponent(plan)}` : '/payment/success';
+        router.push(successUrl);
     }
 
   return (
@@ -39,7 +42,7 @@ export function PaymentOptionsPage() {
       <div className="max-w-2xl mx-auto text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold">Choose a Payment Method</h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Select how you'd like to pay for your Professional plan.
+          Select how you'd like to pay for your {plan || 'plan'}.
         </p>
       </div>
 

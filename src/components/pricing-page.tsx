@@ -67,8 +67,8 @@ export function PricingPage() {
         return '/contact';
     }
     
-    // For any "Get Started" button, go to payment options
-    return '/payment/options';
+    // For any "Get Started" button, go to payment options with the plan name
+    return `/payment/options?plan=${encodeURIComponent(tier.name)}`;
   }
 
 
