@@ -76,9 +76,9 @@ export function PricingPage() {
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="max-w-4xl mx-auto text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold">Pricing examples</h1>
+        <h1 className="text-4xl md:text-5xl font-bold">Payment</h1>
         <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-          Actual pricing depends on data costs and volume. These tiers show how ASSETRAZ UK could be packaged.
+          Choose a plan to continue. Actual pricing depends on data costs and volume. These tiers show how ASSETRAZ UK could be packaged.
         </p>
       </div>
 
