@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, Settings } from "lucide-react";
+import { Menu, LogOut, User, Settings, Code } from "lucide-react";
 import { useState } from "react";
 import {
   Sheet,
@@ -92,9 +92,13 @@ export function Header() {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => router.push('/dashboard')}>
                         <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
+                        <span>Dashboard</span>
+                      </DropdownMenuItem>
+                       <DropdownMenuItem onClick={() => router.push('/code')}>
+                        <Code className="mr-2 h-4 w-4" />
+                        <span>Code Explorer</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Settings className="mr-2 h-4 w-4" />
