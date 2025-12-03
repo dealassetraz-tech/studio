@@ -21,7 +21,6 @@ const tiers = [
     ],
     buttonText: "Get Started",
     highlight: false,
-    contact: true,
   },
   {
     name: "Professional",
@@ -36,7 +35,7 @@ const tiers = [
       "Basic API integration",
       "Priority support",
     ],
-    buttonText: "Subscribe Now",
+    buttonText: "Get Started",
     highlight: true,
     badge: "For growing teams",
   },
@@ -55,11 +54,22 @@ const tiers = [
     ],
     buttonText: "Contact Sales",
     highlight: false,
-    contact: true,
   },
 ];
 
 export function PricingPage() {
+  const { user, loading } = useUser();
+  const getButtonLink = (tier: typeof tiers[0]) => {
+    if (tier.name === 'Enterprise' || tier.name === 'Pay-as-you-go') {
+        return '/contact';
+    }
+    if (!loading && user) {
+        return '/verify';
+    }
+    return '/auth?type=signup';
+  }
+
+
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="max-w-4xl mx-auto text-center mb-12">
@@ -103,15 +113,8 @@ export function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Button 
-                asChild
-                className={cn(
-                    "w-full mt-8",
-                     !tier.highlight && 'bg-foreground text-background hover:bg-foreground/80'
-                )} 
-                variant={tier.highlight ? 'default' : 'secondary'}
-              >
-                <Link href={tier.contact ? '/contact' : `/payment?plan=${tier.name}&price=${tier.price}`}>
+              <Button asChild className="w-full mt-8" variant={tier.highlight ? 'default' : 'secondary'}>
+                <Link href={getButtonLink(tier)}>
                     {tier.buttonText}
                 </Link>
               </Button>
