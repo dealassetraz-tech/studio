@@ -63,18 +63,12 @@ const tiers = [
 export function PricingPage() {
   const { user, loading } = useUser();
   const getButtonLink = (tier: typeof tiers[0]) => {
-    if (tier.name === 'Enterprise' || tier.name === 'Pay-as-you-go') {
+    if (tier.buttonText === 'Contact Sales') {
         return '/contact';
     }
-    // For Professional plan, always go to payment options
-    if (tier.name === 'Professional') {
-        return '/payment/options';
-    }
-
-    if (!loading && user) {
-        return '/verify';
-    }
-    return '/auth?type=signup';
+    
+    // For any "Get Started" button, go to payment options
+    return '/payment/options';
   }
 
 
