@@ -66,6 +66,11 @@ export function PricingPage() {
     if (tier.name === 'Enterprise' || tier.name === 'Pay-as-you-go') {
         return '/contact';
     }
+    // For Professional plan, always go to payment options
+    if (tier.name === 'Professional') {
+        return '/payment/options';
+    }
+
     if (!loading && user) {
         return '/verify';
     }
