@@ -2,11 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useUser } from "@/firebase";
 
 const tiers = [
   {
     name: "Pay-as-you-go",
     price: "£7",
+    priceValue: 7,
     period: "/check",
     description: "Ideal for small agencies & occasional checks.",
     priceDescription: "Example price, ex VAT.",
@@ -16,13 +19,14 @@ const tiers = [
       "Price paid history",
       "Downloadable PDF",
     ],
-    buttonText: "Talk to sales",
-    buttonVariant: "secondary",
+    buttonText: "Get Started",
     highlight: false,
+    contact: true,
   },
   {
     name: "Professional",
     price: "£199",
+    priceValue: 199,
     period: "/month",
     description: "For agencies & platforms doing regular checks.",
     priceDescription: "Example: includes a bundle of checks.",
@@ -32,14 +36,14 @@ const tiers = [
       "Basic API integration",
       "Priority support",
     ],
-    buttonText: "Request a quote",
-    buttonVariant: "default",
+    buttonText: "Subscribe Now",
     highlight: true,
     badge: "For growing teams",
   },
   {
     name: "Enterprise",
     price: "Custom",
+    priceValue: null,
     period: "",
     description: "For portals, lenders and large platforms.",
     priceDescription: "Based on expected volume & SLA.",
@@ -49,9 +53,9 @@ const tiers = [
       "Custom data bundles",
       "Dedicated support & onboarding",
     ],
-    buttonText: "Contact sales",
-    buttonVariant: "secondary",
+    buttonText: "Contact Sales",
     highlight: false,
+    contact: true,
   },
 ];
 
@@ -100,13 +104,16 @@ export function PricingPage() {
                 ))}
               </ul>
               <Button 
+                asChild
                 className={cn(
                     "w-full mt-8",
-                     tier.buttonVariant === 'secondary' && 'bg-foreground text-background hover:bg-foreground/80'
+                     !tier.highlight && 'bg-foreground text-background hover:bg-foreground/80'
                 )} 
-                variant={tier.buttonVariant}
+                variant={tier.highlight ? 'default' : 'secondary'}
               >
-                {tier.buttonText}
+                <Link href={tier.contact ? '/contact' : `/payment?plan=${tier.name}&price=${tier.price}`}>
+                    {tier.buttonText}
+                </Link>
               </Button>
             </CardContent>
           </Card>
