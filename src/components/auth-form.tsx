@@ -59,7 +59,7 @@ export function AuthForm() {
     const subStatus = await checkSubscriptionStatus({ userId });
 
     if (subStatus.action === 'REDIRECT_TO_PRICING') {
-      router.push('/pricing');
+      router.push('/payment');
     } else {
       router.push('/verify');
     }

@@ -29,7 +29,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/verify", label: "Verify Property" },
   { href: "/features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/payment", label: "Payment" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
