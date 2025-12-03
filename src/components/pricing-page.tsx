@@ -24,6 +24,7 @@ const tiers = [
     ],
     buttonText: "Get Started",
     highlight: false,
+    badge: "For Individuals",
   },
   {
     name: "Professional",
@@ -57,6 +58,7 @@ const tiers = [
     ],
     buttonText: "Contact Sales",
     highlight: false,
+    badge: "For Large Platforms",
   },
 ];
 
@@ -91,11 +93,11 @@ export function PricingPage() {
             )}
           >
              {tier.badge && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 text-sm font-semibold rounded-full">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 text-sm font-semibold rounded-full whitespace-nowrap">
                 {tier.badge}
               </div>
             )}
-            <CardHeader className="text-left">
+            <CardHeader className="text-left pt-12">
               <CardTitle className="text-2xl">{tier.name}</CardTitle>
               <CardDescription>{tier.description}</CardDescription>
             </CardHeader>
