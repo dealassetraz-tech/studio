@@ -88,8 +88,7 @@ export function PricingPage() {
           <Card
             key={tier.name}
             className={cn(
-                "shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full relative hover:border-primary hover:border-2",
-                tier.highlight && "border-primary border-2"
+                "shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full relative hover:border-primary hover:border-2"
             )}
           >
              {tier.badge && (
