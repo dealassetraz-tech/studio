@@ -72,27 +72,9 @@ export function VerificationForm({ onVerify, setIsLoading, isLoading }: Verifica
   const verificationMethod = form.watch("verificationMethod");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) {
-      router.push('/auth?type=login');
-      return;
-    }
-    
     setIsLoading(true);
-
-    const subStatus = await checkSubscriptionStatus({ userId: user.uid });
-
-    if (subStatus.action === 'REDIRECT_TO_PRICING') {
-      toast({
-        title: "Subscription Required",
-        description: `Your status is: ${subStatus.status}. Please upgrade your plan.`,
-        variant: "destructive",
-      });
-      router.push('/pricing');
-      setIsLoading(false);
-      return;
-    }
     
-    // Proceed with verification if subscription is active
+    // Proceed with verification
     let propertyIdentifier = '';
     if (values.verificationMethod === 'title') {
         propertyIdentifier = values.titleNumber || '';
