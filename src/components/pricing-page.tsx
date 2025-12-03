@@ -116,7 +116,7 @@ export function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Button asChild className="w-full mt-8" variant={tier.highlight ? 'default' : 'secondary'}>
+              <Button asChild className="w-full mt-8 rounded-lg" variant={'default'}>
                 <Link href={getButtonLink(tier)}>
                     {tier.buttonText}
                 </Link>
