@@ -2,11 +2,11 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase';
-import { Toaster } from '@/components/ui/toaster';
+import { ToasterProvider } from '@/components/toaster-provider';
 import { Footer } from '@/components/footer';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'ASSETRAZ UK',
@@ -27,7 +27,7 @@ export default function RootLayout({
           </div>
           <Footer />
         </FirebaseClientProvider>
-        <Toaster />
+        <ToasterProvider />
       </body>
     </html>
   );
