@@ -1,7 +1,9 @@
-import { EndToEndSteps } from "@/components/end-to-end-steps";
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
-import { WhyProfessionals } from "@/components/why-professionals";
+import dynamic from "next/dynamic";
+
+const WhyProfessionals = dynamic(() => import('@/components/why-professionals').then(mod => mod.WhyProfessionals));
+const EndToEndSteps = dynamic(() => import('@/components/end-to-end-steps').then(mod => mod.EndToEndSteps));
 
 export default function Home() {
   return (

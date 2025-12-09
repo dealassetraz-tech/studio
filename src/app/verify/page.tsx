@@ -3,13 +3,16 @@
 
 import { Header } from "@/components/header";
 import { VerificationForm } from "@/components/verification-form";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
 import { VerificationReport } from "@/components/verification-report";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, Share2, AlertTriangle } from "lucide-react";
-import { DownloadDialog } from "@/components/download-dialog";
-import { ShareDialog } from "@/components/share-dialog";
+import dynamic from "next/dynamic";
+
+const DownloadDialog = dynamic(() => import('@/components/download-dialog').then(mod => mod.DownloadDialog));
+const ShareDialog = dynamic(() => import('@/components/share-dialog').then(mod => mod.ShareDialog));
+
 
 export default function VerifyPage() {
   const [report, setReport] = useState<VerifyPropertyOutput | null>(null);
@@ -63,16 +66,22 @@ export default function VerifyPage() {
             </div>
         </main>
         </div>
-        <DownloadDialog
-            isOpen={isDownloadDialogOpen}
-            onClose={() => setIsDownloadDialogOpen(false)}
-            report={report}
-        />
-        <ShareDialog
-            isOpen={isShareDialogOpen}
-            onClose={() => setIsShareDialogOpen(false)}
-            reportId={report.verificationId}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+            {isDownloadDialogOpen && (
+                <DownloadDialog
+                    isOpen={isDownloadDialogOpen}
+                    onClose={() => setIsDownloadDialogOpen(false)}
+                    report={report}
+                />
+            )}
+            {isShareDialogOpen && (
+                <ShareDialog
+                    isOpen={isShareDialogOpen}
+                    onClose={() => setIsShareDialogOpen(false)}
+                    reportId={report.verificationId}
+                />
+            )}
+        </Suspense>
      </>
     )
   }

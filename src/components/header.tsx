@@ -55,7 +55,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5" prefetch={true}>
                 <AssetrazLogo />
               <div>
                 <span className="text-xl font-bold text-foreground">ASSETRAZ UK</span>
@@ -65,7 +65,7 @@ export function Header() {
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-foreground">
             {navLinks.map((link) => (
-               <Link key={link.href} href={link.href} className="flex items-center gap-1 hover:text-primary transition-colors">
+               <Link key={link.href} href={link.href} className="flex items-center gap-1 hover:text-primary transition-colors" prefetch={true}>
                 {link.label}
               </Link>
             ))}
@@ -114,10 +114,10 @@ export function Header() {
                 ) : (
                     <>
                         <Button variant="ghost" asChild>
-                            <Link href="/auth?type=login">Login</Link>
+                            <Link href="/auth?type=login" prefetch={true}>Login</Link>
                         </Button>
                         <Button asChild>
-                            <Link href="/auth?type=signup">Sign Up</Link>
+                            <Link href="/auth?type=signup" prefetch={true}>Sign Up</Link>
                         </Button>
                     </>
                 )}
@@ -140,7 +140,7 @@ export function Header() {
                 </SheetHeader>
                  <nav className="flex flex-col gap-4 text-lg font-medium">
                     {navLinks.map((link) => (
-                      <Link key={link.href} href={link.href} className="flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                      <Link key={link.href} href={link.href} className="flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)} prefetch={true}>
                         {link.label}
                       </Link>
                     ))}
@@ -160,10 +160,10 @@ export function Header() {
                     ) : (
                         <div className="flex gap-2">
                             <Button variant="ghost" asChild className="w-full">
-                                <Link href="/auth?type=login" onClick={() => setIsMenuOpen(false)}>Login</Link>
+                                <Link href="/auth?type=login" onClick={() => setIsMenuOpen(false)} prefetch={true}>Login</Link>
                             </Button>
                             <Button asChild className="w-full">
-                                <Link href="/auth?type=signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                                <Link href="/auth?type=signup" onClick={() => setIsMenuOpen(false)} prefetch={true}>Sign Up</Link>
                             </Button>
                         </div>
                     )}
