@@ -10,17 +10,20 @@ const paymentOptions = [
   {
     name: "Credit / Debit Card",
     icon: <CreditCard className="w-6 h-6 text-primary" />,
-    description: "Pay with your Visa, Mastercard, or Amex."
+    description: "Pay with your Visa, Mastercard, or Amex.",
+    path: "card"
   },
   {
     name: "UPI Payment",
     icon: <Banknote className="w-6 h-6 text-primary" />,
-    description: "Pay with any supported UPI app."
+    description: "Pay with any supported UPI app.",
+    path: "upi"
   },
   {
     name: "Net Banking / Online Banking",
     icon: <Landmark className="w-6 h-6 text-primary" />,
-    description: "Pay from your bank account directly."
+    description: "Pay from your bank account directly.",
+    path: "netbanking"
   },
 ];
 
@@ -29,12 +32,9 @@ export function PaymentOptionsPage() {
     const searchParams = useSearchParams();
     const plan = searchParams.get('plan');
 
-    const handleOptionClick = (optionName: string) => {
-        // In a real app, this would navigate to a specific payment flow
-        console.log(`Selected payment option: ${optionName}`);
-        // For this demo, we can just log it or navigate to a generic success page
-        const successUrl = plan ? `/payment/success?plan=${encodeURIComponent(plan)}` : '/payment/success';
-        router.push(successUrl);
+    const handleOptionClick = (path: string) => {
+        const paymentUrl = plan ? `/payment/${path}?plan=${encodeURIComponent(plan)}` : `/payment/${path}`;
+        router.push(paymentUrl);
     }
 
   return (
@@ -52,7 +52,7 @@ export function PaymentOptionsPage() {
                 {paymentOptions.map((option) => (
                     <button
                         key={option.name}
-                        onClick={() => handleOptionClick(option.name)}
+                        onClick={() => handleOptionClick(option.path)}
                         className="w-full text-left p-4 border rounded-lg hover:bg-accent hover:border-primary transition-all flex items-center gap-4"
                     >
                         <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
