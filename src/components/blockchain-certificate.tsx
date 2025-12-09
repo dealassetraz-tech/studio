@@ -2,9 +2,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export function BlockchainCertificate() {
+  const transactionHash = "0xe4c62448f1367a7d432514f7b53f0e2d3d9f3f1a6b0c2e3a5d8b7a6f9c8d0e1f";
   return (
     <Card className="bg-primary/5 border-primary/20 shadow-lg">
         <CardContent className="p-6">
@@ -20,7 +21,7 @@ export function BlockchainCertificate() {
                 <div>
                     <label className="text-sm font-medium text-muted-foreground">Blockchain Transaction Hash</label>
                     <div className="mt-1 p-3 bg-secondary rounded-md font-mono text-sm break-all">
-                        0x4c76477e19f298c4b0c265691d01a93b3f2f701c9f40398f8b248a3d52c1e4b3
+                       {transactionHash}
                     </div>
                 </div>
             </div>

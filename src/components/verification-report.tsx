@@ -1,4 +1,3 @@
-
 'use client';
 
 import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
