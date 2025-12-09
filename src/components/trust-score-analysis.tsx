@@ -273,6 +273,29 @@ export function TrustScoreAnalysis() {
                 </ul>
             </div>
 
+            <div className="mt-8 pt-6 border-t">
+                <h3 className="text-lg font-semibold mb-2">Score Methodology</h3>
+                <p className="text-sm text-muted-foreground mb-4">Trust Score Range: 0-100 (Higher is better)</p>
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-red-500"></div>
+                        <span>0-40 High Risk</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-yellow-500"></div>
+                        <span>41-60 Medium</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-blue-500"></div>
+                        <span>61-80 Good</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-sm bg-green-500"></div>
+                        <span>81-100 Excellent</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
       </CardContent>
     </Card>
