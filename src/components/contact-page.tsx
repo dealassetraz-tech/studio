@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 const formSchema = z.object({
   fullName: z.string().min(1, "Full name is required."),
@@ -24,6 +25,24 @@ const formSchema = z.object({
   interest: z.string().min(1, "Please select an interest."),
   message: z.string().min(1, "Message is required."),
 });
+
+const contactInfo = [
+    {
+        icon: <Mail className="h-6 w-6 text-blue-500" />,
+        label: "Email",
+        value: "info@assetraz.co.uk",
+    },
+    {
+        icon: <Phone className="h-6 w-6 text-green-500" />,
+        label: "Phone",
+        value: "020 1234 5678",
+    },
+    {
+        icon: <MapPin className="h-6 w-6 text-purple-500" />,
+        label: "Address",
+        value: "123 Property Lane\nLondon, UK\nSW1A 1AA",
+    }
+]
 
 export function ContactPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -142,25 +161,24 @@ export function ContactPage() {
                     </Form>
                 </CardContent>
             </Card>
-            <div className="space-y-8 pt-8 text-muted-foreground">
-                <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">Integration & pilots</h3>
-                    <ul className="space-y-2 list-disc list-inside">
-                        <li>Estate agencies doing 20+ completions per month</li>
-                        <li>Portals / marketplaces that want "verified" badges</li>
-                        <li>Conveyancing firms exploring automation</li>
-                    </ul>
-                </div>
-                 <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">Implementation notes</h3>
-                     <ul className="space-y-2 list-disc list-inside">
-                        <li>A production version would include:</li>
-                        <li className="ml-4">Secure backend calling official UK data sources</li>
-                        <li className="ml-4">Authentication & rate limiting for API use</li>
-                        <li className="ml-4">Data retention & audit policies compliant with UK GDPR</li>
-                    </ul>
-                </div>
-            </div>
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-2xl">Contact Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    {contactInfo.map((item, index) => (
+                        <div key={index} className="flex items-start gap-4">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-secondary flex items-center justify-center">
+                                {item.icon}
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-foreground">{item.label}</h3>
+                                <p className="text-muted-foreground whitespace-pre-line">{item.value}</p>
+                            </div>
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>
