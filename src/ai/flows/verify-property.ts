@@ -86,18 +86,22 @@ const verifyPropertyFlow = ai.defineFlow(
     // Simulate an API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
+    const isCompany = input.propertyIdentifier.toLowerCase().includes('company') || input.propertyIdentifier.toLowerCase().includes('ltd');
+    const isLeasehold = input.propertyIdentifier.toLowerCase().includes('flat') || input.propertyIdentifier.toLowerCase().includes('apartment');
+    const hasWarning = input.propertyIdentifier.toLowerCase().includes('warning');
+
     // MOCK DATA: In a real app, this would be fetched from official sources.
     const mockReport: VerifyPropertyOutput = {
       verificationId: `VER-${Date.now()}`,
       timestamp: new Date().toISOString(),
       propertyDetails: {
-        titleNumber: input.propertyIdentifier.startsWith('DN') ? input.propertyIdentifier : 'DN123456',
+        titleNumber: input.identifierType === 'title' ? input.propertyIdentifier.toUpperCase() : `DN${Math.floor(Math.random() * 900000) + 100000}`,
         address: input.identifierType === 'address' ? input.propertyIdentifier : '123 Example Street, London, SW1A 1AA',
-        tenure: 'Freehold',
+        tenure: isLeasehold ? 'Leasehold' : 'Freehold',
       },
       ownership: {
-        proprietors: ['John Smith'],
-        ownershipType: 'Individual',
+        proprietors: isCompany ? ['EXAMPLE HOLDINGS LTD'] : ['John Smith'],
+        ownershipType: isCompany ? 'Company' : 'Individual',
         registrationDate: '2018-03-15T00:00:00.000Z',
       },
       alerts: [
@@ -107,6 +111,13 @@ const verifyPropertyFlow = ai.defineFlow(
         }
       ],
     };
+
+    if (hasWarning) {
+        mockReport.alerts.push({
+            level: 'warning',
+            message: 'A restriction has been identified on this title. Further investigation is recommended.'
+        })
+    }
     
     if (input.checks.pricePaid) {
         mockReport.pricePaidHistory = [
@@ -117,22 +128,19 @@ const verifyPropertyFlow = ai.defineFlow(
         ];
     }
     
-    if (input.checks.companyOwnership) {
-        // Example of what would happen if company ownership was checked
-        // but the proprietor is an individual. We can add an alert.
-        if (mockReport.ownership.ownershipType === 'Individual') {
-            mockReport.alerts.push({
-                level: 'info',
-                message: 'Company ownership check was requested, but the registered proprietor is an individual.'
-            })
-        } else {
-             mockReport.companyDetails = {
-                companyName: 'EXAMPLE HOLDINGS LTD',
-                companyNumber: '01234567',
-                directors: ['John Doe', 'Jane Smith'],
-            };
-        }
+    if (input.checks.companyOwnership && isCompany) {
+        mockReport.companyDetails = {
+            companyName: 'EXAMPLE HOLDINGS LTD',
+            companyNumber: '01234567',
+            directors: ['Jane Doe', 'Peter Jones'],
+        };
+    } else if (input.checks.companyOwnership && !isCompany) {
+         mockReport.alerts.push({
+            level: 'info',
+            message: 'Company ownership check was requested, but the registered proprietor is an individual.'
+        })
     }
+
 
     return mockReport;
   }
