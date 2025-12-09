@@ -75,6 +75,11 @@ const antiFraudChecks = [
         points: 5,
     },
     {
+        title: "AML Screening Clear",
+        description: "Owner passed anti-money laundering checks, no PEP or sanctions matches",
+        points: 4,
+    },
+    {
         title: "No Repossession History",
         description: "No records of forced sales or repossessions at this address",
         points: 3,
@@ -197,7 +202,7 @@ export function TrustScoreAnalysis() {
             <div className="mt-6">
                 <h3 className="text-sm font-semibold tracking-wider text-red-600 mb-3 flex items-center">
                     <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                    ANTI-FRAUD & COMPLIANCE (8 POINTS)
+                    ANTI-FRAUD & COMPLIANCE (12 POINTS)
                 </h3>
                  <div className="space-y-2">
                     {antiFraudChecks.map((item, index) => (
