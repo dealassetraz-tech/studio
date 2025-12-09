@@ -11,22 +11,24 @@ type VerificationReportProps = {
   report: VerifyPropertyOutput;
 };
 
-const InfoBlock = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div className="bg-secondary/50 p-4 rounded-lg">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="font-semibold text-foreground">{value}</p>
-    </div>
-);
+const InfoBlock = ({ label, value }: { label: string; value: React.ReactNode }) => {
+    if (!value) return null;
+    return (
+        <div className="bg-secondary/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="font-semibold text-foreground">{value}</p>
+        </div>
+    );
+};
 
 export function VerificationReport({ report }: VerificationReportProps) {
-  // Use a placeholder if registrationDate is not available
   const registrationDate = report.ownership.registrationDate
     ? new Date(report.ownership.registrationDate).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       })
-    : 'Not Available';
+    : null;
     
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -67,15 +69,20 @@ export function VerificationReport({ report }: VerificationReportProps) {
             <CardContent>
                  <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg">
                     <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <p className="text-sm text-muted-foreground">Registered Proprietor</p>
-                            <p className="font-bold text-lg text-foreground">{report.ownership.proprietors[0] || 'N/A'}</p>
-                        </div>
-                         <div>
-                            <p className="text-sm text-muted-foreground">Registration Date</p>
-                            <p className="font-bold text-lg text-foreground">{registrationDate}</p>
-                        </div>
+                        {report.ownership.proprietors && report.ownership.proprietors.length > 0 && (
+                             <div>
+                                <p className="text-sm text-muted-foreground">Registered Proprietor</p>
+                                <p className="font-bold text-lg text-foreground">{report.ownership.proprietors[0]}</p>
+                            </div>
+                        )}
+                         {registrationDate && (
+                            <div>
+                                <p className="text-sm text-muted-foreground">Registration Date</p>
+                                <p className="font-bold text-lg text-foreground">{registrationDate}</p>
+                            </div>
+                         )}
                     </div>
+                    {/* This part seems to duplicate the main property address, assuming it's the proprietor address */}
                     <div>
                         <p className="text-sm text-muted-foreground">Proprietor Address</p>
                         <p className="font-semibold text-foreground">{report.propertyDetails.address}</p>
@@ -88,7 +95,7 @@ export function VerificationReport({ report }: VerificationReportProps) {
         <TrustScoreAnalysis />
         
         {/* Price Paid History */}
-        {report.pricePaidHistory && (
+        {report.pricePaidHistory && report.pricePaidHistory.length > 0 && (
           <PricePaidHistory history={report.pricePaidHistory} />
         )}
 
