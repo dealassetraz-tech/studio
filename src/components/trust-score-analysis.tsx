@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Info } from "lucide-react";
+import { CheckCircle, Info, Bot } from "lucide-react";
 import { CircularProgress } from "./circular-progress";
 
 const legalChecks = [
@@ -75,15 +75,37 @@ const antiFraudChecks = [
         points: 5,
     },
     {
-        title: "AML Screening Clear",
-        description: "Owner passed anti-money laundering checks, no PEP or sanctions matches",
-        points: 4,
-    },
-    {
         title: "No Repossession History",
         description: "No records of forced sales or repossessions at this address",
         points: 3,
     }
+]
+
+const additionalVerificationChecks = [
+    {
+        title: "Planning Permissions Valid",
+        description: "No unauthorized works, all planning applications properly approved",
+        points: 3,
+        icon: CheckCircle,
+        iconClass: "text-green-500",
+        borderClass: "border-green-500",
+    },
+    {
+        title: "Council Tax Up-to-Date",
+        description: "No arrears or disputes with local authority",
+        points: 3,
+        icon: CheckCircle,
+        iconClass: "text-green-500",
+        borderClass: "border-green-500",
+    },
+    {
+        title: "EPC Available",
+        description: "Valid Energy Performance Certificate on record (Rating: C)",
+        points: 2,
+        icon: Info,
+        iconClass: "text-blue-500",
+        borderClass: "border-blue-500",
+    },
 ]
 
 
@@ -99,14 +121,14 @@ export function TrustScoreAnalysis() {
                 <div>
                     <p className="text-sm text-muted-foreground">Overall Trust Score</p>
                     <div className="flex items-baseline gap-2">
-                        <p className="text-5xl font-bold text-green-600">87</p>
+                        <p className="text-5xl font-bold text-green-600">95</p>
                         <div>
                             <p className="font-semibold text-green-600">Excellent</p>
                             <p className="text-sm text-muted-foreground">High confidence</p>
                         </div>
                     </div>
                 </div>
-                <CircularProgress value={87} />
+                <CircularProgress value={95} />
             </div>
 
             <div>
@@ -175,7 +197,7 @@ export function TrustScoreAnalysis() {
             <div className="mt-6">
                 <h3 className="text-sm font-semibold tracking-wider text-red-600 mb-3 flex items-center">
                     <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                    ANTI-FRAUD & COMPLIANCE (12 POINTS)
+                    ANTI-FRAUD & COMPLIANCE (8 POINTS)
                 </h3>
                  <div className="space-y-2">
                     {antiFraudChecks.map((item, index) => (
@@ -191,6 +213,64 @@ export function TrustScoreAnalysis() {
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <div className="mt-6">
+                <h3 className="text-sm font-semibold tracking-wider text-orange-500 mb-3 flex items-center">
+                    <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                    ADDITIONAL VERIFICATION (8 POINTS)
+                </h3>
+                 <div className="space-y-2">
+                    {additionalVerificationChecks.map((item, index) => (
+                        <div key={index} className={`flex items-center justify-between p-3 bg-background rounded-md border-l-4 ${item.borderClass}`}>
+                           <div className="flex items-center gap-3">
+                                <item.icon className={`w-5 h-5 ${item.iconClass}`} />
+                                <div>
+                                    <p className="font-semibold">{item.title}</p>
+                                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                                </div>
+                            </div>
+                            <p className={`font-semibold ${item.iconClass}`}>+{item.points}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            
+            <div className="mt-6">
+                <h3 className="text-sm font-semibold tracking-wider text-green-600 mb-4 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Risk Assessment: Low Risk
+                </h3>
+                <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="bg-background p-4 rounded-lg text-center">
+                        <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                        <p className="font-semibold">No Fraud Flags</p>
+                        <p className="text-sm text-muted-foreground">Clean history</p>
+                    </div>
+                    <div className="bg-background p-4 rounded-lg text-center">
+                        <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                        <p className="font-semibold">No Disputes</p>
+                        <p className="text-sm text-muted-foreground">Clear title</p>
+                    </div>
+                    <div className="bg-background p-4 rounded-lg text-center">
+                        <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                        <p className="font-semibold">Verified Owner</p>
+                        <p className="text-sm text-muted-foreground">Identity confirmed</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div className="mt-8 bg-primary/5 p-6 rounded-lg border border-primary/20">
+                <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+                    <Bot className="w-5 h-5" />
+                    AI-Powered Insights
+                </h3>
+                <ul className="space-y-2 text-sm list-disc list-inside text-foreground/90">
+                    <li>Property has appreciated consistently above London market average (+359% vs +280% market avg)</li>
+                    <li>Owner-occupied status suggests long-term stability and lower investment risk</li>
+                    <li>Transaction intervals (6-7 years) indicate stable ownership patterns</li>
+                    <li>Freehold tenure provides maximum ownership security and investment value</li>
+                </ul>
             </div>
 
         </div>
