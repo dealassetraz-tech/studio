@@ -2,8 +2,9 @@
 'use client';
 
 import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BadgeCheck, Calendar, FileText, Home, User } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BadgeCheck } from "lucide-react";
+import { TrustScoreAnalysis } from "./trust-score-analysis";
 
 type VerificationReportProps = {
   report: VerifyPropertyOutput;
@@ -82,15 +83,8 @@ export function VerificationReport({ report }: VerificationReportProps) {
             </CardContent>
         </Card>
         
-         {/* Trust Score Analysis Placeholder */}
-        <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle>Trust Score Analysis</CardTitle>
-            </CardHeader>
-             <CardContent>
-                <p className="text-muted-foreground">Trust score analysis will be displayed here in a future update.</p>
-            </CardContent>
-        </Card>
+         {/* Trust Score Analysis */}
+        <TrustScoreAnalysis />
 
     </div>
   );
