@@ -2,8 +2,8 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase';
-import { Toaster } from '@/components/ui/toaster';
 import { Footer } from '@/components/footer';
+import { ClientToaster } from '@/components/client-toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
@@ -27,7 +27,7 @@ export default function RootLayout({
           </div>
           <Footer />
         </FirebaseClientProvider>
-        <Toaster />
+        <ClientToaster />
       </body>
     </html>
   );
