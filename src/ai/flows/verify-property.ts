@@ -37,6 +37,7 @@ const VerifyPropertyOutputSchema = z.object({
   ownership: z.object({
     proprietors: z.array(z.string()).describe('A list of the registered proprietors (owners).'),
     ownershipType: z.string().describe('The type of ownership (e.g., Individual, Company).'),
+    registrationDate: z.string().optional().describe('The date the current owner was registered.'),
   }),
   pricePaidHistory: z.array(
     z.object({
@@ -85,34 +86,23 @@ const verifyPropertyFlow = ai.defineFlow(
 
     // MOCK DATA: In a real app, this would be fetched from official sources.
     const mockReport: VerifyPropertyOutput = {
-      verificationId: `ASSETRAZ-${Date.now()}`,
+      verificationId: `VER-${Date.now()}`,
       timestamp: new Date().toISOString(),
       propertyDetails: {
         titleNumber: input.propertyIdentifier.startsWith('DN') ? input.propertyIdentifier : 'DN123456',
-        address: input.identifierType === 'address' ? input.propertyIdentifier : '10 Downing Street, London, SW1A 2AA',
+        address: input.identifierType === 'address' ? input.propertyIdentifier : '123 Example Street, London, SW1A 1AA',
         tenure: 'Freehold',
       },
       ownership: {
-        proprietors: ['THE CROWN ESTATE'],
-        ownershipType: 'Corporate Body',
+        proprietors: ['John Smith'],
+        ownershipType: 'Individual',
+        registrationDate: '2018-03-15T00:00:00.000Z',
       },
       alerts: [
         {
           level: 'info',
           message: 'This is a demonstration report. Data is illustrative and not from live sources.',
-        },
-        {
-          level: 'warning',
-          message: 'No restrictions on title found.',
-        },
-        {
-          level: 'critical',
-          message: 'Litigation risk detected: Pending boundary dispute (Case #2024-C08-1138).',
-        },
-         {
-          level: 'critical',
-          message: 'Outstanding charge found: A mortgage from Barclays Bank PLC is registered against this title.',
-        },
+        }
       ],
     };
     
@@ -124,11 +114,20 @@ const verifyPropertyFlow = ai.defineFlow(
     }
     
     if (input.checks.companyOwnership) {
-        mockReport.companyDetails = {
-            companyName: 'THE CROWN ESTATE',
-            companyNumber: 'CE000001',
-            directors: ['John Doe', 'Jane Smith'],
-        };
+        // Example of what would happen if company ownership was checked
+        // but the proprietor is an individual. We can add an alert.
+        if (mockReport.ownership.ownershipType === 'Individual') {
+            mockReport.alerts.push({
+                level: 'info',
+                message: 'Company ownership check was requested, but the registered proprietor is an individual.'
+            })
+        } else {
+             mockReport.companyDetails = {
+                companyName: 'EXAMPLE HOLDINGS LTD',
+                companyNumber: '01234567',
+                directors: ['John Doe', 'Jane Smith'],
+            };
+        }
     }
 
     return mockReport;
