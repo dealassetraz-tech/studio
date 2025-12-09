@@ -5,6 +5,8 @@ import { VerifyPropertyOutput } from "@/ai/flows/verify-property";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BadgeCheck } from "lucide-react";
 import { TrustScoreAnalysis } from "./trust-score-analysis";
+import { PricePaidHistory } from "./price-paid-history";
+import { BlockchainCertificate } from "./blockchain-certificate";
 
 type VerificationReportProps = {
   report: VerifyPropertyOutput;
@@ -85,7 +87,14 @@ export function VerificationReport({ report }: VerificationReportProps) {
         
          {/* Trust Score Analysis */}
         <TrustScoreAnalysis />
+        
+        {/* Price Paid History */}
+        {report.pricePaidHistory && (
+          <PricePaidHistory history={report.pricePaidHistory} />
+        )}
 
+        {/* Blockchain Certificate */}
+        <BlockchainCertificate />
     </div>
   );
 }

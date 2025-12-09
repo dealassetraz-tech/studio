@@ -43,6 +43,8 @@ const VerifyPropertyOutputSchema = z.object({
     z.object({
       date: z.string().describe('The date of the transaction.'),
       price: z.string().describe('The price paid in the transaction.'),
+      type: z.string().optional(),
+      growth: z.string().optional(),
     })
   ).optional().describe('A history of prices paid for the property.'),
   companyDetails: z.object({
@@ -108,8 +110,10 @@ const verifyPropertyFlow = ai.defineFlow(
     
     if (input.checks.pricePaid) {
         mockReport.pricePaidHistory = [
-            { date: '2015-08-21', price: '£5,250,000' },
-            { date: '2002-01-10', price: '£2,100,000' },
+            { date: '2018-03-15', price: '£850,000', type: 'Transfer', growth: '+36.0%' },
+            { date: '2012-08-22', price: '£625,000', type: 'Transfer', growth: '+47.1%' },
+            { date: '2005-06-10', price: '£425,000', type: 'Transfer', growth: '+129.7%' },
+            { date: '1998-01-03', price: '£185,000', type: 'Transfer', growth: '' },
         ];
     }
     
