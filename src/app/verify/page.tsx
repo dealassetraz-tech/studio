@@ -9,8 +9,6 @@ import { VerificationReport } from "@/components/verification-report";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, Share2, AlertTriangle } from "lucide-react";
 import { DownloadDialog } from "@/components/download-dialog";
-import jsPDF from "jspdf";
-import { saveAs } from "file-saver";
 import { ShareDialog } from "@/components/share-dialog";
 
 export default function VerifyPage() {
@@ -25,76 +23,6 @@ export default function VerifyPage() {
     setIsLoading(false);
   };
   
-   const generateReportText = (report: VerifyPropertyOutput): string => {
-    let reportText = `ASSETRAZ UK - Verification Report\n`;
-    reportText += `====================================\n\n`;
-    reportText += `Report ID: ${report.verificationId}\n`;
-    reportText += `Timestamp: ${new Date(report.timestamp).toLocaleString()}\n\n`;
-
-    reportText += `--- Property Details ---\n`;
-    reportText += `Title Number: ${report.propertyDetails.titleNumber}\n`;
-    reportText += `Address: ${report.propertyDetails.address}\n`;
-    reportText += `Tenure: ${report.propertyDetails.tenure}\n\n`;
-
-    reportText += `--- Ownership ---\n`;
-    reportText += `Ownership Type: ${report.ownership.ownershipType}\n`;
-    reportText += `Proprietors:\n`;
-    report.ownership.proprietors.forEach(p => {
-      reportText += `  - ${p}\n`;
-    });
-    reportText += `\n`;
-
-    if (report.companyDetails) {
-      reportText += `--- Company Details ---\n`;
-      reportText += `Company Name: ${report.companyDetails.companyName}\n`;
-      reportText += `Company Number: ${report.companyDetails.companyNumber}\n`;
-      reportText += `Directors:\n`;
-      report.companyDetails.directors.forEach(d => {
-        reportText += `  - ${d}\n`;
-      });
-      reportText += `\n`;
-    }
-
-    if (report.pricePaidHistory && report.pricePaidHistory.length > 0) {
-      reportText += `--- Price Paid History ---\n`;
-      report.pricePaidHistory.forEach(h => {
-        reportText += `Date: ${new Date(h.date).toLocaleDateString()}, Price: ${h.price}\n`;
-      });
-      reportText += `\n`;
-    }
-
-    reportText += `--- Alerts & Notices ---\n`;
-    report.alerts.forEach(a => {
-      reportText += `[${a.level.toUpperCase()}] ${a.message}\n`;
-    });
-
-    return reportText;
-}
-
-  const handleDownloadPdf = () => {
-    if (!report) return;
-    const reportText = generateReportText(report);
-    const doc = new jsPDF();
-    
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text("ASSETRAZ UK - Verification Report", 14, 22);
-
-    doc.setFont('Helvetica', 'normal');
-    doc.setFontSize(12);
-    const lines = doc.splitTextToSize(reportText.replace('ASSETRAZ UK - Verification Report\n====================================\n\n', ''), 180);
-    doc.text(lines, 14, 35);
-    
-    doc.save(`verification-report-${report.verificationId}.pdf`);
-  };
-
-  const handleDownloadJson = () => {
-    if (!report) return;
-    const jsonString = JSON.stringify(report, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    saveAs(blob, `verification-report-${report.verificationId}.json`);
-  };
-
   if (report) {
     return (
      <>
@@ -115,13 +43,9 @@ export default function VerifyPage() {
             <VerificationReport report={report} />
              <div className="max-w-4xl mx-auto mt-8">
                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Button onClick={handleDownloadPdf} className="flex-1">
+                    <Button onClick={() => setIsDownloadDialogOpen(true)} className="flex-1">
                         <Download className="mr-2 h-4 w-4" />
-                        Download PDF Report
-                    </Button>
-                    <Button onClick={handleDownloadJson} variant="secondary" className="flex-1">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Download JSON Data
+                        Download Report
                     </Button>
                     <Button onClick={() => setIsShareDialogOpen(true)} variant="outline" className="flex-1">
                         <Share2 className="mr-2 h-4 w-4" />
