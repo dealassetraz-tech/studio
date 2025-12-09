@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Info } from "lucide-react";
 import { CircularProgress } from "./circular-progress";
 
 const legalChecks = [
@@ -28,13 +28,64 @@ const ownershipChecks = [
     title: "Identity Verified",
     description: "Owner identity cross-referenced with electoral roll and credit agencies",
     points: 10,
+    icon: CheckCircle,
+    iconClass: "text-green-500",
+    borderClass: "border-green-500",
   },
   {
     title: "Ownership Stability",
-    description: "No recent, rapid changes in ownership",
+    description: "Current owner for 6+ years, indicates genuine long-term ownership",
     points: 10,
+    icon: CheckCircle,
+    iconClass: "text-green-500",
+    borderClass: "border-green-500",
+  },
+  {
+    title: "Owner-Occupied Status",
+    description: "Address matches proprietor address, lower fraud risk for occupied properties",
+    points: 5,
+    icon: Info,
+    iconClass: "text-blue-500",
+    borderClass: "border-blue-500",
   },
 ];
+
+const transactionChecks = [
+    {
+        title: "Market-Aligned Pricing",
+        description: "All sales within ±15% of comparable properties, no £1 transfers",
+        points: 8,
+    },
+    {
+        title: "Normal Transaction Velocity",
+        description: "4 sales in 26 years (avg 6.5 years per ownership) - healthy pattern",
+        points: 7,
+    },
+    {
+        title: "SDLT Records Match",
+        description: "Stamp Duty Land Tax paid correctly on all transactions",
+        points: 5,
+    }
+]
+
+const antiFraudChecks = [
+    {
+        title: "No Fraud Markers",
+        description: "Property not flagged by CIFAS, Action Fraud, or police databases",
+        points: 5,
+    },
+    {
+        title: "AML Screening Clear",
+        description: "Owner passed anti-money laundering checks, no PEP or sanctions matches",
+        points: 4,
+    },
+    {
+        title: "No Repossession History",
+        description: "No records of forced sales or repossessions at this address",
+        points: 3,
+    }
+]
+
 
 export function TrustScoreAnalysis() {
   return (
@@ -86,6 +137,27 @@ export function TrustScoreAnalysis() {
                 </h3>
                  <div className="space-y-2">
                     {ownershipChecks.map((item, index) => (
+                        <div key={index} className={`flex items-center justify-between p-3 bg-background rounded-md border-l-4 ${item.borderClass}`}>
+                           <div className="flex items-center gap-3">
+                                <item.icon className={`w-5 h-5 ${item.iconClass}`} />
+                                <div>
+                                    <p className="font-semibold">{item.title}</p>
+                                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                                </div>
+                            </div>
+                            <p className={`font-semibold ${item.iconClass}`}>+{item.points}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="mt-6">
+                <h3 className="text-sm font-semibold tracking-wider text-green-600 mb-3 flex items-center">
+                    <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+                    TRANSACTION & PRICING (20 POINTS)
+                </h3>
+                 <div className="space-y-2">
+                    {transactionChecks.map((item, index) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-background rounded-md border-l-4 border-green-500">
                            <div className="flex items-center gap-3">
                                 <CheckCircle className="w-5 h-5 text-green-500" />
@@ -99,6 +171,28 @@ export function TrustScoreAnalysis() {
                     ))}
                 </div>
             </div>
+
+            <div className="mt-6">
+                <h3 className="text-sm font-semibold tracking-wider text-red-600 mb-3 flex items-center">
+                    <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
+                    ANTI-FRAUD & COMPLIANCE (12 POINTS)
+                </h3>
+                 <div className="space-y-2">
+                    {antiFraudChecks.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-background rounded-md border-l-4 border-green-500">
+                           <div className="flex items-center gap-3">
+                                <CheckCircle className="w-5 h-5 text-green-500" />
+                                <div>
+                                    <p className="font-semibold">{item.title}</p>
+                                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                                </div>
+                            </div>
+                            <p className="font-semibold text-green-600">+{item.points}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </div>
       </CardContent>
     </Card>
