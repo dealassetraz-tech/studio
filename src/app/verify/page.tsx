@@ -33,15 +33,13 @@ export default function VerifyPage() {
         <Header />
         <main className="flex-grow">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-4">
-                <div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-left">
+                <div className="text-center max-w-3xl mx-auto mb-8">
+                  <h1 className="text-4xl md:text-5xl font-bold">
                     Verification Report
-                    </h1>
-                    <p className="text-lg text-muted-foreground text-left mt-1">
+                  </h1>
+                  <p className="text-lg text-muted-foreground mt-2">
                     A summary of the checks performed on the property.
-                    </p>
-                </div>
+                  </p>
                 </div>
             <VerificationReport report={report} />
              <div className="max-w-4xl mx-auto mt-8">
