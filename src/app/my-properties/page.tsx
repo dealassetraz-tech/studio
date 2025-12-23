@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { IndianRupee, Tag, ArrowLeft } from "lucide-react";
 import placeholderImages from "@/lib/placeholder-images.json";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Property {
   id: string;
@@ -89,7 +90,9 @@ export default function MyPropertiesPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
             </Button>
-            <Button>+ Add Property</Button>
+            <Button asChild>
+                <Link href="/add-property">+ Add Property</Link>
+            </Button>
         </div>
       </div>
 
@@ -147,7 +150,9 @@ export default function MyPropertiesPage() {
           <p className="text-muted-foreground mt-2">
             You don't have any properties listed for sale right now.
           </p>
-           <Button className="mt-4">+ Add Property</Button>
+           <Button asChild className="mt-4">
+                <Link href="/add-property">+ Add Property</Link>
+            </Button>
         </div>
       )}
     </div>

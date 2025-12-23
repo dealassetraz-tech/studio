@@ -7,6 +7,7 @@ import { useMemo, useState, useEffect } from "react";
 import { IndianRupee } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import Link from "next/link";
 
 interface Property {
   id: string;
@@ -109,7 +110,9 @@ export default function SellerDashboard() {
             Manage your properties and deals
           </p>
         </div>
-        <Button>+ Add Property</Button>
+        <Button asChild>
+          <Link href="/add-property">+ Add Property</Link>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
