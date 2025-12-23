@@ -3,7 +3,7 @@ import { CheckCircle2, FileText, Shield, Users } from "lucide-react";
 
 const rolesData = [
   {
-    icon: <FileText className="w-8 h-8 text-green-600" />,
+    icon: <FileText className="w-8 h-8 text-primary" />,
     title: "For Sellers",
     description: "List properties privately, assign trusted brokers, and manage offers with complete control.",
     features: [
@@ -12,10 +12,10 @@ const rolesData = [
       "Offer management",
       "Deal tracking",
     ],
-    featureColor: "text-green-600",
+    featureColor: "text-primary",
   },
   {
-    icon: <Users className="w-8 h-8 text-blue-600" />,
+    icon: <Users className="w-8 h-8 text-primary" />,
     title: "For Buyers",
     description: "Browse curated properties and work with verified brokers to secure your dream home.",
     features: [
@@ -24,10 +24,10 @@ const rolesData = [
       "Secure messaging",
       "Status tracking",
     ],
-    featureColor: "text-blue-600",
+    featureColor: "text-primary",
   },
   {
-    icon: <Shield className="w-8 h-8 text-purple-600" />,
+    icon: <Shield className="w-8 h-8 text-primary" />,
     title: "For Brokers",
     description: "Facilitate deals as the trusted intermediary with powerful negotiation tools.",
     features: [
@@ -36,7 +36,7 @@ const rolesData = [
       "Offer negotiation",
       "Commission tracking",
     ],
-    featureColor: "text-purple-600",
+    featureColor: "text-primary",
   },
 ];
 
@@ -46,7 +46,7 @@ export function Roles() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {rolesData.map((role, index) => (
-            <Card key={index} className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-border/30 overflow-hidden group hover:border-primary/50 transition-all duration-300">
+            <Card key={index} className="bg-card backdrop-blur-sm rounded-2xl shadow-lg border border-border/30 overflow-hidden group hover:border-primary/50 transition-all duration-300">
               <CardHeader className="p-8">
                 <div className="p-4 bg-muted rounded-xl w-fit mb-4 border border-border/50">
                   {role.icon}

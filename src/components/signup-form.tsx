@@ -44,19 +44,19 @@ const roles = [
         value: "seller",
         label: "Seller",
         description: "List and manage your properties",
-        icon: <Home className="w-6 h-6 text-green-600" />,
+        icon: <Home className="w-6 h-6 text-primary" />,
     },
     {
         value: "buyer",
         label: "Buyer",
         description: "Browse and purchase properties",
-        icon: <Building className="w-6 h-6 text-blue-600" />,
+        icon: <Building className="w-6 h-6 text-primary" />,
     },
     {
         value: "broker",
         label: "Broker",
         description: "Facilitate property transactions",
-        icon: <User className="w-6 h-6 text-purple-600" />,
+        icon: <User className="w-6 h-6 text-primary" />,
     }
 ]
 
@@ -152,6 +152,7 @@ export function SignUpForm() {
                                         <span className="font-semibold">{role.label}</span>
                                         <span className="text-sm text-muted-foreground">{role.description}</span>
                                     </div>
+
                                     <div className="absolute top-4 right-4">
                                       {field.value === role.value && <CheckCircle className="w-6 h-6 text-primary" />}
                                     </div>
