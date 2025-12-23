@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { DealLockLogo } from "./deallock-logo";
 
@@ -50,7 +52,7 @@ export function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Platform</h3>
             <ul className="space-y-2">
               {footerLinks.platform.map((link) => (
-                <li key={link.href}>
+                <li key={`${link.href}-${link.label}`}>
                   <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm" onClick={handleScroll}>
                     {link.label}
                   </Link>
@@ -62,7 +64,7 @@ export function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Company</h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
-                <li key={link.href}>
+                <li key={`${link.href}-${link.label}`}>
                   <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm" onClick={handleScroll}>
                     {link.label}
                   </Link>
@@ -74,7 +76,7 @@ export function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Legal</h3>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
-                <li key={link.href}>
+                <li key={`${link.href}-${link.label}`}>
                   <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm" onClick={handleScroll}>
                     {link.label}
                   </Link>
