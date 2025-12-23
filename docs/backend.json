@@ -15,13 +15,14 @@
           "description": "User's email address.",
           "format": "email"
         },
-        "firstName": {
+        "fullName": {
           "type": "string",
-          "description": "User's first name."
+          "description": "User's full name."
         },
-        "lastName": {
+        "role": {
           "type": "string",
-          "description": "User's last name."
+          "enum": ["seller", "buyer", "broker"],
+          "description": "The user's role in the application."
         },
         "createdAt": {
           "type": "string",
@@ -37,11 +38,71 @@
       "required": [
         "id",
         "email",
-        "firstName",
-        "lastName",
+        "fullName",
+        "role",
         "createdAt",
         "updatedAt"
       ]
+    },
+    "Property": {
+      "title": "Property",
+      "description": "Represents a real estate property listed in the application.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "The UID of the user who owns the property."
+        },
+        "address": {
+          "type": "string",
+          "description": "The full address of the property."
+        },
+        "price": {
+          "type": "number",
+          "description": "The listing price of the property."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Listed", "Under Contract", "Sold"],
+          "description": "The current status of the property."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the property was listed."
+        }
+      },
+      "required": ["ownerId", "address", "price", "status", "createdAt"]
+    },
+    "Deal": {
+      "title": "Deal",
+      "description": "Represents a transaction or deal for a property.",
+      "type": "object",
+      "properties": {
+        "propertyId": {
+          "type": "string",
+          "description": "The ID of the property this deal is for."
+        },
+        "sellerId": {
+          "type": "string",
+          "description": "The UID of the seller."
+        },
+        "buyerId": {
+          "type": "string",
+          "description": "The UID of the buyer."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Active", "Closed", "Cancelled"],
+          "description": "The current status of the deal."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the deal was initiated."
+        }
+      },
+      "required": ["propertyId", "sellerId", "buyerId", "status", "createdAt"]
     }
   },
   "auth": {
@@ -55,11 +116,10 @@
       {
         "path": "/users/{userId}",
         "definition": {
-          "entityName": "User",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/entities/User"
           },
-          "description": "Stores user profiles, with path-based ownership for security. Ensures only the authenticated user (or admin, if applicable) can access their data.",
+          "description": "Stores user profiles, with path-based ownership for security.",
           "params": [
             {
               "name": "userId",
@@ -69,11 +129,40 @@
         }
       },
       {
+        "path": "/properties/{propertyId}",
+        "definition": {
+          "schema": {
+            "$ref": "#/entities/Property"
+          },
+          "description": "Contains all property listings.",
+          "params": [
+            {
+              "name": "propertyId",
+              "description": "The unique identifier for the property."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/deals/{dealId}",
+        "definition": {
+          "schema": {
+            "$ref": "#/entities/Deal"
+          },
+          "description": "Contains all deals related to properties.",
+          "params": [
+            {
+              "name": "dealId",
+              "description": "The unique identifier for the deal."
+            }
+          ]
+        }
+      },
+      {
         "path": "/roles_admin/{userId}",
         "definition": {
-          "entityName": "roles_admin",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/entities/User"
           },
           "description": "A collection of admin user IDs, used for role-based access control. Existence in this collection grants admin privileges.",
           "params": [
@@ -84,7 +173,6 @@
           ]
         }
       }
-    ],
-    "reasoning": "Based on the provided entities and application requirements, a straightforward Firestore structure is recommended. Given the single entity 'User', and the need for a fully functional sign-in and sign-up page, the structure prioritizes secure user data storage. Specifically, we focus on a path-based ownership model for private user data. This approach simplifies security rules by directly associating data access with the authenticated user's ID.\n\nTo ensure 'Authorization Independence', no denormalization is required since there's only a single entity and no complex relationships. QAPs are supported because listing and accessing users is straightforward and secure, based on user ID. The design inherently supports private data, as each user document resides under a path segment unique to the user's ID, reinforcing data privacy and security."
+    ]
   }
 }

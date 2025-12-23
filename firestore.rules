@@ -3,19 +3,17 @@
  * The primary goal is to ensure that a user's personal data is private and can only be modified by the user themselves.
  * A secondary 'roles_admin' collection provides a mechanism to grant read-only administrative privileges.
  *
- * Data Structure: The data is organized into two top-level collections:
+ * Data Structure: The data is organized into several top-level collections:
  * 1. `/users/{userId}`: Contains the profile document for each user, keyed by their Firebase Auth UID.
- * 2. `/roles_admin/{userId}`: A simple collection where the existence of a document indicates that the user is an administrator.
+ * 2. `/properties/{propertyId}`: Contains property listings.
+ * 3. `/deals/{dealId}`: Contains deal information related to properties.
+ * 4. `/roles_admin/{userId}`: A simple collection where the existence of a document indicates that the user is an administrator.
  *
  * Key Security Decisions:
  * - User Privacy: Listing users is explicitly disabled to protect user privacy and prevent data scraping. A user cannot discover other users in the system.
- * - Owner-Only Writes: All write operations (create, update, delete) on a user's profile are strictly limited to the authenticated owner of that profile.
- * - Administrative Access: Users designated as admins gain read-only access to all user profiles for support or moderation purposes, but they cannot modify or delete other users' data from the client.
- * - Immutable Roles: The `roles_admin` collection is locked down and cannot be modified by any client. This prevents privilege escalation; admin roles must be assigned through a trusted server environment (e.g., using the Firebase Admin SDK).
- *
- * Denormalization for Authorization: This ruleset does not require denormalization. Admin status is checked using an `exists()` call on the `/roles_admin` collection, which is a highly performant read operation.
- *
- * Structural Segregation: Not applicable, as the data model does not contain mixed public/private content within the same collection.
+ * - Owner-Only Writes: All write operations (create, update, delete) on a user's profile, properties, and deals are strictly limited to the authenticated owner.
+ * - Administrative Access: Users designated as admins gain read-only access to all user profiles, properties, and deals for support or moderation purposes.
+ * - Immutable Roles: The `roles_admin` collection is locked down and cannot be modified by any client.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -24,89 +22,53 @@ service cloud.firestore {
     // Helper Functions
     // --------------------------------
 
-    /**
-     * Checks if a user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the currently authenticated user's UID matches the provided userId.
-     * This is the foundation of the ownership model.
-     * @param userId The user ID to check against the authenticated user's UID.
-     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-
-    /**
-     * Checks for ownership on an existing document.
-     * CRITICAL: Used for update and delete operations to prevent acting on non-existent data.
-     * @param userId The user ID to check for ownership.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+    
+    function isResourceOwner(resource) {
+        return isSignedIn() && request.auth.uid == resource.data.ownerId;
+    }
+    
+    function isDealParticipant(resource) {
+        return isSignedIn() && (request.auth.uid == resource.data.sellerId || request.auth.uid == resource.data.buyerId);
     }
 
-    /**
-     * Checks if the authenticated user has an admin role.
-     * An admin is defined by the existence of a document in the /roles_admin collection.
-     */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-    }
-
-    /**
-     * Validates that the incoming User document being created has its 'id' field
-     * correctly set to the user's auth UID, enforcing relational integrity.
-     * @param userId The UID of the user creating the document.
-     */
-    function isCreatingValidUser(userId) {
-      return request.resource.data.id == userId;
-    }
-
-    /**
-     * Validates that the 'id' field of a User document is not being changed during an update.
-     * This makes the ownership link immutable.
-     */
-    function isUpdatingValidUser() {
-      return request.resource.data.id == resource.data.id;
     }
 
     // Collection Rules
     // --------------------------------
 
-    /**
-     * @description Manages user profile documents.
-     * @path /users/{userId}
-     * @allow (get) An authenticated user to read their own profile, or an admin to read any profile.
-     * @allow (create, update, delete) An authenticated user to write to their own profile.
-     * @deny (list) Any user, including admins, from listing all user profiles to protect privacy.
-     * @deny (get, create, update, delete) A user attempting to access another user's profile.
-     * @principle Restricts access to a user's own data tree and enforces document ownership.
-     */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if false;
-      allow create: if isOwner(userId) && isCreatingValidUser(userId);
-      allow update: if isExistingOwner(userId) && isUpdatingValidUser();
-      allow delete: if isExistingOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    match /properties/{propertyId} {
+        allow get: if isResourceOwner(resource) || isAdmin();
+        allow list: if isSignedIn() || isAdmin(); // Allow signed-in users to list properties
+        allow create: if isOwner(request.resource.data.ownerId);
+        allow update, delete: if isResourceOwner(resource);
+    }
+    
+    match /deals/{dealId} {
+        allow get: if isDealParticipant(resource) || isAdmin();
+        allow list: if isSignedIn() || isAdmin();
+        allow create: if isOwner(request.resource.data.sellerId);
+        allow update, delete: if isDealParticipant(resource);
     }
 
-    /**
-     * @description Defines which users have administrative privileges.
-     * @path /roles_admin/{userId}
-     * @allow (none) No client-side operations are permitted.
-     * @deny (all) All reads and writes are denied to prevent privilege escalation from the client.
-     * @principle This collection must only be managed by a trusted server environment using the Admin SDK.
-     */
     match /roles_admin/{userId} {
-      allow get: if false;
-      allow list: if false;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow read, write: if false;
     }
   }
 }

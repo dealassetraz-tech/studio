@@ -2,27 +2,74 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Home, Briefcase } from "lucide-react";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
+import { DollarSign, Home, Briefcase, Building } from "lucide-react";
+import { useMemo } from "react";
 
-const stats = [
-  {
-    title: "Total Properties",
-    value: "0",
-    icon: <Home className="w-6 h-6 text-primary" />,
-  },
-  {
-    title: "Active Deals",
-    value: "0",
-    icon: <Briefcase className="w-6 h-6 text-yellow-500" />,
-  },
-  {
-    title: "Total Value",
-    value: "$0",
-    icon: <DollarSign className="w-6 h-6 text-green-500" />,
-  },
-];
+interface Property {
+  id: string;
+  address: string;
+  price: number;
+  status: string;
+}
+
+interface Deal {
+  id: string;
+  propertyId: string;
+  status: 'Active' | 'Closed' | 'Cancelled';
+}
 
 export default function SellerDashboard() {
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const propertiesQuery = useMemoFirebase(
+    () =>
+      user
+        ? query(collection(firestore, "properties"), where("ownerId", "==", user.uid))
+        : null,
+    [firestore, user]
+  );
+  const { data: properties, isLoading: isLoadingProperties } = useCollection<Property>(propertiesQuery);
+
+  const dealsQuery = useMemoFirebase(
+    () =>
+      user
+        ? query(collection(firestore, "deals"), where("sellerId", "==", user.uid))
+        : null,
+    [firestore, user]
+  );
+  const { data: deals, isLoading: isLoadingDeals } = useCollection<Deal>(dealsQuery);
+
+  const stats = useMemo(() => {
+    const totalProperties = properties?.length || 0;
+    const activeDeals = deals?.filter(d => d.status === 'Active').length || 0;
+    const totalValue = properties?.reduce((sum, prop) => sum + prop.price, 0) || 0;
+
+    return [
+      {
+        title: "Total Properties",
+        value: totalProperties.toString(),
+        icon: <Home className="w-6 h-6 text-primary" />,
+        isLoading: isLoadingProperties,
+      },
+      {
+        title: "Active Deals",
+        value: activeDeals.toString(),
+        icon: <Briefcase className="w-6 h-6 text-yellow-500" />,
+        isLoading: isLoadingDeals,
+      },
+      {
+        title: "Total Value",
+        value: `$${totalValue.toLocaleString()}`,
+        icon: <DollarSign className="w-6 h-6 text-green-500" />,
+        isLoading: isLoadingProperties,
+      },
+    ];
+  }, [properties, deals, isLoadingProperties, isLoadingDeals]);
+
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -45,7 +92,11 @@ export default function SellerDashboard() {
               {stat.icon}
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              {stat.isLoading ? (
+                <div className="h-8 w-24 bg-muted animate-pulse rounded-md" />
+              ) : (
+                <div className="text-2xl font-bold">{stat.value}</div>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -53,12 +104,37 @@ export default function SellerDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>My Properties</CardTitle>
         </CardHeader>
-        <CardContent className="h-64 flex items-center justify-center">
-          <p className="text-muted-foreground">
-            No recent activity. Start by adding a property!
-          </p>
+        <CardContent className="h-auto">
+          {isLoadingProperties ? (
+             <div className="space-y-4">
+                <div className="h-12 bg-muted animate-pulse rounded-md" />
+                <div className="h-12 bg-muted animate-pulse rounded-md" />
+                <div className="h-12 bg-muted animate-pulse rounded-md" />
+             </div>
+          ) : properties && properties.length > 0 ? (
+            <ul className="space-y-4">
+              {properties.map(prop => (
+                <li key={prop.id} className="flex items-center justify-between p-4 bg-accent rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <Building className="w-6 h-6 text-primary" />
+                    <div>
+                      <p className="font-semibold">{prop.address}</p>
+                      <p className="text-sm text-muted-foreground">${prop.price.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary">{prop.status}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="h-64 flex items-center justify-center">
+              <p className="text-muted-foreground">
+                No properties found. Start by adding a property!
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
