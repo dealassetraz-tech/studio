@@ -21,7 +21,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-12 md:py-20 bg-secondary">
+    <section id="how-it-works" className="py-12 md:py-20 bg-card/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">How It Works</h2>
@@ -31,7 +31,7 @@ export function HowItWorks() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <Card key={index} className="text-center border-border/50 shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
+            <Card key={index} className="text-center bg-background/50 border-border/50 shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
               <CardHeader>
                 <div className="mx-auto bg-primary/10 rounded-full p-4 w-fit mb-4 border border-primary/20">
                   {step.icon}

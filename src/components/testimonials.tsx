@@ -47,7 +47,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="py-12 md:py-20 bg-secondary">
+    <section id="testimonials" className="py-12 md:py-20 bg-card/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">What Our Users Say</h2>
@@ -66,7 +66,7 @@ export function Testimonials() {
             {testimonials.map((testimonial, index) => (
               <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                 <div className="p-1">
-                  <Card className="h-full border-border/50 shadow-lg flex flex-col">
+                  <Card className="h-full bg-background/50 border-border/50 shadow-lg flex flex-col">
                     <CardContent className="p-6 flex-grow flex flex-col">
                       <div className="flex items-center mb-4">
                         <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-primary/50">

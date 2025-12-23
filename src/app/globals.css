@@ -10,9 +10,9 @@
     --card-foreground: 210 40% 98%;
     --popover: 210 60% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 225 73% 55%; /* #1E40AF -> adjusted for better visibility */
+    --primary: 221 83% 53%; /* #2563EB - Brighter Blue */
     --primary-foreground: 210 40% 98%;
-    --secondary: 221 83% 53%; /* #2563EB */
+    --secondary: 215 50% 35%; /* A complementary blue */
     --secondary-foreground: 210 40% 98%;
     --muted: 210 60% 14%;
     --muted-foreground: 215 20% 65%;
@@ -22,7 +22,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 210 60% 18%;
     --input: 210 60% 18%;
-    --ring: 225 73% 55%;
+    --ring: 221 83% 53%;
     --radius: 0.5rem;
   }
 
@@ -33,9 +33,9 @@
     --card-foreground: 210 40% 98%;
     --popover: 210 60% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 225 73% 55%;
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 221 83% 53%;
+    --secondary: 215 50% 35%;
     --secondary-foreground: 210 40% 98%;
     --muted: 210 60% 14%;
     --muted-foreground: 215 20% 65%;
@@ -45,7 +45,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 210 60% 18%;
     --input: 210 60% 18%;
-    --ring: 225 73% 55%;
+    --ring: 221 83% 53%;
   }
 }
 
@@ -55,7 +55,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at top, hsl(210 60% 14%) 0%, hsl(var(--background)) 50%);
+    background-image: radial-gradient(circle at top, hsl(210 60% 14%) 0%, hsl(var(--background)) 40%);
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
