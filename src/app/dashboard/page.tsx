@@ -2,10 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
-import { collection, query, where } from "firebase/firestore";
 import { DollarSign, Home, Briefcase, Building } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 interface Property {
   id: string;
@@ -20,27 +18,33 @@ interface Deal {
   status: 'Active' | 'Closed' | 'Cancelled';
 }
 
+const mockProperties: Property[] = [
+    { id: 'prop1', address: '123 Main St, San Francisco, CA', price: 1200000, status: 'Listed' },
+    { id: 'prop2', address: '456 Market St, San Francisco, CA', price: 2500000, status: 'Under Contract' },
+    { id: 'prop3', address: '789 Oak St, Oakland, CA', price: 850000, status: 'Sold' },
+];
+
+const mockDeals: Deal[] = [
+    { id: 'deal1', propertyId: 'prop1', status: 'Active' },
+    { id: 'deal2', propertyId: 'prop2', status: 'Active' },
+    { id: 'deal3', propertyId: 'prop3', status: 'Closed' },
+];
+
+
 export default function SellerDashboard() {
-  const { user } = useUser();
-  const firestore = useFirestore();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const propertiesQuery = useMemoFirebase(
-    () =>
-      user
-        ? query(collection(firestore, "properties"), where("ownerId", "==", user.uid))
-        : null,
-    [firestore, user]
-  );
-  const { data: properties, isLoading: isLoadingProperties } = useCollection<Property>(propertiesQuery);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setProperties(mockProperties);
+      setDeals(mockDeals);
+      setIsLoading(false);
+    }, 1000); // Simulate network delay
 
-  const dealsQuery = useMemoFirebase(
-    () =>
-      user
-        ? query(collection(firestore, "deals"), where("sellerId", "==", user.uid))
-        : null,
-    [firestore, user]
-  );
-  const { data: deals, isLoading: isLoadingDeals } = useCollection<Deal>(dealsQuery);
+    return () => clearTimeout(timer);
+  }, []);
 
   const stats = useMemo(() => {
     const totalProperties = properties?.length || 0;
@@ -52,22 +56,22 @@ export default function SellerDashboard() {
         title: "Total Properties",
         value: totalProperties.toString(),
         icon: <Home className="w-6 h-6 text-primary" />,
-        isLoading: isLoadingProperties,
+        isLoading: isLoading,
       },
       {
         title: "Active Deals",
         value: activeDeals.toString(),
         icon: <Briefcase className="w-6 h-6 text-yellow-500" />,
-        isLoading: isLoadingDeals,
+        isLoading: isLoading,
       },
       {
         title: "Total Value",
         value: `$${totalValue.toLocaleString()}`,
         icon: <DollarSign className="w-6 h-6 text-green-500" />,
-        isLoading: isLoadingProperties,
+        isLoading: isLoading,
       },
     ];
-  }, [properties, deals, isLoadingProperties, isLoadingDeals]);
+  }, [properties, deals, isLoading]);
 
 
   return (
@@ -107,7 +111,7 @@ export default function SellerDashboard() {
           <CardTitle>My Properties</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoadingProperties ? (
+          {isLoading ? (
              <div className="space-y-4">
                 <div className="h-12 bg-muted animate-pulse rounded-md" />
                 <div className="h-12 bg-muted animate-pulse rounded-md" />
@@ -124,7 +128,11 @@ export default function SellerDashboard() {
                       <p className="text-sm text-muted-foreground">${prop.price.toLocaleString()}</p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary">{prop.status}</span>
+                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                      prop.status === 'Listed' ? 'bg-blue-500/10 text-blue-500' :
+                      prop.status === 'Under Contract' ? 'bg-yellow-500/10 text-yellow-500' :
+                      'bg-green-500/10 text-green-500'
+                    }`}>{prop.status}</span>
                 </li>
               ))}
             </ul>
