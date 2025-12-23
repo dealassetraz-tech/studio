@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Home, Briefcase, Building, Filter } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { IndianRupee } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
@@ -28,6 +27,7 @@ const mockProperties: Property[] = [
     { id: 'prop2', address: '456 Market St, Bengaluru, KA', price: 18000000, status: 'Under Contract', brokerage: 1.5 },
     { id: 'prop3', address: '789 Oak St, Delhi, DL', price: 7200000, status: 'Sold', brokerage: 2.5 },
     { id: 'prop4', address: '101 Pine St, Pune, MH', price: 12000000, status: 'Listed', brokerage: 1 },
+    { id: 'prop5', address: '222 River Rd, Chennai, TN', price: 25000000, status: 'Listed', brokerage: 1.8 },
 ];
 
 const mockDeals: Deal[] = [
@@ -42,7 +42,7 @@ export default function SellerDashboard() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [priceFilter, setPriceFilter] = useState<number | ''>('');
+  const [priceFilter, setPriceFilter] = useState<number[]>([30000000]);
   const [brokerageFilter, setBrokerageFilter] = useState<number[]>([5]);
 
   useEffect(() => {
@@ -85,11 +85,18 @@ export default function SellerDashboard() {
   const filteredProperties = useMemo(() => {
       if (!properties) return [];
       return properties.filter(prop => {
-          const priceMatch = priceFilter === '' || prop.price <= priceFilter;
+          const priceMatch = prop.price <= priceFilter[0];
           const brokerageMatch = prop.brokerage <= brokerageFilter[0];
           return priceMatch && brokerageMatch;
       });
   }, [properties, priceFilter, brokerageFilter]);
+
+  const formatPrice = (value: number) => {
+    if (value >= 10000000) {
+        return `${(value / 10000000).toFixed(1)} Cr`;
+    }
+    return `${(value / 100000).toFixed(0)} L`;
+  };
 
 
   return (
@@ -134,14 +141,17 @@ export default function SellerDashboard() {
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="price-filter">Max Expected Price (₹)</Label>
-            <Input
-              id="price-filter"
-              type="number"
-              placeholder="e.g., 15000000"
-              value={priceFilter}
-              onChange={(e) => setPriceFilter(e.target.value === '' ? '' : Number(e.target.value))}
-              className="bg-muted/50"
-            />
+            <div className="flex items-center gap-4 pt-2">
+                <Slider
+                    id="price-filter"
+                    min={5000000}
+                    max={30000000}
+                    step={500000}
+                    value={priceFilter}
+                    onValueChange={setPriceFilter}
+                />
+                <span className="text-lg font-semibold w-20 text-right">{formatPrice(priceFilter[0])}</span>
+             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="brokerage-filter">Max Broker Percentage (%)</Label>
