@@ -24,11 +24,12 @@ import { Building, Home, User, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { DealLockLogo } from "./deallock-logo";
 import { useAuth, useFirestore } from "@/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Label } from "./ui/label";
+import { useState } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -64,6 +65,7 @@ export function SignUpForm() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,27 +75,45 @@ export function SignUpForm() {
       password: "",
     },
   });
+  
+  useState(() => {
+    setIsMounted(true);
+  }, []);
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const toastId = toast.loading('Creating account...');
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
+
+      await updateProfile(user, { displayName: values.fullName });
 
       await setDoc(doc(firestore, "users", user.uid), {
         id: user.uid,
         email: values.email,
         fullName: values.fullName,
         role: values.role,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
 
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
+      toast.success("Account created successfully!", { id: toastId });
+      
+      if (values.role === 'buyer') {
+        router.push("/buyer-dashboard");
+      } else {
+        router.push("/dashboard");
+      }
+
     } catch (error: any) {
       console.error("Sign up error:", error);
-      toast.error(error.message || "Failed to create account.");
+      toast.error(error.message || "Failed to create account.", { id: toastId });
     }
+  }
+
+  if (!isMounted) {
+    return null; // or a loading spinner
   }
 
   return (
@@ -153,9 +173,11 @@ export function SignUpForm() {
                                         <span className="text-sm text-muted-foreground">{role.description}</span>
                                     </div>
 
-                                    <div className="absolute top-4 right-4">
-                                      {field.value === role.value && <CheckCircle className="w-6 h-6 text-primary" />}
-                                    </div>
+                                    {isMounted && field.value === role.value && 
+                                        <div className="absolute top-4 right-4">
+                                            <CheckCircle className="w-6 h-6 text-primary" />
+                                        </div>
+                                    }
                                 </Label>
                             </FormItem>
                         ))}

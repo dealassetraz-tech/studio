@@ -9,19 +9,22 @@ export default function BuyerDashboard() {
 
   const stats = [
     {
-      title: "Active Deals",
-      value: "3",
+      title: "Active Offers",
+      value: "2",
       icon: <Handshake className="w-6 h-6 text-amber-500" />,
+      description: "Offers you've made",
+    },
+    {
+      title: "Saved Properties",
+      value: "7",
+      icon: <Heart className="w-6 h-6 text-rose-500" />,
+      description: "Properties you're watching",
     },
     {
       title: "Properties Viewed",
       value: "28",
       icon: <Search className="w-6 h-6 text-primary" />,
-    },
-    {
-      title: "Wishlisted",
-      value: "7",
-      icon: <Heart className="w-6 h-6 text-rose-500" />,
+      description: "Properties you've explored",
     },
   ];
 
@@ -35,7 +38,9 @@ export default function BuyerDashboard() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/buyer-dashboard/browse-properties">Browse Properties</Link>
+          <Link href="/buyer-dashboard/browse-properties">
+            <Search className="mr-2 h-4 w-4" /> Browse Properties
+          </Link>
         </Button>
       </div>
       
@@ -50,6 +55,7 @@ export default function BuyerDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
+               <p className="text-xs text-muted-foreground">{stat.description}</p>
             </CardContent>
           </Card>
         ))}
@@ -60,7 +66,7 @@ export default function BuyerDashboard() {
           <CardTitle>Welcome, Buyer!</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">This is your personal dashboard. Use the links in the sidebar to browse properties, view your active deals, and manage your account.</p>
+          <p className="text-muted-foreground">This is your personal dashboard. Use the links in the sidebar to browse properties, view your active deals, and manage your account settings.</p>
         </CardContent>
       </Card>
     </div>

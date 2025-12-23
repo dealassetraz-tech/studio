@@ -40,6 +40,7 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const toastId = toast.loading('Signing in...');
     try {
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
@@ -50,23 +51,26 @@ export function SignInForm() {
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        toast.success("Signed in successfully!");
+        toast.success("Signed in successfully!", { id: toastId });
 
         // Redirect based on role
         if (userData.role === 'buyer') {
           router.push("/buyer-dashboard");
+        } else if (userData.role === 'seller' || userData.role === 'broker') {
+          router.push("/dashboard"); 
         } else {
-          router.push("/dashboard"); // Default to seller dashboard
+           // Fallback for any other roles or if role is not set
+          router.push("/dashboard");
         }
       } else {
         // Fallback if user doc doesn't exist for some reason
-        toast.error("User data not found. Redirecting to default dashboard.");
+        toast.error("User data not found. Redirecting to default dashboard.", { id: toastId });
         router.push("/dashboard");
       }
 
     } catch (error: any) {
       console.error("Sign in error:", error);
-      toast.error(error.message || "Failed to sign in.");
+      toast.error(error.message || "Failed to sign in.", { id: toastId });
     }
   }
 
