@@ -12,5 +12,11 @@
       "src": "https://picsum.photos/seed/testimonial3/100/100",
       "hint": "Indian person"
     }
+  ],
+  "properties": [
+    {
+      "src": "https://picsum.photos/seed/property1/600/400",
+      "hint": "modern apartment"
+    }
   ]
 }
