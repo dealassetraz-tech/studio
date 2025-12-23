@@ -8,6 +8,7 @@ import {
   LogOut,
   LayoutDashboard,
   Building,
+  Handshake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth, useUser } from "@/firebase";
@@ -18,7 +19,7 @@ import { DealLockLogo } from "./deallock-logo";
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: "/my-properties", label: "My Properties", icon: <Building className="w-5 h-5" /> },
-  { href: "/deals", label: "Deals", icon: <Briefcase className="w-5 h-5" /> },
+  { href: "/deals", label: "Deals", icon: <Handshake className="w-5 h-5" /> },
 ];
 
 export function Sidebar() {
