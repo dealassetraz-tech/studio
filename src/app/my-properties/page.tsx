@@ -79,18 +79,18 @@ export default function MyPropertiesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-end mb-4">
-        <Button variant="outline" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
-          <span className="sr-only">Back</span>
-        </Button>
-      </div>
       <div className="flex justify-between items-center mb-8">
         <div>
             <h1 className="text-3xl font-bold font-headline">My Properties</h1>
             <p className="text-muted-foreground">Manage your properties here.</p>
         </div>
-        <Button>+ Add Property</Button>
+        <div className="flex items-center gap-4">
+            <Button variant="outline" onClick={() => router.back()}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+            </Button>
+            <Button>+ Add Property</Button>
+        </div>
       </div>
 
       {isLoading ? (
