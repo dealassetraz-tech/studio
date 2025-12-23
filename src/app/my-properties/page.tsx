@@ -1,11 +1,13 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { IndianRupee, Tag } from "lucide-react";
+import { IndianRupee, Tag, ArrowLeft } from "lucide-react";
 import placeholderImages from "@/lib/placeholder-images.json";
+import { useRouter } from "next/navigation";
 
 interface Property {
   id: string;
@@ -64,6 +66,7 @@ const mockProperties: Property[] = [
 export default function MyPropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,9 +80,15 @@ export default function MyPropertiesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <div>
-            <h1 className="text-3xl font-bold font-headline">My Properties</h1>
-            <p className="text-muted-foreground">Manage your properties here.</p>
+        <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={() => router.back()}>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Back</span>
+            </Button>
+            <div>
+                <h1 className="text-3xl font-bold font-headline">My Properties</h1>
+                <p className="text-muted-foreground">Manage your properties here.</p>
+            </div>
         </div>
         <Button>+ Add Property</Button>
       </div>
