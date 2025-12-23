@@ -14,6 +14,7 @@
  * - Owner-Only Writes: All write operations (create, update, delete) on a user's profile, properties, and deals are strictly limited to the authenticated owner.
  * - Administrative Access: Users designated as admins gain read-only access to all user profiles, properties, and deals for support or moderation purposes.
  * - Immutable Roles: The `roles_admin` collection is locked down and cannot be modified by any client.
+ * - Secure Queries: List operations are not broadly allowed. Instead, client-side queries must be specific enough for Firestore to validate them against the `get` rule for each document, ensuring users can only query their own data.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -47,7 +48,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if false;
+      allow list: if false; // Explicitly forbid listing all users
       allow create: if isOwner(userId);
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
@@ -55,16 +56,20 @@ service cloud.firestore {
     
     match /properties/{propertyId} {
         allow get: if isResourceOwner(resource) || isAdmin();
-        allow list: if (request.auth.uid == request.query.ownerId) || isAdmin();
         allow create: if isOwner(request.resource.data.ownerId);
         allow update, delete: if isResourceOwner(resource);
+        // NO 'allow list'. Queries are secured by the 'get' rule.
+        // A query like `where("ownerId", "==", uid)` is allowed because 
+        // Firestore can verify that `isResourceOwner` will be true for all returned documents.
     }
     
     match /deals/{dealId} {
         allow get: if isDealParticipant(resource) || isAdmin();
-        allow list: if (request.auth.uid == request.query.sellerId || request.auth.uid == request.query.buyerId) || isAdmin();
         allow create: if isOwner(request.resource.data.sellerId);
         allow update, delete: if isDealParticipant(resource);
+        // NO 'allow list'. Queries are secured by the 'get' rule.
+        // A query like `where("sellerId", "==", uid)` is allowed because
+        // Firestore can verify that `isDealParticipant` will be true for all returned documents.
     }
 
     match /roles_admin/{userId} {

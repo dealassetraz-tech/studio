@@ -123,67 +123,29 @@
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "schema": {
-            "$ref": "#/entities/User"
-          },
-          "description": "Stores user profiles, with path-based ownership for security.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user, corresponding to their Firebase Auth UID."
-            }
-          ]
-        }
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
       },
-      {
-        "path": "/properties/{propertyId}",
-        "definition": {
-          "schema": {
-            "$ref": "#/entities/Property"
-          },
-          "description": "Contains all property listings.",
-          "params": [
-            {
-              "name": "propertyId",
-              "description": "The unique identifier for the property."
-            }
-          ]
-        }
+      "description": "Stores user profiles, with path-based ownership for security."
+    },
+    "/properties/{propertyId}": {
+      "schema": {
+        "$ref": "#/entities/Property"
       },
-      {
-        "path": "/deals/{dealId}",
-        "definition": {
-          "schema": {
-            "$ref": "#/entities/Deal"
-          },
-          "description": "Contains all deals related to properties.",
-          "params": [
-            {
-              "name": "dealId",
-              "description": "The unique identifier for the deal."
-            }
-          ]
-        }
+      "description": "Contains all property listings."
+    },
+    "/deals/{dealId}": {
+      "schema": {
+        "$ref": "#/entities/Deal"
       },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "schema": {
-            "$ref": "#/entities/User"
-          },
-          "description": "A collection of admin user IDs, used for role-based access control. Existence in this collection grants admin privileges.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            }
-          ]
-        }
-      }
-    ]
+      "description": "Contains all deals related to properties."
+    },
+    "/roles_admin/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "A collection of admin user IDs, used for role-based access control. Existence in this collection grants admin privileges."
+    }
   }
 }
