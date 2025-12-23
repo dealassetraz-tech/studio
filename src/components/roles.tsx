@@ -12,7 +12,6 @@ const rolesData = [
       "Offer management",
       "Deal tracking",
     ],
-    featureColor: "text-primary",
   },
   {
     icon: <Users className="w-8 h-8 text-primary" />,
@@ -24,7 +23,6 @@ const rolesData = [
       "Secure messaging",
       "Status tracking",
     ],
-    featureColor: "text-primary",
   },
   {
     icon: <Shield className="w-8 h-8 text-primary" />,
@@ -36,7 +34,6 @@ const rolesData = [
       "Offer negotiation",
       "Commission tracking",
     ],
-    featureColor: "text-primary",
   },
 ];
 
@@ -46,7 +43,7 @@ export function Roles() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {rolesData.map((role, index) => (
-            <Card key={index} className="bg-card backdrop-blur-sm rounded-2xl shadow-lg border border-border/30 overflow-hidden group hover:border-primary/50 transition-all duration-300">
+            <Card key={index} className="bg-card backdrop-blur-sm rounded-2xl shadow-lg border border-border/30 overflow-hidden transition-all duration-300 hover:border-primary/50 hover:bg-accent">
               <CardHeader className="p-8">
                 <div className="p-4 bg-muted rounded-xl w-fit mb-4 border border-border/50">
                   {role.icon}
@@ -58,7 +55,7 @@ export function Roles() {
                 <ul className="space-y-3">
                   {role.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <CheckCircle2 className={`w-5 h-5 ${role.featureColor}`} />
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
                       <span className="text-foreground">{feature}</span>
                     </li>
                   ))}
