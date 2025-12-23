@@ -79,6 +79,10 @@
       "description": "Represents a transaction or deal for a property.",
       "type": "object",
       "properties": {
+        "dealId": {
+          "type": "string",
+          "description": "The unique identifier for the deal."
+        },
         "propertyId": {
           "type": "string",
           "description": "The ID of the property this deal is for."
@@ -102,7 +106,14 @@
           "description": "Timestamp of when the deal was initiated."
         }
       },
-      "required": ["propertyId", "sellerId", "buyerId", "status", "createdAt"]
+      "required": [
+        "dealId",
+        "propertyId",
+        "sellerId",
+        "buyerId",
+        "status",
+        "createdAt"
+      ]
     }
   },
   "auth": {

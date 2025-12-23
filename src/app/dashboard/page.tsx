@@ -106,7 +106,7 @@ export default function SellerDashboard() {
         <CardHeader>
           <CardTitle>My Properties</CardTitle>
         </CardHeader>
-        <CardContent className="h-auto">
+        <CardContent>
           {isLoadingProperties ? (
              <div className="space-y-4">
                 <div className="h-12 bg-muted animate-pulse rounded-md" />
