@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Building, Home, User } from "lucide-react";
+import { Building, Home, User, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { DealLockLogo } from "./deallock-logo";
 import { useAuth, useFirestore } from "@/firebase";
@@ -123,32 +123,6 @@ export function SignUpForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="john.doe@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="********" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
              <FormField
               control={form.control}
               name="role"
@@ -166,7 +140,11 @@ export function SignUpForm() {
                                  <FormControl>
                                     <RadioGroupItem value={role.value} className="sr-only" />
                                 </FormControl>
-                                <Label className="flex items-center gap-4 rounded-lg border p-4 cursor-pointer hover:bg-accent hover:text-accent-foreground data-[state=checked]:border-primary data-[state=checked]:bg-primary/10">
+                                <Label
+                                  htmlFor={field.name + role.value}
+                                  className="flex items-center gap-4 rounded-lg border p-4 cursor-pointer hover:bg-accent hover:text-accent-foreground data-[state=checked]:border-primary data-[state=checked]:bg-primary/10 relative"
+                                >
+                                    <RadioGroupItem value={role.value} id={field.name + role.value} className="sr-only" />
                                     <div className="p-3 bg-muted rounded-lg border">
                                         {role.icon}
                                     </div>
@@ -174,10 +152,39 @@ export function SignUpForm() {
                                         <span className="font-semibold">{role.label}</span>
                                         <span className="text-sm text-muted-foreground">{role.description}</span>
                                     </div>
+                                    <div className="absolute top-4 right-4">
+                                      {field.value === role.value && <CheckCircle className="w-6 h-6 text-primary" />}
+                                    </div>
                                 </Label>
                             </FormItem>
                         ))}
                     </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="you@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
