@@ -1,0 +1,16 @@
+{
+  "testimonials": [
+    {
+      "src": "https://picsum.photos/seed/testimonial1/100/100",
+      "hint": "woman portrait"
+    },
+    {
+      "src": "https://picsum.photos/seed/testimonial2/100/100",
+      "hint": "man portrait"
+    },
+    {
+      "src": "https://picsum.photos/seed/testimonial3/100/100",
+      "hint": "person portrait"
+    }
+  ]
+}
