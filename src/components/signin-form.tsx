@@ -16,10 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DealLockLogo } from "./deallock-logo";
 import Link from "next/link";
-import { useAuth } from "@/firebase";
+import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { doc, getDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -28,6 +29,7 @@ const formSchema = z.object({
 
 export function SignInForm() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,9 +41,29 @@ export function SignInForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      toast.success("Signed in successfully!");
-      router.push("/dashboard");
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+
+      // Fetch user role from Firestore
+      const userDocRef = doc(firestore, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        toast.success("Signed in successfully!");
+
+        // Redirect based on role
+        if (userData.role === 'buyer') {
+          router.push("/buyer-dashboard");
+        } else {
+          router.push("/dashboard"); // Default to seller dashboard
+        }
+      } else {
+        // Fallback if user doc doesn't exist for some reason
+        toast.error("User data not found. Redirecting to default dashboard.");
+        router.push("/dashboard");
+      }
+
     } catch (error: any) {
       console.error("Sign in error:", error);
       toast.error(error.message || "Failed to sign in.");
