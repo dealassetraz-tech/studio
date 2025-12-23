@@ -47,10 +47,23 @@ export default function AddPropertyPage() {
   });
 
   function onSubmit(values: z.infer<typeof propertyFormSchema>) {
-    console.log(values);
+    // Simulate saving the data
+    const newProperty = {
+      id: `prop_${Date.now()}`,
+      ...values,
+    };
+    
+    // Get existing properties from local storage, or an empty array
+    const existingProperties = JSON.parse(localStorage.getItem('mockProperties') || '[]');
+    
+    // Add the new property
+    const updatedProperties = [...existingProperties, newProperty];
+    
+    // Save back to local storage
+    localStorage.setItem('mockProperties', JSON.stringify(updatedProperties));
+    
     toast.success('Property listed successfully!');
-    // Here you would typically send the data to your backend
-    // For now, we just navigate back to the dashboard
+    
     router.push('/dashboard');
   }
 

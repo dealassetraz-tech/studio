@@ -14,7 +14,7 @@ interface Property {
   address: string;
   price: number;
   status: string;
-  brokerage: number; // New field for broker percentage
+  brokerage: number;
 }
 
 interface Deal {
@@ -23,7 +23,7 @@ interface Deal {
   status: 'Active' | 'Closed' | 'Cancelled';
 }
 
-const mockProperties: Property[] = [
+const defaultMockProperties: Property[] = [
     { id: 'prop1', address: '123 Main St, Mumbai, MH', price: 9500000, status: 'Listed', brokerage: 2 },
     { id: 'prop2', address: '456 Market St, Bengaluru, KA', price: 18000000, status: 'Under Contract', brokerage: 1.5 },
     { id: 'prop3', address: '789 Oak St, Delhi, DL', price: 7200000, status: 'Sold', brokerage: 2.5 },
@@ -49,10 +49,19 @@ export default function SellerDashboard() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setProperties(mockProperties);
+      // Try to load properties from localStorage
+      const storedProperties = localStorage.getItem('mockProperties');
+      if (storedProperties) {
+        setProperties(JSON.parse(storedProperties));
+      } else {
+        // If nothing is in localStorage, use default and set it
+        setProperties(defaultMockProperties);
+        localStorage.setItem('mockProperties', JSON.stringify(defaultMockProperties));
+      }
+      
       setDeals(mockDeals);
       setIsLoading(false);
-    }, 1000); // Simulate network delay
+    }, 500); // Shorten delay a bit
 
     return () => clearTimeout(timer);
   }, []);
