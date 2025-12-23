@@ -1,16 +1,13 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { Inter, Space_Grotesk } from 'next/font/google';
-import { FirebaseClientProvider } from '@/firebase';
-import { Footer } from '@/components/footer';
-import { ClientToaster } from '@/components/client-toaster';
+import { Inter, Playfair_Display } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
+const playfairDisplay = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair-display', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'ASSETRAZ UK',
-  description: 'Property & Owner Verification',
+  title: 'DealLock',
+  description: 'Secure Real Estate Deal Management',
 };
 
 export default function RootLayout({
@@ -19,15 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-       <body className="font-sans flex flex-col min-h-screen">
-        <FirebaseClientProvider>
-          <div className="flex-grow">
-            {children}
-          </div>
-          <Footer />
-        </FirebaseClientProvider>
-        <ClientToaster />
+    <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
+       <body className="font-sans">
+        {children}
       </body>
     </html>
   );

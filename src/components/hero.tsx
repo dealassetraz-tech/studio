@@ -1,44 +1,31 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
-import { HowItWorksNew } from "./how-it-works-new";
-import { useUser } from "@/firebase";
 
 export function Hero() {
-  const { user, loading } = useUser();
-  const verificationHref = !loading && user ? "/verify" : "/auth?type=signup";
-
   return (
-    <section className="relative bg-gradient-to-br from-[#2A3E90] to-[#6042A4] py-12 md:py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
-      <div className="container mx-auto px-4 relative">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                    Verify UK property & ownership before the deal moves.
-                </h1>
-                <p className="text-lg md:text-xl text-purple-200 mb-10 max-w-2xl mx-auto md:mx-0">
-                    ASSETRAZ UK connects to official sources to confirm that a property exists, who owns it, and what its history looks like – in one standardised report for agents, platforms and professionals.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                    <Button size="lg" className="h-12 w-full sm:w-auto bg-white text-blue-900 hover:bg-gray-200" asChild>
-                    <Link href={verificationHref}>
-                        Start a verification
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                    </Button>
-                    <Button size="lg" variant="outline" className="h-12 w-full sm:w-auto text-white border-white/50 hover:bg-white/10 hover:text-white" asChild>
-                    <Link href="/contact">
-                        Contact Sales
-                    </Link>
-                    </Button>
-                </div>
-            </div>
-            <div>
-                <HowItWorksNew />
-            </div>
+    <section className="py-20 md:py-32">
+      <div className="container mx-auto px-4 text-center">
+        <div className="inline-flex items-center justify-center bg-secondary text-secondary-foreground rounded-full px-4 py-2 mb-6 border border-border">
+            <Star className="w-4 h-4 mr-2 text-primary" />
+            <span className="text-sm">Trusted by 10,000+ real estate professionals</span>
+        </div>
+        <h1 className="font-headline text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            Secure Real Estate <br />
+            <span className="text-primary">Deal Management</span>
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+            The only platform where sellers, buyers, and brokers connect securely. Every transaction is protected, every detail is private.
+        </p>
+        <div className="flex items-center justify-center gap-4">
+            <Button size="lg" asChild>
+              <Link href="#">
+                  Start Free Today
+                  <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
         </div>
       </div>
     </section>
