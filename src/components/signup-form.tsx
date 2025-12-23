@@ -1,0 +1,172 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Building, Home, User } from "lucide-react";
+import Link from "next/link";
+import { DealLockLogo } from "./deallock-logo";
+
+const formSchema = z.object({
+  fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
+  email: z.string().email({ message: "Invalid email address." }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  role: z.enum(["seller", "buyer", "broker"], {
+    required_error: "You need to select a role.",
+  }),
+});
+
+const roles = [
+    {
+        value: "seller",
+        label: "Seller",
+        description: "List and manage your properties",
+        icon: <Home className="w-6 h-6 text-green-600" />,
+    },
+    {
+        value: "buyer",
+        label: "Buyer",
+        description: "Browse and purchase properties",
+        icon: <Building className="w-6 h-6 text-blue-600" />,
+    },
+    {
+        value: "broker",
+        label: "Broker",
+        description: "Facilitate property transactions",
+        icon: <User className="w-6 h-6 text-purple-600" />,
+    }
+]
+
+export function SignUpForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+  }
+
+  return (
+    <Card className="w-full max-w-lg my-8">
+      <CardHeader className="text-center">
+        <div className="mx-auto mb-4">
+          <DealLockLogo className="w-16 h-16 p-4" />
+        </div>
+        <CardTitle className="text-2xl font-headline">Create Account</CardTitle>
+        <p className="text-muted-foreground">
+          Join DealLock to start your real estate journey
+        </p>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="john.doe@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Select Your Role</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-3"
+                    >
+                        {roles.map(role => (
+                            <FormItem key={role.value}>
+                                 <FormControl>
+                                    <RadioGroupItem value={role.value} className="sr-only" />
+                                </FormControl>
+                                <Label className="flex items-center gap-4 rounded-lg border p-4 cursor-pointer hover:bg-accent hover:text-accent-foreground data-[state=checked]:border-primary data-[state=checked]:bg-primary/10">
+                                    <div className="p-3 bg-muted rounded-lg border">
+                                        {role.icon}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold">{role.label}</span>
+                                        <span className="text-sm text-muted-foreground">{role.description}</span>
+                                    </div>
+                                </Label>
+                            </FormItem>
+                        ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">
+              Create Account
+            </Button>
+            <div className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link href="/signin" className="text-primary hover:underline">
+                    Sign In
+                </Link>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}

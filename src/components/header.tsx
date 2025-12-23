@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import {
   Sheet,
@@ -48,11 +48,11 @@ export function Header() {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-4">
-            <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href="/signin" className="text-sm font-medium hover:text-primary transition-colors">
               Sign In
             </Link>
             <Button asChild>
-                <Link href="#">Get Started</Link>
+                <Link href="/signup">Get Started</Link>
             </Button>
           </div>
           <div className="flex items-center gap-4 md:hidden">
@@ -76,11 +76,11 @@ export function Header() {
                           </Link>
                         ))}
                          <hr className="my-2 border-border"/>
-                         <Link href="#" className="flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                         <Link href="/signin" className="flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                             Sign In
                          </Link>
                         <Button asChild>
-                            <Link href="#" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                            <Link href="/signup" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
                         </Button>
                     </nav>
                  </div>

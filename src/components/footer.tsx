@@ -7,8 +7,8 @@ const footerLinks = {
     platform: [
         { href: "#how-it-works", label: "How it Works" },
         { href: "#features", label: "Features" },
-        { href: "#", label: "Pricing" },
-        { href: "#", label: "Sign In" },
+        { href: "/pricing", label: "Pricing" },
+        { href: "/signin", label: "Sign In" },
     ],
     company: [
         { href: "#", label: "About Us" },
@@ -53,7 +53,7 @@ export function Footer() {
             <ul className="space-y-2">
               {footerLinks.platform.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
-                  <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm" onClick={handleScroll}>
+                  <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors text-sm" onClick={link.href.startsWith("#") ? handleScroll : undefined}>
                     {link.label}
                   </Link>
                 </li>
