@@ -23,6 +23,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Building, Home, User } from "lucide-react";
 import Link from "next/link";
 import { DealLockLogo } from "./deallock-logo";
+import { useAuth, useFirestore } from "@/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { Label } from "./ui/label";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -55,6 +61,10 @@ const roles = [
 ]
 
 export function SignUpForm() {
+  const auth = useAuth();
+  const firestore = useFirestore();
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,8 +74,26 @@ export function SignUpForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+
+      await setDoc(doc(firestore, "users", user.uid), {
+        id: user.uid,
+        email: values.email,
+        fullName: values.fullName,
+        role: values.role,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      toast.success("Account created successfully!");
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Sign up error:", error);
+      toast.error(error.message || "Failed to create account.");
+    }
   }
 
   return (
