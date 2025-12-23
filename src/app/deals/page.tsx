@@ -22,14 +22,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowUpDown, Building, User, Check, X } from 'lucide-react';
 import placeholderImages from '@/lib/placeholder-images.json';
 
-type DealStatus = 'Pending' | 'Accepted' | 'Rejected';
+type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
+
+interface Property {
+  id: string;
+  ownerId: string;
+  address: string;
+  image: string;
+}
 
 interface Deal {
   id: string;
-  property: {
-    address: string;
-    image: string;
-  };
+  propertyId: string;
   broker: {
     name: string;
     avatar: string;
@@ -39,13 +43,21 @@ interface Deal {
   date: string;
 }
 
+// Assume this is the logged-in seller's user ID
+const currentUserId = 'seller1';
+
+const mockProperties: Property[] = [
+  { id: 'prop1', ownerId: 'seller1', address: '2 BHK Apartment, HSR Layout, Bengaluru', image: placeholderImages.properties[0].src, },
+  { id: 'prop2', ownerId: 'seller2', address: '4 BHK Penthouse, DLF Phase 5, Gurgaon', image: 'https://picsum.photos/seed/property4/100/100', },
+  { id: 'prop3', ownerId: 'seller1', address: '3 BHK Villa, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/property2/100/100', },
+  { id: 'prop4', ownerId: 'seller2', address: '1 RK Studio, Bandra West, Mumbai', image: 'https://picsum.photos/seed/property3/100/100', },
+];
+
+
 const mockDeals: Deal[] = [
   {
     id: 'deal1',
-    property: {
-      address: '2 BHK Apartment, HSR Layout, Bengaluru',
-      image: placeholderImages.properties[0].src,
-    },
+    propertyId: 'prop1',
     broker: {
       name: 'Rohan Mehta',
       avatar: placeholderImages.testimonials[1].src,
@@ -56,10 +68,7 @@ const mockDeals: Deal[] = [
   },
   {
     id: 'deal2',
-    property: {
-      address: '4 BHK Penthouse, DLF Phase 5, Gurgaon',
-      image: 'https://picsum.photos/seed/property4/100/100',
-    },
+    propertyId: 'prop2', // Belongs to seller2
     broker: {
       name: 'Suresh Gupta',
       avatar: 'https://picsum.photos/seed/broker2/100/100',
@@ -70,10 +79,7 @@ const mockDeals: Deal[] = [
   },
   {
     id: 'deal3',
-    property: {
-      address: '3 BHK Villa, Jubilee Hills, Hyderabad',
-      image: 'https://picsum.photos/seed/property2/100/100',
-    },
+    propertyId: 'prop3',
     broker: {
       name: 'Anjali Rao',
       avatar: 'https://picsum.photos/seed/broker3/100/100',
@@ -84,10 +90,7 @@ const mockDeals: Deal[] = [
   },
     {
     id: 'deal4',
-    property: {
-      address: '1 RK Studio, Bandra West, Mumbai',
-      image: 'https://picsum.photos/seed/property3/100/100',
-    },
+    propertyId: 'prop1',
     broker: {
       name: 'Rohan Mehta',
       avatar: placeholderImages.testimonials[1].src,
@@ -98,10 +101,18 @@ const mockDeals: Deal[] = [
   },
 ];
 
-type SortKey = keyof Deal | 'property.address' | 'offerPrice';
+
+type SortKey = 'property.address' | 'offerPrice' | 'status' | 'date';
+
+interface DisplayDeal extends Deal {
+    property: {
+        address: string;
+        image: string;
+    };
+}
 
 export default function DealsPage() {
-  const [deals, setDeals] = useState<Deal[]>([]);
+  const [deals, setDeals] = useState<DisplayDeal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
@@ -110,7 +121,23 @@ export default function DealsPage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDeals(mockDeals);
+      const sellerProperties = mockProperties.filter(p => p.ownerId === currentUserId);
+      const sellerPropertyIds = sellerProperties.map(p => p.id);
+      
+      const sellerDeals = mockDeals
+        .filter(deal => sellerPropertyIds.includes(deal.propertyId))
+        .map(deal => {
+            const property = mockProperties.find(p => p.id === deal.propertyId)!;
+            return {
+                ...deal,
+                property: {
+                    address: property.address,
+                    image: property.image
+                }
+            }
+        });
+
+      setDeals(sellerDeals);
       setIsLoading(false);
     }, 1000);
     return () => clearTimeout(timer);
@@ -172,6 +199,8 @@ export default function DealsPage() {
             Rejected
           </Badge>
         );
+      default:
+         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
@@ -293,3 +322,5 @@ export default function DealsPage() {
     </div>
   );
 }
+
+    
