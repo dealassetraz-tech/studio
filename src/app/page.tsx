@@ -4,6 +4,7 @@ import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/how-it-works";
 import { KeyFeatures } from "@/components/key-features";
+import { Roles } from "@/components/roles";
 import { Testimonials } from "@/components/testimonials";
 
 export default function Home() {
@@ -12,6 +13,7 @@ export default function Home() {
       <Header />
       <main className="flex-grow">
         <Hero />
+        <Roles />
         <HowItWorks />
         <KeyFeatures />
         <Testimonials />

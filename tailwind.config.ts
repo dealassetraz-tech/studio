@@ -18,7 +18,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['var(--font-inter)'],
-        headline: ['var(--font-space-grotesk)'],
+        headline: ['var(--font-playfair-display)'],
       },
       colors: {
         background: 'hsl(var(--background))',
