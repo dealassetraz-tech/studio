@@ -57,7 +57,9 @@ export function SignInForm() {
         // Redirect based on role
         if (userData.role === 'buyer') {
           router.push("/buyer-dashboard");
-        } else if (userData.role === 'seller' || userData.role === 'broker') {
+        } else if (userData.role === 'broker') {
+          router.push("/broker-dashboard");
+        } else if (userData.role === 'seller') {
           router.push("/dashboard"); 
         } else {
            // Fallback for any other roles or if role is not set

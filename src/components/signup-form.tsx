@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,7 +30,7 @@ import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Label } from "./ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -76,7 +77,7 @@ export function SignUpForm() {
     },
   });
   
-  useState(() => {
+  useEffect(() => {
     setIsMounted(true);
   }, []);
 
@@ -102,6 +103,8 @@ export function SignUpForm() {
       
       if (values.role === 'buyer') {
         router.push("/buyer-dashboard");
+      } else if (values.role === 'broker') {
+        router.push("/broker-dashboard");
       } else {
         router.push("/dashboard");
       }
