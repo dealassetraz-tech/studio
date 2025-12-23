@@ -1,63 +1,90 @@
 {
   "entities": {
-    "UserProfile": {
-      "title": "User Profile",
-      "description": "Represents a user's profile in the system.",
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
       "type": "object",
+      "description": "Represents a user account within the application.",
       "properties": {
-        "uid": {
+        "id": {
           "type": "string",
-          "description": "The user's unique ID."
+          "description": "Unique identifier for the user."
         },
         "email": {
           "type": "string",
-          "format": "email",
-          "description": "The user's email address."
+          "description": "User's email address.",
+          "format": "email"
         },
-        "displayName": {
+        "firstName": {
           "type": "string",
-          "description": "The user's display name."
+          "description": "User's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "User's last name."
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the user profile was created."
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
         },
-        "isSubscribed": {
-          "type": "boolean",
-          "description": "Indicates if the user has an active subscription."
-        },
-        "plan": {
+        "updatedAt": {
           "type": "string",
-          "description": "The user's current subscription plan."
-        },
-        "subscriptionExpiry": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "date-time",
-          "description": "The expiration date of the user's subscription."
+          "description": "Timestamp indicating when the user account was last updated.",
+          "format": "date-time"
         }
       },
       "required": [
-        "uid",
+        "id",
         "email",
-        "createdAt"
+        "firstName",
+        "lastName",
+        "createdAt",
+        "updatedAt"
       ]
     }
   },
   "auth": {
     "providers": [
-      "email"
+      "password",
+      "anonymous"
     ]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": {
-        "$ref": "#/entities/UserProfile"
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles, with path-based ownership for security. Ensures only the authenticated user (or admin, if applicable) can access their data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to their Firebase Auth UID."
+            }
+          ]
+        }
       },
-      "description": "Stores public information about a user."
-    }
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "roles_admin",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A collection of admin user IDs, used for role-based access control. Existence in this collection grants admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "Based on the provided entities and application requirements, a straightforward Firestore structure is recommended. Given the single entity 'User', and the need for a fully functional sign-in and sign-up page, the structure prioritizes secure user data storage. Specifically, we focus on a path-based ownership model for private user data. This approach simplifies security rules by directly associating data access with the authenticated user's ID.\n\nTo ensure 'Authorization Independence', no denormalization is required since there's only a single entity and no complex relationships. QAPs are supported because listing and accessing users is straightforward and secure, based on user ID. The design inherently supports private data, as each user document resides under a path segment unique to the user's ID, reinforcing data privacy and security."
   }
 }
