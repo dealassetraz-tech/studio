@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -19,7 +20,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowUpDown, Building, User, Check, X } from 'lucide-react';
+import { ArrowUpDown, Building, User, Check, X, ArrowLeft } from 'lucide-react';
 import placeholderImages from '@/lib/placeholder-images.json';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
@@ -114,6 +115,7 @@ interface DisplayDeal extends Deal {
 export default function DealsPage() {
   const [deals, setDeals] = useState<DisplayDeal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
     direction: 'ascending' | 'descending';
@@ -218,11 +220,17 @@ export default function DealsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-headline">Deals</h1>
-        <p className="text-muted-foreground">
-          Review and manage offers on your properties.
-        </p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">Deals</h1>
+            <p className="text-muted-foreground">
+            Review and manage offers on your properties.
+            </p>
+        </div>
+        <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+        </Button>
       </div>
 
       <Card>
@@ -322,5 +330,3 @@ export default function DealsPage() {
     </div>
   );
 }
-
-    
