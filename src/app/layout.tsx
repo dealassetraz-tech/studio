@@ -1,11 +1,11 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const playfairDisplay = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair-display', display: 'swap' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'DealLock',
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
        <body className="font-sans">
         <FirebaseClientProvider>
           {children}

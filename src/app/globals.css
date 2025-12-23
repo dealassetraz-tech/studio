@@ -4,48 +4,48 @@
 
 @layer base {
   :root {
-    --background: 210 60% 11%; /* #0B1C2D */
+    --background: 222.2 84% 4.9%; /* #09090B */
     --foreground: 210 40% 98%;
-    --card: 210 60% 14%; /* Slightly lighter than background */
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --popover: 210 60% 11%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221 83% 53%; /* #2563EB - Brighter Blue */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 215 50% 35%; /* A complementary blue */
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 210 60% 14%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 210 60% 18%; /* Slightly lighter for hover */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 40%; /* #DC2626 */
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 210 60% 18%;
-    --input: 210 60% 18%;
-    --ring: 221 83% 53%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 210 60% 11%; /* #0B1C2D */
+    --background: 222.2 84% 4.9%; /* #09090B */
     --foreground: 210 40% 98%;
-    --card: 210 60% 14%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --popover: 210 60% 11%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 215 50% 35%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 210 60% 14%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 210 60% 18%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 40%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 210 60% 18%;
-    --input: 210 60% 18%;
-    --ring: 221 83% 53%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 210 40% 98%;
   }
 }
 
@@ -55,7 +55,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at top, hsl(210 60% 14%) 0%, hsl(var(--background)) 40%);
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
