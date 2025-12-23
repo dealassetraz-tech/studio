@@ -104,7 +104,7 @@ export function SignUpForm() {
         </div>
         <CardTitle className="text-2xl font-headline">Create Account</CardTitle>
         <p className="text-muted-foreground">
-          Join DealLock to start your real estate journey
+          Join DealLock to start your real estate journey in India
         </p>
       </CardHeader>
       <CardContent>
@@ -117,7 +117,7 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder="Ramesh Kumar" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

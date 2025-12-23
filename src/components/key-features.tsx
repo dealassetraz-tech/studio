@@ -5,12 +5,12 @@ const features = [
   {
     icon: <Lock className="w-8 h-8 text-primary" />,
     title: "Verified Listings",
-    description: "Every property is manually verified by our team, ensuring authenticity and preventing fraud.",
+    description: "Every property is manually verified by our team, ensuring title deeds are clear and preventing fraud.",
   },
   {
     icon: <FileText className="w-8 h-8 text-primary" />,
-    title: "Document Management",
-    description: "A centralized and secure place to manage all your deal-related documents, from NDAs to contracts.",
+    title: "Digital Document Vault",
+    description: "A centralized and secure place to manage all your deal-related documents, from NOCs to sale agreements.",
   },
   {
     icon: <MessageCircle className="w-8 h-8 text-primary" />,
@@ -31,12 +31,12 @@ export function KeyFeatures() {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">Key Features</h2>
           <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-            Everything you need for a secure and seamless real estate transaction.
+            Everything you need for a secure and seamless real estate transaction in India.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="border-border/50 shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
+            <Card key={index} className="shadow-lg hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-300">
               <CardHeader className="flex flex-row items-center gap-4 pb-2">
                 <div className="p-3 bg-primary/10 rounded-full border border-primary/20">{feature.icon}</div>
                 <CardTitle className="font-headline text-xl text-foreground">{feature.title}</CardTitle>

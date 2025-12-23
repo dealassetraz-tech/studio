@@ -16,21 +16,21 @@ const rolesData = [
   {
     icon: <Users className="w-8 h-8 text-primary" />,
     title: "For Buyers",
-    description: "Browse curated properties and work with verified brokers to secure your dream home.",
+    description: "Browse curated properties and work with verified brokers to secure your dream home or investment.",
     features: [
-      "Property browsing",
-      "Broker connection",
+      "Curated property discovery",
+      "Verified broker connections",
       "Secure messaging",
-      "Status tracking",
+      "Transaction status tracking",
     ],
   },
   {
     icon: <Shield className="w-8 h-8 text-primary" />,
     title: "For Brokers",
-    description: "Facilitate deals as the trusted intermediary with powerful negotiation tools.",
+    description: "Facilitate deals as the trusted intermediary with powerful negotiation and management tools.",
     features: [
       "Deal facilitation",
-      "Party communication",
+      "Secure party communication",
       "Offer negotiation",
       "Commission tracking",
     ],
@@ -43,9 +43,9 @@ export function Roles() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {rolesData.map((role, index) => (
-            <Card key={index} className="bg-card backdrop-blur-sm rounded-2xl shadow-lg border border-border/30 overflow-hidden transition-all duration-300 hover:border-primary/50 hover:bg-accent">
+            <Card key={index} className="bg-background backdrop-blur-sm rounded-2xl shadow-lg border overflow-hidden transition-all duration-300 hover:border-primary/50 hover:shadow-primary/20">
               <CardHeader className="p-8">
-                <div className="p-4 bg-muted rounded-xl w-fit mb-4 border border-border/50">
+                <div className="p-4 bg-muted rounded-xl w-fit mb-4 border">
                   {role.icon}
                 </div>
                 <CardTitle className="text-3xl font-headline text-foreground">{role.title}</CardTitle>

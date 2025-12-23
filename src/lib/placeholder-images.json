@@ -2,15 +2,15 @@
   "testimonials": [
     {
       "src": "https://picsum.photos/seed/testimonial1/100/100",
-      "hint": "woman portrait"
+      "hint": "Indian woman"
     },
     {
       "src": "https://picsum.photos/seed/testimonial2/100/100",
-      "hint": "man portrait"
+      "hint": "Indian man"
     },
     {
       "src": "https://picsum.photos/seed/testimonial3/100/100",
-      "hint": "person portrait"
+      "hint": "Indian person"
     }
   ]
 }

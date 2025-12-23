@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Home, Briefcase, Building } from "lucide-react";
+import { Home, Briefcase, Building } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
+import { IndianRupee } from "lucide-react";
 
 interface Property {
   id: string;
@@ -19,9 +20,9 @@ interface Deal {
 }
 
 const mockProperties: Property[] = [
-    { id: 'prop1', address: '123 Main St, San Francisco, CA', price: 1200000, status: 'Listed' },
-    { id: 'prop2', address: '456 Market St, San Francisco, CA', price: 2500000, status: 'Under Contract' },
-    { id: 'prop3', address: '789 Oak St, Oakland, CA', price: 850000, status: 'Sold' },
+    { id: 'prop1', address: '123 Main St, Mumbai, MH', price: 9500000, status: 'Listed' },
+    { id: 'prop2', address: '456 Market St, Bengaluru, KA', price: 18000000, status: 'Under Contract' },
+    { id: 'prop3', address: '789 Oak St, Delhi, DL', price: 7200000, status: 'Sold' },
 ];
 
 const mockDeals: Deal[] = [
@@ -61,13 +62,13 @@ export default function SellerDashboard() {
       {
         title: "Active Deals",
         value: activeDeals.toString(),
-        icon: <Briefcase className="w-6 h-6 text-yellow-500" />,
+        icon: <Briefcase className="w-6 h-6 text-amber-500" />,
         isLoading: isLoading,
       },
       {
         title: "Total Value",
-        value: `$${totalValue.toLocaleString()}`,
-        icon: <DollarSign className="w-6 h-6 text-green-500" />,
+        value: `₹${totalValue.toLocaleString('en-IN')}`,
+        icon: <IndianRupee className="w-6 h-6 text-emerald-500" />,
         isLoading: isLoading,
       },
     ];
@@ -120,18 +121,18 @@ export default function SellerDashboard() {
           ) : properties && properties.length > 0 ? (
             <ul className="space-y-4">
               {properties.map(prop => (
-                <li key={prop.id} className="flex items-center justify-between p-4 bg-accent rounded-lg">
+                <li key={prop.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-4">
                     <Building className="w-6 h-6 text-primary" />
                     <div>
                       <p className="font-semibold">{prop.address}</p>
-                      <p className="text-sm text-muted-foreground">${prop.price.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">₹{prop.price.toLocaleString('en-IN')}</p>
                     </div>
                   </div>
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      prop.status === 'Listed' ? 'bg-blue-500/10 text-blue-500' :
-                      prop.status === 'Under Contract' ? 'bg-yellow-500/10 text-yellow-500' :
-                      'bg-green-500/10 text-green-500'
+                      prop.status === 'Listed' ? 'bg-primary/10 text-primary' :
+                      prop.status === 'Under Contract' ? 'bg-amber-500/10 text-amber-500' :
+                      'bg-emerald-500/10 text-emerald-500'
                     }`}>{prop.status}</span>
                 </li>
               ))}

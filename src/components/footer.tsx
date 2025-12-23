@@ -36,7 +36,7 @@ export function Footer() {
         }
     };
   return (
-    <footer className="bg-background border-t border-border/50">
+    <footer className="bg-background border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col gap-4">
@@ -45,7 +45,7 @@ export function Footer() {
               <span className="text-xl font-bold text-foreground">DealLock</span>
             </Link>
             <p className="text-muted-foreground text-sm">
-              Secure Real Estate Deal Management
+              India's Secure Real Estate Deal Platform
             </p>
           </div>
           <div>
@@ -85,8 +85,8 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} DealLock. All rights reserved.</p>
+        <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
+          <p>&copy; {new Date().getFullYear()} DealLock India. All rights reserved.</p>
         </div>
       </div>
     </footer>
