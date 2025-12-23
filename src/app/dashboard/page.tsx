@@ -28,6 +28,7 @@ const mockProperties: Property[] = [
     { id: 'prop3', address: '789 Oak St, Delhi, DL', price: 7200000, status: 'Sold', brokerage: 2.5 },
     { id: 'prop4', address: '101 Pine St, Pune, MH', price: 12000000, status: 'Listed', brokerage: 1 },
     { id: 'prop5', address: '222 River Rd, Chennai, TN', price: 25000000, status: 'Listed', brokerage: 1.8 },
+    { id: 'prop6', address: '333 Lake View, Hyderabad, TS', price: 150000000, status: 'Listed', brokerage: 1.2 },
 ];
 
 const mockDeals: Deal[] = [
@@ -42,7 +43,7 @@ export default function SellerDashboard() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [priceFilter, setPriceFilter] = useState<number[]>([30000000]);
+  const [priceFilter, setPriceFilter] = useState<number[]>([200000000]);
   const [brokerageFilter, setBrokerageFilter] = useState<number[]>([5]);
 
   useEffect(() => {
@@ -145,12 +146,12 @@ export default function SellerDashboard() {
                 <Slider
                     id="price-filter"
                     min={5000000}
-                    max={30000000}
-                    step={500000}
+                    max={200000000}
+                    step={1000000}
                     value={priceFilter}
                     onValueChange={setPriceFilter}
                 />
-                <span className="text-lg font-semibold w-20 text-right">{formatPrice(priceFilter[0])}</span>
+                <span className="text-lg font-semibold w-24 text-right">{formatPrice(priceFilter[0])}</span>
              </div>
           </div>
           <div className="space-y-2">
