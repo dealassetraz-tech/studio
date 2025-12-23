@@ -8,7 +8,7 @@ const stats = [
   {
     title: "Total Properties",
     value: "0",
-    icon: <Home className="w-6 h-6 text-green-500" />,
+    icon: <Home className="w-6 h-6 text-primary" />,
   },
   {
     title: "Active Deals",

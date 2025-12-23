@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useAuth, useUser } from "@/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
+import { DealLockLogo } from "./deallock-logo";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -34,7 +35,8 @@ export function Sidebar() {
   return (
     <aside className="w-64 min-h-screen bg-background text-foreground flex flex-col p-4 border-r">
       <Link href="/" className="flex items-center gap-2.5 mb-8">
-        <span className="text-2xl font-bold font-headline text-yellow-500">EstateFlow</span>
+        <DealLockLogo />
+        <span className="text-xl font-bold text-foreground">DealLock</span>
       </Link>
 
       {user && (
@@ -63,7 +65,7 @@ export function Sidebar() {
             className={cn(
               "flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
               pathname === link.href
-                ? "bg-yellow-400 text-slate-900"
+                ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-accent"
             )}
           >
