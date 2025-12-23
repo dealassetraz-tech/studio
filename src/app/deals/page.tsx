@@ -30,10 +30,6 @@ interface Deal {
     address: string;
     image: string;
   };
-  buyer: {
-    name: string;
-    avatar: string;
-  };
   broker: {
     name: string;
     avatar: string;
@@ -50,10 +46,6 @@ const mockDeals: Deal[] = [
       address: '2 BHK Apartment, HSR Layout, Bengaluru',
       image: placeholderImages.properties[0].src,
     },
-    buyer: {
-      name: 'Aarav Sharma',
-      avatar: placeholderImages.testimonials[0].src,
-    },
     broker: {
       name: 'Rohan Mehta',
       avatar: placeholderImages.testimonials[1].src,
@@ -67,10 +59,6 @@ const mockDeals: Deal[] = [
     property: {
       address: '4 BHK Penthouse, DLF Phase 5, Gurgaon',
       image: 'https://picsum.photos/seed/property4/100/100',
-    },
-    buyer: {
-      name: 'Priya Patel',
-      avatar: placeholderImages.testimonials[2].src,
     },
     broker: {
       name: 'Suresh Gupta',
@@ -86,10 +74,6 @@ const mockDeals: Deal[] = [
       address: '3 BHK Villa, Jubilee Hills, Hyderabad',
       image: 'https://picsum.photos/seed/property2/100/100',
     },
-    buyer: {
-      name: 'Vikram Singh',
-      avatar: 'https://picsum.photos/seed/buyer3/100/100',
-    },
     broker: {
       name: 'Anjali Rao',
       avatar: 'https://picsum.photos/seed/broker3/100/100',
@@ -103,10 +87,6 @@ const mockDeals: Deal[] = [
     property: {
       address: '1 RK Studio, Bandra West, Mumbai',
       image: 'https://picsum.photos/seed/property3/100/100',
-    },
-    buyer: {
-      name: 'Neha Reddy',
-      avatar: 'https://picsum.photos/seed/buyer4/100/100',
     },
     broker: {
       name: 'Rohan Mehta',
@@ -203,7 +183,6 @@ export default function DealsPage() {
             <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
             <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
             <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
-            <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
         </TableRow>
     ))
   )
@@ -234,7 +213,6 @@ export default function DealsPage() {
                         Property <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
-                  <TableHead>Buyer</TableHead>
                   <TableHead>Broker</TableHead>
                   <TableHead onClick={() => requestSort('offerPrice')} className="text-right cursor-pointer">
                      <div className="flex items-center justify-end gap-2">
@@ -261,17 +239,6 @@ export default function DealsPage() {
                           </AvatarFallback>
                         </Avatar>
                         <span className="font-medium text-foreground truncate">{deal.property.address}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={deal.buyer.avatar} />
-                          <AvatarFallback>
-                            {deal.buyer.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{deal.buyer.name}</span>
                       </div>
                     </TableCell>
                      <TableCell>
