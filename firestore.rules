@@ -146,5 +146,8 @@ service cloud.firestore {
       allow update: if isContentOwner() && authorIsImmutable();
       allow delete: if isContentOwner();
     }
+    match /deals/{dealId} {
+      allow list: if isSignedIn();
+    }
   }
 }
