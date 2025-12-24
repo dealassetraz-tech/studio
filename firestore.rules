@@ -149,5 +149,11 @@ service cloud.firestore {
     match /deals/{dealId} {
       allow list: if isSignedIn();
     }
+     match /buyer_requests/{requestId} {
+      allow list: if isSignedIn();
+    }
+     match /seller_listings/{listingId} {
+      allow list: if isSignedIn();
+    }
   }
 }

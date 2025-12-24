@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -92,6 +93,41 @@
         "content",
         "authorId"
       ]
+    },
+     "BuyerRequest": {
+      "title": "BuyerRequest",
+      "type": "object",
+      "description": "Represents a buyer's request for a property.",
+      "properties": {
+        "buyer": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "avatar": {
+              "type": "string"
+            }
+          }
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "bedrooms": {
+              "type": "number"
+            },
+            "budget": {
+              "type": "number"
+            }
+          }
+        }
+      }
     }
   },
   "auth": {
@@ -150,6 +186,22 @@
             {
               "name": "contentId",
               "description": "The unique identifier for the website content."
+            }
+          ]
+        }
+      },
+       {
+        "path": "/buyer_requests/{requestId}",
+        "definition": {
+          "entityName": "BuyerRequest",
+          "schema": {
+            "$ref": "#/backend/entities/BuyerRequest"
+          },
+          "description": "Stores buyer requests for properties.",
+          "params": [
+            {
+              "name": "requestId",
+              "description": "The unique identifier for the buyer request."
             }
           ]
         }
