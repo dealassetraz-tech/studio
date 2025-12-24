@@ -1,21 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Handshake, Search, ShieldCheck } from "lucide-react";
+import { Handshake, Search, ShieldCheck, FileUp, Bot, Settings, KeyRound } from "lucide-react";
 
-const steps = [
+const subSteps = [
   {
-    icon: <Search className="w-10 h-10 text-primary" />,
-    title: "Find Your Deal",
-    description: "Browse curated properties across Tier-1 and Tier-2 cities. Our advanced search helps you find the perfect match for your investment portfolio or dream home.",
+    icon: <FileUp className="w-6 h-6 text-primary" />,
+    title: "Document Upload",
+    description: "Purchase agreements, property details, buyer/seller information, and required disclosures.",
   },
   {
-    icon: <ShieldCheck className="w-10 h-10 text-primary" />,
-    title: "Secure Verification",
-    description: "We verify every property and seller to ensure a safe transaction. Our RERA compliance checks and due diligence give you peace of mind.",
+    icon: <Bot className="w-6 h-6 text-primary" />,
+    title: "Automated Validation",
+    description: "AI-powered checks verify document completeness, detect anomalies, and flag missing information.",
   },
   {
-    icon: <Handshake className="w-10 h-10 text-primary" />,
-    title: "Close with Confidence",
-    description: "Our streamlined process makes closing your deal straightforward. Connect with brokers and sellers securely and manage all your documents in one place.",
+    icon: <Settings className="w-6 h-6 text-primary" />,
+    title: "Commission Setup",
+    description: "Define commission structure, payment terms, and contingency conditions.",
+  },
+    {
+    icon: <KeyRound className="w-6 h-6 text-primary" />,
+    title: "Token Generation",
+    description: "System generates unique token lock tied to deal terms and approval requirements.",
   },
 ];
 
@@ -23,26 +28,39 @@ export function HowItWorks() {
   return (
     <section id="how-it-works" className="py-12 md:py-20 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">How It Works</h2>
-          <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-            A simple, three-step process to secure your next real estate deal in India.
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">How DealLock Works</h2>
+          <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
+            Complete deal lifecycle management with multi-layer verification and enforcement.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <Card key={index} className="text-center bg-background shadow-lg hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-300">
-              <CardHeader>
-                <div className="mx-auto bg-primary/10 rounded-full p-4 w-fit mb-4 border border-primary/20">
-                  {step.icon}
+        <div className="max-w-4xl mx-auto">
+            <div className="flex items-start gap-8">
+                <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold border-4 border-background ring-4 ring-primary">
+                        1
+                    </div>
                 </div>
-                <CardTitle className="font-headline text-2xl text-foreground">{step.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{step.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+                <div className="flex-1 pb-8">
+                    <h3 className="text-2xl font-headline font-semibold text-foreground mb-2">Deal Registration & Initial Submission</h3>
+                    <p className="text-muted-foreground mb-8">
+                        Brokers initiate the deal process through our secure platform, submitting comprehensive documentation and deal parameters.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {subSteps.map((step, index) => (
+                            <Card key={index} className="bg-background/70 shadow-md hover:shadow-primary/10 transition-shadow duration-300">
+                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                    {step.icon}
+                                    <CardTitle className="font-headline text-lg text-foreground">{step.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
     </section>
