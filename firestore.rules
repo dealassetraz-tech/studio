@@ -1,79 +1,143 @@
 /**
- * Core Philosophy: This ruleset enforces a strict user-ownership model supplemented by role-based access control for administrative users.
- * The primary goal is to ensure that a user's personal data is private and can only be modified by the user themselves.
- * A secondary 'roles_admin' collection provides a mechanism to grant read-only administrative privileges.
+ * Core Philosophy: This ruleset enforces a strict user-ownership model for personal data and an
+ * author-ownership model for public content. The primary goal is to securely isolate each user's
+ * private information while allowing website content to be publicly readable.
  *
- * Data Structure: The data is organized into several top-level collections:
- * 1. `/users/{userId}`: Contains the profile document for each user, keyed by their Firebase Auth UID.
- * 2. `/properties/{propertyId}`: Contains property listings.
- * 3. `/deals/{dealId}`: Contains deal information related to properties.
- * 4. `/roles_admin/{userId}`: A simple collection where the existence of a document indicates that the user is an administrator.
+ * Data Structure: The data is organized into two main top-level collections:
+ * 1. `/users`: Contains all private user data. Each user's documents, including their profile,
+ *    are nested under their unique user ID (`/users/{userId}`).
+ * 2. `/website_content`: A flat collection for all public-facing content created by users.
  *
  * Key Security Decisions:
- * - User Privacy: Listing users is explicitly disabled to protect user privacy and prevent data scraping. A user cannot discover other users in the system.
- * - Owner-Only Writes: All write operations (create, update, delete) on a user's profile, properties, and deals are strictly limited to the authenticated owner.
- * - Administrative Access: Users designated as admins gain read-only access to all user profiles, properties, and deals for support or moderation purposes.
- * - Immutable Roles: The `roles_admin` collection is locked down and cannot be modified by any client.
- * - Secure Queries: List operations are explicitly constrained to queries that filter by the user's UID, ensuring users can only query their own data.
+ * - User Isolation: A user can only access documents within their own data tree (i.e., under `/users/{their_own_userId}`).
+ * - No User Listing: It is not possible for any client to list all documents in the `/users` collection.
+ * - Public Content: All documents in `/website_content` are publicly readable by anyone, including unauthenticated visitors.
+ * - Content Ownership: Only the original author of a document in `/website_content` can modify or delete it. This is enforced via an `authorId` field.
+ *
+ * Denormalization for Authorization: The `/website_content` documents include a denormalized `authorId`
+ * field. This allows for simple, performant, and secure write rules without needing to perform costly
+ * `get()` calls to other documents to verify ownership.
+ *
+ * Structural Segregation: Private user data (`/users`) and public content (`/website_content`) are stored
+ * in separate top-level collections. This is a secure and efficient pattern that prevents accidental
+ * exposure of private data and simplifies list queries.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // --------------------------------------------------------------------------------
     // Helper Functions
-    // --------------------------------
+    // --------------------------------------------------------------------------------
 
+    /**
+     * Checks if the user is authenticated.
+     */
     function isSignedIn() {
       return request.auth != null;
     }
 
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the fundamental check for document ownership.
+     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-    
-    function isResourceOwner(resource) {
-        return isSignedIn() && request.auth.uid == resource.data.ownerId;
-    }
-    
-    function isDealParticipant(resource) {
-        return isSignedIn() && (request.auth.uid == resource.data.sellerId || request.auth.uid == resource.data.buyerId);
+
+    /**
+     * Checks for ownership on an existing document. Used for update and delete operations
+     * to ensure the target document exists before allowing the operation.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
     }
 
-    function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-    }
-    
-    function isAssignedBroker(resource) {
-        return isSignedIn() && request.auth.uid == resource.data.brokerId;
+    /**
+     * Validates that the `id` field within a user document matches the document's ID in the path.
+     * Enforces relational integrity on creation.
+     */
+    function hasMatchingUserIdOnCreate(userId) {
+      return request.resource.data.id == userId;
     }
 
+    /**
+     * Validates that the `id` field is immutable on updates.
+     * Prevents re-associating a document with a different user.
+     */
+    function userIdIsImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+    
+    /**
+     * Validates that the incoming `authorId` matches the authenticated user's ID.
+     * Used on create to establish ownership of new content.
+     */
+    function isCreatingOwnContent() {
+      return isSignedIn() && request.resource.data.authorId == request.auth.uid;
+    }
+
+    /**
+     * Validates that the author of an existing document is the authenticated user.
+     * Used for update and delete operations.
+     */
+    function isContentOwner() {
+      return isSignedIn() && resource != null && resource.data.authorId == request.auth.uid;
+    }
+
+    /**
+     * Validates that the author field is immutable on updates.
+     */
+    function authorIsImmutable() {
+      return request.resource.data.authorId == resource.data.authorId;
+    }
+
+    // --------------------------------------------------------------------------------
     // Collection Rules
-    // --------------------------------
+    // --------------------------------------------------------------------------------
 
+    /**
+     * @description Controls access to a user's primary document.
+     * @path /users/{userId}
+     * @allow A user (uid: 'user123') can (create) their own user document at `/users/user123`.
+     * @deny A user (uid: 'user456') cannot (update) another user's document at `/users/user123`.
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
     match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if false; // Explicitly forbid listing all users
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
-    }
-    
-    match /properties/{propertyId} {
-        allow get: if isResourceOwner(resource) || isAdmin() || isAssignedBroker(resource);
-        allow list: if isSignedIn();
-        allow create: if isOwner(request.resource.data.ownerId);
-        allow update, delete: if isResourceOwner(resource) || isAssignedBroker(resource);
-    }
-    
-    match /deals/{dealId} {
-        allow get: if isDealParticipant(resource) || isAdmin();
-        allow list: if isSignedIn();
-        allow create: if isOwner(request.resource.data.sellerId);
-        allow update, delete: if isDealParticipant(resource);
+      allow get: if isOwner(userId);
+      allow list: if false; // CRITICAL: Prevent listing all users.
+      allow create: if isOwner(userId) && hasMatchingUserIdOnCreate(userId);
+      allow update: if isExistingOwner(userId) && userIdIsImmutable();
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Controls access to a user's profile, which is a subcollection.
+       * @path /users/{userId}/profiles/{profileId}
+       * @allow A user (uid: 'user123') can (get) their own profile at `/users/user123/profiles/user123`.
+       * @deny A user (uid: 'user123') cannot (create) a profile at `/users/user123/profiles/anotherId`. The profileId must match userId.
+       * @principle Enforces a 1:1 relationship between a user and their profile by tying access to the parent user document and validating path parameters.
+       */
+      match /profiles/{profileId} {
+        // Path validation: The profileId MUST match the parent userId to enforce the 1:1 relationship.
+        allow get, list: if isOwner(userId) && profileId == userId;
+        allow create: if isOwner(userId) && profileId == userId && hasMatchingUserIdOnCreate(profileId);
+        allow update: if isExistingOwner(userId) && profileId == userId && userIdIsImmutable();
+        allow delete: if isExistingOwner(userId) && profileId == userId;
+      }
     }
 
-    match /roles_admin/{userId} {
-      allow read, write: if false;
+    /**
+     * @description Controls access to public website content. Readable by all, writable only by the author.
+     * @path /website_content/{contentId}
+     * @allow An anonymous user can (get) or (list) any document in this collection.
+     * @deny A signed-in user cannot (update) a document where their UID does not match the `authorId`.
+     * @principle Implements a "Public Read, Owner Write" pattern using a denormalized `authorId` field for efficient authorization.
+     */
+    match /website_content/{contentId} {
+      allow get, list: if true;
+      allow create: if isCreatingOwnContent();
+      allow update: if isContentOwner() && authorIsImmutable();
+      allow delete: if isContentOwner();
     }
   }
 }

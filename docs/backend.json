@@ -4,135 +4,93 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user account within the application.",
+      "description": "Represents a user of the website.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the user."
+          "description": "Unique identifier for the User entity."
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's username."
         },
         "email": {
           "type": "string",
-          "description": "User's email address.",
+          "description": "The user's email address.",
           "format": "email"
         },
-        "fullName": {
+        "profileId": {
           "type": "string",
-          "description": "User's full name."
-        },
-        "role": {
-          "type": "string",
-          "enum": ["seller", "buyer", "broker"],
-          "description": "The user's role in the application."
-        },
-        "wishlist": {
-          "type": "array",
-          "description": "An array of property IDs that the user has added to their wishlist.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the user account was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the user account was last updated.",
-          "format": "date-time"
+          "description": "Reference to UserProfile. (Relationship: User 1:1 UserProfile)"
         }
       },
       "required": [
         "id",
+        "username",
         "email",
-        "fullName",
-        "role",
-        "createdAt",
-        "updatedAt"
+        "profileId"
       ]
     },
-    "Property": {
-      "title": "Property",
-      "description": "Represents a real estate property listed in the application.",
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
       "type": "object",
+      "description": "Represents the profile information for a user.",
       "properties": {
-        "ownerId": {
+        "id": {
           "type": "string",
-          "description": "The UID of the user who owns the property."
+          "description": "Unique identifier for the UserProfile entity."
         },
-        "address": {
+        "firstName": {
           "type": "string",
-          "description": "The full address of the property."
+          "description": "The user's first name."
         },
-        "price": {
-          "type": "number",
-          "description": "The listing price of the property."
-        },
-        "status": {
+        "lastName": {
           "type": "string",
-          "enum": ["Listed", "Under Contract", "Sold"],
-          "description": "The current status of the property."
+          "description": "The user's last name."
         },
-        "brokerage": {
-          "type": "number",
-          "description": "The commission percentage offered to the broker."
-        },
-        "brokerId": {
-            "type": "string",
-            "description": "The UID of the broker assigned to this property."
-        },
-        "brokerAssignmentStatus": {
-            "type": "string",
-            "enum": ["pending", "accepted", "rejected"],
-            "description": "The status of the broker's assignment to the property."
-        },
-        "createdAt": {
+        "bio": {
           "type": "string",
-          "format": "date-time",
-          "description": "Timestamp of when the property was listed."
-        }
-      },
-      "required": ["ownerId", "address", "price", "status", "createdAt"]
-    },
-    "Deal": {
-      "title": "Deal",
-      "description": "Represents a transaction or deal for a property.",
-      "type": "object",
-      "properties": {
-        "dealId": {
-          "type": "string",
-          "description": "The unique identifier for the deal."
+          "description": "A short biography of the user."
         },
-        "propertyId": {
+        "website": {
           "type": "string",
-          "description": "The ID of the property this deal is for."
-        },
-        "sellerId": {
-          "type": "string",
-          "description": "The UID of the seller."
-        },
-        "buyerId": {
-          "type": "string",
-          "description": "The UID of the buyer."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["Active", "Closed", "Cancelled"],
-          "description": "The current status of the deal."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Timestamp of when the deal was initiated."
+          "description": "The user's website URL.",
+          "format": "uri"
         }
       },
       "required": [
-        "dealId",
-        "propertyId",
-        "sellerId",
-        "buyerId",
-        "status",
-        "createdAt"
+        "id"
+      ]
+    },
+    "WebsiteContent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteContent",
+      "type": "object",
+      "description": "Represents the content of a webpage on the website.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WebsiteContent entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the webpage."
+        },
+        "content": {
+          "type": "string",
+          "description": "The HTML content of the webpage."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N WebsiteContent)"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "authorId"
       ]
     }
   },
@@ -143,29 +101,60 @@
     ]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": {
-        "$ref": "#/entities/User"
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user information. The `userId` is used for path-based access control.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
       },
-      "description": "Stores user profiles, with path-based ownership for security."
-    },
-    "/properties/{propertyId}": {
-      "schema": {
-        "$ref": "#/entities/Property"
+      {
+        "path": "/users/{userId}/profiles/{profileId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. It ensures atomicity of user and profile creation as a subcollection.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "profileId",
+              "description": "The unique identifier for the user profile. Should be equal to userId."
+            }
+          ]
+        }
       },
-      "description": "Contains all property listings."
-    },
-    "/deals/{dealId}": {
-      "schema": {
-        "$ref": "#/entities/Deal"
-      },
-      "description": "Contains all deals related to properties."
-    },
-    "/roles_admin/{userId}": {
-      "schema": {
-        "$ref": "#/entities/User"
-      },
-      "description": "A collection of admin user IDs, used for role-based access control. Existence in this collection grants admin privileges."
-    }
+      {
+        "path": "/website_content/{contentId}",
+        "definition": {
+          "entityName": "WebsiteContent",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteContent"
+          },
+          "description": "Stores website content. Includes `authorId` for authorization and listing content by a specific author.",
+          "params": [
+            {
+              "name": "contentId",
+              "description": "The unique identifier for the website content."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure Authorization Independence, DBAC, and QAPs. User data and website content are separated into distinct collections, with clear ownership established through path-based access and explicit `authorId` fields. User profiles are stored as a subcollection of users to ensure atomicity of user and profile creation. Website content is stored with an explicit `authorId` for simplified rules. This design facilitates listing website content while securing access to user-specific data. All documents within a collection share the same security requirements, avoiding mixing data with different access needs. The structure supports integrity by enforcing ownership, timestamps (if added later), and denormalized data via the explicit `authorId`."
   }
 }
