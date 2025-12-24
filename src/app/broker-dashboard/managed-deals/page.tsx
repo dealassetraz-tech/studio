@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -21,7 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, Info, Handshake } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
@@ -48,13 +49,15 @@ interface Deal {
 export default function ManagedDealsPage() {
   const router = useRouter();
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
 
   const dealsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'deals'));
-  }, [firestore]);
+  }, [firestore, user]);
 
-  const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
+  const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
+  const isLoading = isUserLoading || dealsLoading;
 
   const getStatusBadge = (status: DealStatus) => {
     switch (status) {
