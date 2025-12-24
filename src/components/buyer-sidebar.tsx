@@ -7,6 +7,7 @@ import {
   Handshake,
   LogOut,
   LayoutDashboard,
+  Heart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth, useUser } from '@/firebase';
@@ -18,6 +19,7 @@ const navLinks = [
   { href: '/buyer-dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: '/buyer-dashboard/browse-properties', label: 'Browse Properties', icon: <Search className="w-5 h-5" /> },
   { href: '/buyer-dashboard/my-deals', label: 'My Deals', icon: <Handshake className="w-5 h-5" /> },
+  { href: '/buyer-dashboard/wishlist', label: 'Wishlist', icon: <Heart className="w-5 h-5" /> },
 ];
 
 export function BuyerSidebar() {

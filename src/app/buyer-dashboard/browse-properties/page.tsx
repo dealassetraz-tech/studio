@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { IndianRupee, Bed, Bath, ArrowLeft, Filter } from "lucide-react";
+import { IndianRupee, Bed, Bath, ArrowLeft, Filter, Heart } from "lucide-react";
 import placeholderImages from "@/lib/placeholder-images.json";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 
 interface Property {
@@ -91,12 +92,19 @@ export default function BrowsePropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   const [propertyTypeFilter, setPropertyTypeFilter] = useState('All');
   const [priceRangeFilter, setPriceRangeFilter] = useState([30000000]);
   const [locationFilter, setLocationFilter] = useState('');
 
   useEffect(() => {
+    // Load wishlist from local storage
+    const savedWishlist = localStorage.getItem('wishlist');
+    if (savedWishlist) {
+      setWishlist(JSON.parse(savedWishlist));
+    }
+
     const timer = setTimeout(() => {
       // For buyers, we show all listed properties
       setProperties(mockProperties.filter(p => p.status === 'Listed'));
@@ -105,6 +113,15 @@ export default function BrowsePropertiesPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const toggleWishlist = (propertyId: string) => {
+    const updatedWishlist = wishlist.includes(propertyId)
+      ? wishlist.filter(id => id !== propertyId)
+      : [...wishlist, propertyId];
+    setWishlist(updatedWishlist);
+    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+  };
+
 
   const formatPrice = (value: number) => {
     if (value >= 10000000) {
@@ -215,6 +232,14 @@ export default function BrowsePropertiesPage() {
                             <Link href={`/make-offer/${prop.id}`}>Make an Offer</Link>
                         </Button>
                     </div>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 rounded-full h-10 w-10 bg-black/30 hover:bg-black/50 text-white"
+                        onClick={() => toggleWishlist(prop.id)}
+                    >
+                        <Heart className={cn("w-5 h-5", wishlist.includes(prop.id) ? 'fill-rose-500 text-rose-500' : 'text-white')} />
+                    </Button>
                 </div>
 
               <CardContent className="p-4">
@@ -250,5 +275,3 @@ export default function BrowsePropertiesPage() {
     </div>
   );
 }
-
-    

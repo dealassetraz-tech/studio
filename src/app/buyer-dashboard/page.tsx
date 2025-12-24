@@ -1,11 +1,42 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Handshake, Heart, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function BuyerDashboard() {
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  useEffect(() => {
+    // Function to update count from local storage
+    const updateWishlistCount = () => {
+      const savedWishlist = localStorage.getItem('wishlist');
+      if (savedWishlist) {
+        setWishlistCount(JSON.parse(savedWishlist).length);
+      }
+    };
+
+    // Initial update
+    updateWishlistCount();
+
+    // Listen for storage changes to update count across tabs
+    window.addEventListener('storage', updateWishlistCount);
+
+    // Custom event listener for same-tab updates
+    const handleWishlistChange = () => {
+        updateWishlistCount();
+    }
+    window.addEventListener('wishlistChanged', handleWishlistChange);
+
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', updateWishlistCount);
+      window.removeEventListener('wishlistChanged', handleWishlistChange);
+    };
+  }, []);
 
   const stats = [
     {
@@ -16,7 +47,7 @@ export default function BuyerDashboard() {
     },
     {
       title: "Saved Properties",
-      value: "7",
+      value: wishlistCount.toString(),
       icon: <Heart className="w-6 h-6 text-rose-500" />,
       description: "Properties you're watching",
     },
