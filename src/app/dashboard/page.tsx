@@ -3,14 +3,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home, Briefcase, Building, Filter } from "lucide-react";
+import { Home, Briefcase, Building, Filter, User } from "lucide-react";
 import { useMemo, useState } from "react";
 import { IndianRupee } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
-import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Property {
   id: string;
@@ -18,6 +19,8 @@ interface Property {
   price: number;
   status: string;
   brokerage: number;
+  brokerId?: string;
+  brokerAssignmentStatus?: 'pending' | 'accepted' | 'rejected';
 }
 
 interface Deal {
@@ -37,6 +40,19 @@ export default function SellerDashboard() {
 
   const { data: properties, isLoading: propertiesLoading } = useCollection<Property>(propertiesQuery);
 
+  const brokerIds = useMemo(() => {
+    if (!properties) return [];
+    return [...new Set(properties.map(p => p.brokerId).filter(Boolean) as string[])];
+  }, [properties]);
+  
+  const { data: brokers, isLoading: brokersLoading } = useUsers(brokerIds);
+
+  const brokersMap = useMemo(() => {
+    if (!brokers) return new Map();
+    return new Map(brokers.map(b => [b.id, b]));
+  }, [brokers]);
+
+
   const dealIds = useMemo(() => properties?.map(p => p.id) || [], [properties]);
 
   const dealsQuery = useMemoFirebase(() => {
@@ -46,7 +62,7 @@ export default function SellerDashboard() {
 
   const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
 
-  const isLoading = propertiesLoading || (dealIds.length > 0 && dealsLoading);
+  const isLoading = propertiesLoading || (dealIds.length > 0 && dealsLoading) || (brokerIds.length > 0 && brokersLoading);
 
   const [priceFilter, setPriceFilter] = useState<number[]>([200000000]);
   const [brokerageFilter, setBrokerageFilter] = useState<number[]>([5]);
@@ -93,6 +109,15 @@ export default function SellerDashboard() {
         return `${(value / 10000000).toFixed(1)} Cr`;
     }
     return `${(value / 100000).toFixed(0)} L`;
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+        case 'pending': return <Badge variant="outline" className="text-amber-500 border-amber-500/50">Pending</Badge>;
+        case 'accepted': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Accepted</Badge>;
+        case 'rejected': return <Badge variant="destructive">Rejected</Badge>;
+        default: return <Badge variant="secondary">{status}</Badge>;
+    }
   };
 
 
@@ -176,9 +201,9 @@ export default function SellerDashboard() {
         <CardContent>
           {isLoading ? (
              <div className="space-y-4">
-                <div className="h-12 bg-muted animate-pulse rounded-md" />
-                <div className="h-12 bg-muted animate-pulse rounded-md" />
-                <div className="h-12 bg-muted animate-pulse rounded-md" />
+                <div className="h-16 bg-muted animate-pulse rounded-md" />
+                <div className="h-16 bg-muted animate-pulse rounded-md" />
+                <div className="h-16 bg-muted animate-pulse rounded-md" />
              </div>
           ) : filteredProperties && filteredProperties.length > 0 ? (
             <ul className="space-y-4">
@@ -191,13 +216,37 @@ export default function SellerDashboard() {
                       <p className="text-sm text-muted-foreground">₹{prop.price.toLocaleString('en-IN')}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-muted-foreground">Brokerage: {prop.brokerage}%</span>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        prop.status === 'Listed' ? 'bg-primary/10 text-primary' :
-                        prop.status === 'Under Contract' ? 'bg-amber-500/10 text-amber-500' :
-                        'bg-emerald-500/10 text-emerald-500'
-                      }`}>{prop.status}</span>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3">
+                         {prop.brokerId && brokersMap.get(prop.brokerId) ? (
+                            <>
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage src={brokersMap.get(prop.brokerId)?.photoURL || ''} />
+                                    <AvatarFallback>{brokersMap.get(prop.brokerId)?.fullName?.[0]}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="text-sm font-medium text-foreground">{brokersMap.get(prop.brokerId)?.fullName}</p>
+                                    <p className="text-xs text-muted-foreground">Broker</p>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-8 w-8">
+                                    <AvatarFallback><User className="w-4 h-4" /></AvatarFallback>
+                                </Avatar>
+                                <p className="text-sm text-muted-foreground">No Broker Assigned</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        {prop.brokerAssignmentStatus && getStatusBadge(prop.brokerAssignmentStatus)}
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                            prop.status === 'Listed' ? 'bg-primary/10 text-primary' :
+                            prop.status === 'Under Contract' ? 'bg-amber-500/10 text-amber-500' :
+                            'bg-emerald-500/10 text-emerald-500'
+                        }`}>{prop.status}</span>
+                    </div>
                   </div>
                 </li>
               ))}
