@@ -6,6 +6,7 @@ import {
   Handshake,
   LogOut,
   LayoutDashboard,
+  Shuffle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth, useUser } from '@/firebase';
@@ -17,6 +18,7 @@ import { useEffect, useState } from 'react';
 const navLinks = [
   { href: '/broker-dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: '/broker-dashboard/managed-deals', label: 'Managed Deals', icon: <Handshake className="w-5 h-5" /> },
+  { href: '/broker-dashboard/matching-requests', label: 'Matching Requests', icon: <Shuffle className="w-5 h-5" /> },
 ];
 
 export function BrokerSidebar() {
