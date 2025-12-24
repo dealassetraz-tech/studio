@@ -35,10 +35,10 @@ interface Property {
 interface Deal {
   id: string;
   propertyId: string;
-  seller: {
+  broker: {
     name: string;
     avatar: string;
-  },
+  };
   offerPrice: number;
   status: DealStatus;
   date: string;
@@ -57,9 +57,9 @@ const mockDeals: Deal[] = [
   {
     id: 'deal1',
     propertyId: 'prop1',
-    seller: {
-      name: 'Priya S.',
-      avatar: placeholderImages.testimonials[0].src,
+    broker: {
+      name: 'Ramesh K.',
+      avatar: placeholderImages.testimonials[1].src,
     },
     offerPrice: 9300000,
     status: 'Pending',
@@ -68,8 +68,8 @@ const mockDeals: Deal[] = [
   {
     id: 'deal4',
     propertyId: 'prop2',
-     seller: {
-      name: 'Anjali P.',
+     broker: {
+      name: 'Sunita M.',
       avatar: placeholderImages.testimonials[2].src,
     },
     offerPrice: 24000000,
@@ -170,7 +170,7 @@ export default function BuyerDealsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Property</TableHead>
-                  <TableHead>Seller</TableHead>
+                  <TableHead>Broker</TableHead>
                   <TableHead className="text-right">Your Offer</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center">Actions</TableHead>
@@ -193,12 +193,12 @@ export default function BuyerDealsPage() {
                      <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
-                          <AvatarImage src={deal.seller.avatar} />
+                          <AvatarImage src={deal.broker.avatar} />
                            <AvatarFallback>
-                            {deal.seller.name.charAt(0)}
+                            {deal.broker.name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <span>{deal.seller.name}</span>
+                        <span>{deal.broker.name}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-semibold text-foreground">
