@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FileUp, Bot, Settings, KeyRound, FileSearch, Signature, TriangleAlert, CalendarClock, Info } from "lucide-react";
+import { FileUp, Bot, Settings, KeyRound, FileSearch, Signature, TriangleAlert, CalendarClock, Info, ShieldCheck, Wallet, History, BellRing, CheckCircle2 } from "lucide-react";
 
 const registrationSteps = [
   {
@@ -48,6 +48,29 @@ const verificationSteps = [
   },
 ];
 
+const closureSteps = [
+    {
+        icon: <ShieldCheck className="w-6 h-6 text-primary" />,
+        title: "Final Admin Approval",
+        description: "Administrator confirms all documentation is complete and accurate, triggering token unlock.",
+    },
+    {
+        icon: <Wallet className="w-6 h-6 text-primary" />,
+        title: "Commission Distribution",
+        description: "Automated payments to broker, referral partners, and transaction coordinators per agreement.",
+    },
+    {
+        icon: <History className="w-6 h-6 text-primary" />,
+        title: "Audit Trail",
+        description: "Complete transaction history recorded with timestamps, signatures, and all document versions.",
+    },
+    {
+        icon: <BellRing className="w-6 h-6 text-primary" />,
+        title: "Completion Notifications",
+        description: "All parties receive confirmation with payment details, tax documents, and receipt records.",
+    },
+];
+
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="py-12 md:py-20 bg-muted/30">
@@ -93,6 +116,7 @@ export function HowItWorks() {
                     <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold border-4 border-background ring-4 ring-primary">
                         2
                     </div>
+                    <div className="w-px h-full bg-border my-4" />
                 </div>
                 <div className="flex-1 pb-8">
                     <h3 className="text-2xl font-headline font-semibold text-foreground mb-2">Multi-Party Verification & Approval Workflow</h3>
@@ -116,6 +140,39 @@ export function HowItWorks() {
                         <Info className="h-4 w-4 text-blue-400" />
                         <AlertDescription>
                            <span className="font-bold text-blue-300">Key Protection:</span> Token lock mechanism ensures funds cannot be released without explicit administrator approval AND completion of all required signatures. No premature payouts possible.
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            </div>
+            {/* Step 3 */}
+            <div className="flex items-start gap-8">
+                <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold border-4 border-background ring-4 ring-primary">
+                        3
+                    </div>
+                </div>
+                <div className="flex-1 pb-8">
+                    <h3 className="text-2xl font-headline font-semibold text-foreground mb-2">Closure Verification & Automated Payout</h3>
+                    <p className="text-muted-foreground mb-8">
+                        Final verification confirms successful closure. System automatically releases funds to all parties according to agreed terms.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {closureSteps.map((step, index) => (
+                            <Card key={index} className="bg-background/70 shadow-md hover:shadow-primary/10 transition-shadow duration-300">
+                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                    {step.icon}
+                                    <CardTitle className="font-headline text-lg text-foreground">{step.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                    <Alert className="mt-8 bg-emerald-900/20 border-emerald-500/20 text-emerald-300">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                        <AlertDescription>
+                           <span className="font-bold text-emerald-300">Complete Transparency:</span> Every action is logged and visible to authorized parties. Dispute resolution supported by comprehensive documentation trail.
                         </AlertDescription>
                     </Alert>
                 </div>
