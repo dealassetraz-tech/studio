@@ -73,6 +73,19 @@
           "enum": ["Listed", "Under Contract", "Sold"],
           "description": "The current status of the property."
         },
+        "brokerage": {
+          "type": "number",
+          "description": "The commission percentage offered to the broker."
+        },
+        "brokerId": {
+            "type": "string",
+            "description": "The UID of the broker assigned to this property."
+        },
+        "brokerAssignmentStatus": {
+            "type": "string",
+            "enum": ["pending", "accepted", "rejected"],
+            "description": "The status of the broker's assignment to the property."
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",
