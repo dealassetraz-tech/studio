@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -11,9 +11,9 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, User, Building, IndianRupee, Link as LinkIcon, Shuffle, Bed, Bath, MapPin } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import placeholderImages from '@/lib/placeholder-images.json';
+import { ArrowLeft, Building, IndianRupee, Link as LinkIcon, Shuffle, Bed, Bath, MapPin } from 'lucide-react';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query } from 'firebase/firestore';
 
 interface Requirement {
     location: string;
@@ -52,6 +52,7 @@ interface Match {
     sellerListing: SellerListing;
 }
 
+// This is mock data. In a real app, you would fetch this and run matching logic.
 const mockBuyerRequests: BuyerRequest[] = [
     { 
         id: 'req1', 
@@ -68,7 +69,7 @@ const mockBuyerRequests: BuyerRequest[] = [
 const mockSellerListings: SellerListing[] = [
     {
         id: 'list1',
-        seller: { name: 'Priya S.', avatar: placeholderImages.testimonials[0].src },
+        seller: { name: 'Priya S.', avatar: 'https://picsum.photos/seed/seller1/100/100' },
         property: { address: '2 BHK Apartment, HSR Layout, Bengaluru', price: 9500000, bedrooms: 2, bathrooms: 2, type: 'Apartment' }
     },
     {
@@ -78,31 +79,42 @@ const mockSellerListings: SellerListing[] = [
     },
 ];
 
-const mockMatches: Match[] = [
-    {
-        id: 'match1',
-        buyerRequest: mockBuyerRequests[0],
-        sellerListing: mockSellerListings[0],
-    },
-    {
-        id: 'match2',
-        buyerRequest: mockBuyerRequests[1],
-        sellerListing: mockSellerListings[1],
-    }
-]
+
+const findMatches = (buyers: BuyerRequest[], sellers: SellerListing[]): Match[] => {
+    const matches: Match[] = [];
+    if (!buyers || !sellers) return matches;
+
+    buyers.forEach(buyerReq => {
+        sellers.forEach(sellerList => {
+            const priceMatch = sellerList.property.price <= buyerReq.requirements.budget * 1.1 && sellerList.property.price >= buyerReq.requirements.budget * 0.9;
+            const typeMatch = sellerList.property.type === buyerReq.requirements.type;
+            const bedroomMatch = sellerList.property.bedrooms === buyerReq.requirements.bedrooms;
+            const locationMatch = sellerList.property.address.toLowerCase().includes(buyerReq.requirements.location.toLowerCase().split(',')[0]);
+
+            if (priceMatch && typeMatch && bedroomMatch && locationMatch) {
+                matches.push({
+                    id: `match-${buyerReq.id}-${sellerList.id}`,
+                    buyerRequest: buyerReq,
+                    sellerListing: sellerList,
+                });
+            }
+        });
+    });
+    return matches;
+}
+
 
 export default function MatchingRequestsPage() {
-    const [matches, setMatches] = useState<Match[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+    const firestore = useFirestore();
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setMatches(mockMatches);
-            setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, []);
+    // In a real app, you would have collections for buyer_requests and seller_listings
+    const { data: buyers, isLoading: buyersLoading } = useCollection<BuyerRequest>(useMemoFirebase(() => collection(firestore, 'buyer_requests'), [firestore]));
+    const { data: sellers, isLoading: sellersLoading } = useCollection<SellerListing>(useMemoFirebase(() => collection(firestore, 'seller_listings'), [firestore]));
+    
+    // For demo, using mock data as Firestore collections are not populated.
+    const isLoading = false; // buyersLoading || sellersLoading;
+    const matches = findMatches(mockBuyerRequests, mockSellerListings);
 
     const renderSkeleton = () => (
         <Card className="animate-pulse">

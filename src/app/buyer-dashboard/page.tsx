@@ -1,59 +1,48 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Handshake, Heart, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useCollection, useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { collection, query, where, doc } from 'firebase/firestore';
 
 export default function BuyerDashboard() {
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const firestore = useFirestore();
+  const { user } = useUser();
 
-  useEffect(() => {
-    // Function to update count from local storage
-    const updateWishlistCount = () => {
-      const savedWishlist = localStorage.getItem('wishlist');
-      if (savedWishlist) {
-        setWishlistCount(JSON.parse(savedWishlist).length);
-      }
-    };
+  const dealsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'deals'), where('buyerId', '==', user.uid));
+  }, [firestore, user]);
+  const { data: deals, isLoading: dealsLoading } = useCollection(dealsQuery);
 
-    // Initial update
-    updateWishlistCount();
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+  const { data: userData, isLoading: userLoading } = useDoc<{wishlist: string[]}>(userDocRef);
 
-    // Listen for storage changes to update count across tabs
-    window.addEventListener('storage', updateWishlistCount);
+  const wishlistCount = userData?.wishlist?.length || 0;
+  const activeOffersCount = deals?.length || 0;
 
-    // Custom event listener for same-tab updates
-    const handleWishlistChange = () => {
-        updateWishlistCount();
-    }
-    window.addEventListener('wishlistChanged', handleWishlistChange);
-
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('storage', updateWishlistCount);
-      window.removeEventListener('wishlistChanged', handleWishlistChange);
-    };
-  }, []);
 
   const stats = [
     {
       title: "Active Offers",
-      value: "2",
+      value: dealsLoading ? '...' : activeOffersCount.toString(),
       icon: <Handshake className="w-6 h-6 text-amber-500" />,
       description: "Offers you've made",
     },
     {
       title: "Saved Properties",
-      value: wishlistCount.toString(),
+      value: userLoading ? '...' : wishlistCount.toString(),
       icon: <Heart className="w-6 h-6 text-rose-500" />,
       description: "Properties you're watching",
     },
     {
       title: "Properties Viewed",
-      value: "28",
+      value: "28", // This would likely come from another data source
       icon: <Search className="w-6 h-6 text-primary" />,
       description: "Properties you've explored",
     },

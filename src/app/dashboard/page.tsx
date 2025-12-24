@@ -4,11 +4,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Home, Briefcase, Building, Filter } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { IndianRupee } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
 
 interface Property {
   id: string;
@@ -24,48 +26,31 @@ interface Deal {
   status: 'Active' | 'Closed' | 'Cancelled';
 }
 
-const defaultMockProperties: Property[] = [
-    { id: 'prop1', address: '123 Main St, Mumbai, MH', price: 9500000, status: 'Listed', brokerage: 2 },
-    { id: 'prop2', address: '456 Market St, Bengaluru, KA', price: 18000000, status: 'Under Contract', brokerage: 1.5 },
-    { id: 'prop3', address: '789 Oak St, Delhi, DL', price: 7200000, status: 'Sold', brokerage: 2.5 },
-    { id: 'prop4', address: '101 Pine St, Pune, MH', price: 12000000, status: 'Listed', brokerage: 1 },
-    { id: 'prop5', address: '222 River Rd, Chennai, TN', price: 25000000, status: 'Listed', brokerage: 1.8 },
-    { id: 'prop6', address: '333 Lake View, Hyderabad, TS', price: 150000000, status: 'Listed', brokerage: 1.2 },
-];
-
-const mockDeals: Deal[] = [
-    { id: 'deal1', propertyId: 'prop1', status: 'Active' },
-    { id: 'deal2', propertyId: 'prop2', status: 'Active' },
-    { id: 'deal3', propertyId: 'prop3', status: 'Closed' },
-];
-
-
 export default function SellerDashboard() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const firestore = useFirestore();
+  const { user } = useUser();
+  
+  const propertiesQuery = useMemoFirebase(() => {
+      if (!firestore || !user) return null;
+      return query(collection(firestore, "properties"), where("ownerId", "==", user.uid));
+  }, [firestore, user]);
+
+  const { data: properties, isLoading: propertiesLoading } = useCollection<Property>(propertiesQuery);
+
+  const dealIds = useMemo(() => properties?.map(p => p.id) || [], [properties]);
+
+  const dealsQuery = useMemoFirebase(() => {
+    if (!firestore || dealIds.length === 0) return null;
+    return query(collection(firestore, "deals"), where("propertyId", "in", dealIds));
+  }, [firestore, dealIds]);
+
+  const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
+
+  const isLoading = propertiesLoading || (dealIds.length > 0 && dealsLoading);
 
   const [priceFilter, setPriceFilter] = useState<number[]>([200000000]);
   const [brokerageFilter, setBrokerageFilter] = useState<number[]>([5]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Try to load properties from localStorage
-      const storedProperties = localStorage.getItem('mockProperties');
-      if (storedProperties) {
-        setProperties(JSON.parse(storedProperties));
-      } else {
-        // If nothing is in localStorage, use default and set it
-        setProperties(defaultMockProperties);
-        localStorage.setItem('mockProperties', JSON.stringify(defaultMockProperties));
-      }
-      
-      setDeals(mockDeals);
-      setIsLoading(false);
-    }, 500); // Shorten delay a bit
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const stats = useMemo(() => {
     const totalProperties = properties?.length || 0;
@@ -220,7 +205,7 @@ export default function SellerDashboard() {
           ) : (
             <div className="h-64 flex items-center justify-center">
               <p className="text-muted-foreground">
-                No properties match the current filters.
+                {properties && properties.length > 0 ? 'No properties match the current filters.' : 'You have not listed any properties yet.'}
               </p>
             </div>
           )}

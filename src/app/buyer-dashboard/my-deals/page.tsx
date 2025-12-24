@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -21,20 +20,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, User, Info } from 'lucide-react';
-import placeholderImages from '@/lib/placeholder-images.json';
+import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
+import Link from 'next/link';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
-interface Property {
-  id: string;
-  ownerId: string;
-  address: string;
-  image: string;
-}
-
 interface Deal {
   id: string;
-  propertyId: string;
+  property: {
+    address: string;
+    image: string;
+  };
   broker: {
     name: string;
     avatar: string;
@@ -44,74 +41,18 @@ interface Deal {
   date: string;
 }
 
-// Assume this is the logged-in buyer's user ID / name
-const currentBuyerName = 'Rohan Mehta'; 
-
-const mockProperties: Property[] = [
-  { id: 'prop1', ownerId: 'seller1', address: '2 BHK Apartment, HSR Layout, Bengaluru', image: placeholderImages.properties[0].src, },
-  { id: 'prop2', ownerId: 'seller2', address: '4 BHK Penthouse, DLF Phase 5, Gurgaon', image: 'https://picsum.photos/seed/property4/100/100', },
-];
-
-
-const mockDeals: Deal[] = [
-  {
-    id: 'deal1',
-    propertyId: 'prop1',
-    broker: {
-      name: 'Ramesh K.',
-      avatar: placeholderImages.testimonials[1].src,
-    },
-    offerPrice: 9300000,
-    status: 'Pending',
-    date: '2023-10-28',
-  },
-  {
-    id: 'deal4',
-    propertyId: 'prop2',
-     broker: {
-      name: 'Sunita M.',
-      avatar: placeholderImages.testimonials[2].src,
-    },
-    offerPrice: 24000000,
-    status: 'Accepted',
-    date: '2023-10-29',
-  },
-];
-
-
-interface DisplayDeal extends Deal {
-    property: {
-        address: string;
-        image: string;
-    };
-}
 
 export default function BuyerDealsPage() {
-  const [deals, setDeals] = useState<DisplayDeal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // In a real app, you'd filter by buyerId. Here we just show all for demo.
-      const buyerDeals = mockDeals
-        .map(deal => {
-            const property = mockProperties.find(p => p.id === deal.propertyId)!;
-            return {
-                ...deal,
-                property: {
-                    address: property.address,
-                    image: property.image
-                }
-            }
-        });
+  const firestore = useFirestore();
+  const { user } = useUser();
 
-      setDeals(buyerDeals);
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const dealsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'deals'), where('buyerId', '==', user.uid));
+  }, [firestore, user]);
 
+  const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
 
   const getStatusBadge = (status: DealStatus) => {
     switch (status) {
@@ -177,7 +118,7 @@ export default function BuyerDealsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? renderSkeleton() : deals.map((deal) => (
+                {isLoading ? renderSkeleton() : deals && deals.map((deal) => (
                   <TableRow key={deal.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -215,7 +156,7 @@ export default function BuyerDealsPage() {
                 ))}
               </TableBody>
             </Table>
-             {!isLoading && deals.length === 0 && (
+             {!isLoading && (!deals || deals.length === 0) && (
                 <div className="h-64 flex flex-col items-center justify-center text-center">
                     <User className="w-12 h-12 text-muted-foreground mb-4" />
                     <h3 className="text-xl font-semibold text-foreground">No Offers Made</h3>

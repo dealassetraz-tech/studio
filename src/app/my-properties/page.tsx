@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,74 +9,32 @@ import { IndianRupee, Tag, ArrowLeft } from "lucide-react";
 import placeholderImages from "@/lib/placeholder-images.json";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
 
 interface Property {
   id: string;
   address: string;
   price: number;
   status: "Listed" | "Under Contract" | "Sold";
-  image: {
+  image?: {
     src: string;
     "data-ai-hint": string;
   };
 }
 
-const mockProperties: Property[] = [
-  {
-    id: "prop1",
-    address: "2 BHK Apartment, HSR Layout, Bengaluru",
-    price: 9500000,
-    status: "Listed",
-    image: {
-      src: placeholderImages.properties[0].src,
-      "data-ai-hint": placeholderImages.properties[0].hint,
-    },
-  },
-  {
-    id: "prop2",
-    address: "3 BHK Villa, Jubilee Hills, Hyderabad",
-    price: 18000000,
-    status: "Under Contract",
-    image: {
-        src: placeholderImages.properties[0].src,
-        "data-ai-hint": "modern house",
-    },
-  },
-  {
-    id: "prop3",
-    address: "1 RK Studio, Bandra West, Mumbai",
-    price: 7200000,
-    status: "Sold",
-    image: {
-        src: placeholderImages.properties[0].src,
-        "data-ai-hint": "apartment building",
-    },
-  },
-   {
-    id: "prop4",
-    address: "4 BHK Penthouse, DLF Phase 5, Gurgaon",
-    price: 25000000,
-    status: "Listed",
-    image: {
-        src: placeholderImages.properties[0].src,
-        "data-ai-hint": "luxury condo",
-    },
-  },
-];
 
 export default function MyPropertiesPage() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const firestore = useFirestore();
+  const { user } = useUser();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setProperties(mockProperties.filter(p => p.status === 'Listed'));
-      setIsLoading(false);
-    }, 1000); 
+  const propertiesQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'properties'), where('ownerId', '==', user.uid));
+  }, [firestore, user]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  const { data: properties, isLoading } = useCollection<Property>(propertiesQuery);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -108,18 +66,18 @@ export default function MyPropertiesPage() {
              </Card>
           ))}
         </div>
-      ) : properties.length > 0 ? (
+      ) : properties && properties.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {properties.map((prop) => (
             <Card key={prop.id} className="overflow-hidden shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
                 <div className="relative">
                     <Image
-                        src={prop.image.src}
+                        src={prop.image?.src || placeholderImages.properties[0].src}
                         alt={prop.address}
                         width={600}
                         height={400}
                         className="w-full h-48 object-cover"
-                        data-ai-hint={prop.image["data-ai-hint"]}
+                        data-ai-hint={prop.image?.["data-ai-hint"] || 'modern apartment'}
                     />
                     <div className={`absolute top-2 right-2 px-3 py-1 text-xs font-semibold rounded-full text-white ${
                       prop.status === 'Listed' ? 'bg-primary' :

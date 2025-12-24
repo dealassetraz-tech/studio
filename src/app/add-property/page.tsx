@@ -24,6 +24,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { IndianRupee, Percent } from 'lucide-react';
+import { useFirestore, useUser } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 const propertyFormSchema = z.object({
   address: z.string().min(10, {
@@ -36,6 +38,9 @@ const propertyFormSchema = z.object({
 
 export default function AddPropertyPage() {
   const router = useRouter();
+  const firestore = useFirestore();
+  const { user } = useUser();
+
   const form = useForm<z.infer<typeof propertyFormSchema>>({
     resolver: zodResolver(propertyFormSchema),
     defaultValues: {
@@ -46,25 +51,26 @@ export default function AddPropertyPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof propertyFormSchema>) {
-    // Simulate saving the data
-    const newProperty = {
-      id: `prop_${Date.now()}`,
-      ...values,
-    };
-    
-    // Get existing properties from local storage, or an empty array
-    const existingProperties = JSON.parse(localStorage.getItem('mockProperties') || '[]');
-    
-    // Add the new property
-    const updatedProperties = [...existingProperties, newProperty];
-    
-    // Save back to local storage
-    localStorage.setItem('mockProperties', JSON.stringify(updatedProperties));
-    
-    toast.success('Property listed successfully!');
-    
-    router.push('/dashboard');
+  async function onSubmit(values: z.infer<typeof propertyFormSchema>) {
+    if (!user) {
+      toast.error('You must be logged in to add a property.');
+      return;
+    }
+
+    const toastId = toast.loading('Listing property...');
+    try {
+      const propertiesCollection = collection(firestore, 'properties');
+      await addDoc(propertiesCollection, {
+        ...values,
+        ownerId: user.uid,
+        createdAt: serverTimestamp(),
+      });
+      toast.success('Property listed successfully!', { id: toastId });
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error adding property: ', error);
+      toast.error('Failed to list property.', { id: toastId });
+    }
   }
 
   return (

@@ -24,6 +24,13 @@
           "enum": ["seller", "buyer", "broker"],
           "description": "The user's role in the application."
         },
+        "wishlist": {
+          "type": "array",
+          "description": "An array of property IDs that the user has added to their wishlist.",
+          "items": {
+            "type": "string"
+          }
+        },
         "createdAt": {
           "type": "string",
           "description": "Timestamp indicating when the user account was created.",

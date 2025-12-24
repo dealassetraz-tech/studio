@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -21,21 +21,19 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowUpDown, Building, User, Check, X, ArrowLeft } from 'lucide-react';
-import placeholderImages from '@/lib/placeholder-images.json';
+import { useCollection, useFirestore, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
-interface Property {
-  id: string;
-  ownerId: string;
-  address: string;
-  image: string;
-}
-
 interface Deal {
   id: string;
-  propertyId: string;
-  broker: {
+  property: {
+    address: string;
+    image: string;
+  };
+   broker: {
     name: string;
     avatar: string;
   };
@@ -44,108 +42,41 @@ interface Deal {
   date: string;
 }
 
-// Assume this is the logged-in seller's user ID
-const currentUserId = 'seller1';
-
-const mockProperties: Property[] = [
-  { id: 'prop1', ownerId: 'seller1', address: '2 BHK Apartment, HSR Layout, Bengaluru', image: placeholderImages.properties[0].src, },
-  { id: 'prop2', ownerId: 'seller2', address: '4 BHK Penthouse, DLF Phase 5, Gurgaon', image: 'https://picsum.photos/seed/property4/100/100', },
-  { id: 'prop3', ownerId: 'seller1', address: '3 BHK Villa, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/property2/100/100', },
-  { id: 'prop4', ownerId: 'seller2', address: '1 RK Studio, Bandra West, Mumbai', image: 'https://picsum.photos/seed/property3/100/100', },
-];
-
-
-const mockDeals: Deal[] = [
-  {
-    id: 'deal1',
-    propertyId: 'prop1',
-    broker: {
-      name: 'Rohan Mehta',
-      avatar: placeholderImages.testimonials[1].src,
-    },
-    offerPrice: 9300000,
-    status: 'Pending',
-    date: '2023-10-28',
-  },
-  {
-    id: 'deal2',
-    propertyId: 'prop2', // Belongs to seller2
-    broker: {
-      name: 'Suresh Gupta',
-      avatar: 'https://picsum.photos/seed/broker2/100/100',
-    },
-    offerPrice: 24500000,
-    status: 'Accepted',
-    date: '2023-10-25',
-  },
-  {
-    id: 'deal3',
-    propertyId: 'prop3',
-    broker: {
-      name: 'Anjali Rao',
-      avatar: 'https://picsum.photos/seed/broker3/100/100',
-    },
-    offerPrice: 17500000,
-    status: 'Rejected',
-    date: '2023-10-22',
-  },
-    {
-    id: 'deal4',
-    propertyId: 'prop1',
-    broker: {
-      name: 'Rohan Mehta',
-      avatar: placeholderImages.testimonials[1].src,
-    },
-    offerPrice: 7100000,
-    status: 'Pending',
-    date: '2023-10-29',
-  },
-];
-
 
 type SortKey = 'property.address' | 'offerPrice' | 'status' | 'date';
 
-interface DisplayDeal extends Deal {
-    property: {
-        address: string;
-        image: string;
-    };
-}
-
 export default function DealsPage() {
-  const [deals, setDeals] = useState<DisplayDeal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const firestore = useFirestore();
+  const { user } = useUser();
+  
+  const dealsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'deals'), where('sellerId', '==', user.uid));
+  }, [firestore, user]);
+
+  const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
+
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
     direction: 'ascending' | 'descending';
   } | null>({ key: 'date', direction: 'descending' });
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const sellerProperties = mockProperties.filter(p => p.ownerId === currentUserId);
-      const sellerPropertyIds = sellerProperties.map(p => p.id);
-      
-      const sellerDeals = mockDeals
-        .filter(deal => sellerPropertyIds.includes(deal.propertyId))
-        .map(deal => {
-            const property = mockProperties.find(p => p.id === deal.propertyId)!;
-            return {
-                ...deal,
-                property: {
-                    address: property.address,
-                    image: property.image
-                }
-            }
-        });
 
-      setDeals(sellerDeals);
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleDealStatusChange = async (dealId: string, newStatus: 'Accepted' | 'Rejected') => {
+    if(!firestore) return;
+    const toastId = toast.loading("Updating status...");
+    try {
+        const dealDocRef = doc(firestore, 'deals', dealId);
+        await updateDoc(dealDocRef, { status: newStatus });
+        toast.success(`Deal ${newStatus.toLowerCase()}`, { id: toastId });
+    } catch(error) {
+        console.error("Error updating deal status", error);
+        toast.error("Failed to update status", { id: toastId });
+    }
+  }
 
-  const sortedDeals = [...deals].sort((a, b) => {
+  const sortedDeals = [...(deals || [])].sort((a, b) => {
     if (!sortConfig) return 0;
 
     let aValue: any;
@@ -296,11 +227,11 @@ export default function DealsPage() {
                     <TableCell className="text-center">
                       {deal.status === 'Pending' ? (
                         <div className="flex gap-2 justify-center">
-                          <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary">
+                          <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleDealStatusChange(deal.id, 'Accepted')}>
                             <Check className="w-4 h-4 mr-1" />
                             Accept
                           </Button>
-                          <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive">
+                          <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDealStatusChange(deal.id, 'Rejected')}>
                             <X className="w-4 h-4 mr-1" />
                             Reject
                           </Button>
@@ -315,7 +246,7 @@ export default function DealsPage() {
                 ))}
               </TableBody>
             </Table>
-             {!isLoading && deals.length === 0 && (
+             {!isLoading && (!deals || deals.length === 0) && (
                 <div className="h-64 flex flex-col items-center justify-center text-center">
                     <User className="w-12 h-12 text-muted-foreground mb-4" />
                     <h3 className="text-xl font-semibold text-foreground">No Offers Yet</h3>

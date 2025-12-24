@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -20,8 +20,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User, Info, Handshake } from 'lucide-react';
-import placeholderImages from '@/lib/placeholder-images.json';
+import { ArrowLeft, Building, Info, Handshake } from 'lucide-react';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -44,49 +45,16 @@ interface Deal {
   commission: number;
 }
 
-const mockDeals: Deal[] = [
-  {
-    id: 'deal1',
-    property: { address: '2 BHK Apartment, HSR Layout, Bengaluru', image: placeholderImages.properties[0].src },
-    seller: { name: 'Priya S.', avatar: placeholderImages.testimonials[0].src },
-    buyer: { name: 'Rohan Mehta', avatar: placeholderImages.testimonials[1].src },
-    offerPrice: 9300000,
-    status: 'Active',
-    commission: 1.5,
-  },
-  {
-    id: 'deal2',
-    property: { address: '4 BHK Penthouse, DLF Phase 5, Gurgaon', image: 'https://picsum.photos/seed/property4/100/100' },
-    seller: { name: 'Anjali P.', avatar: placeholderImages.testimonials[2].src },
-    buyer: { name: 'Suresh Gupta', avatar: 'https://picsum.photos/seed/broker2/100/100' },
-    offerPrice: 24500000,
-    status: 'Closed',
-    commission: 2,
-  },
-  {
-    id: 'deal3',
-    property: { address: '1 RK Studio, Bandra West, Mumbai', image: 'https://picsum.photos/seed/property3/100/100' },
-    seller: { name: 'Vikram Singh', avatar: 'https://picsum.photos/seed/seller3/100/100' },
-    buyer: { name: 'Nisha Desai', avatar: 'https://picsum.photos/seed/buyer3/100/100' },
-    offerPrice: 7100000,
-    status: 'Pending',
-    commission: 2.5,
-  },
-];
-
 export default function ManagedDealsPage() {
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // In a real app, you'd fetch deals associated with the broker
-      setDeals(mockDeals);
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const firestore = useFirestore();
+
+  const dealsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'deals'));
+  }, [firestore]);
+
+  const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
 
   const getStatusBadge = (status: DealStatus) => {
     switch (status) {
@@ -150,7 +118,7 @@ export default function ManagedDealsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? renderSkeleton() : deals.map((deal) => (
+                {isLoading ? renderSkeleton() : deals && deals.map((deal) => (
                   <TableRow key={deal.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -199,7 +167,7 @@ export default function ManagedDealsPage() {
                 ))}
               </TableBody>
             </Table>
-             {!isLoading && deals.length === 0 && (
+             {!isLoading && (!deals || deals.length === 0) && (
                 <div className="h-64 flex flex-col items-center justify-center text-center">
                     <Handshake className="w-12 h-12 text-muted-foreground mb-4" />
                     <h3 className="text-xl font-semibold text-foreground">No Deals Found</h3>

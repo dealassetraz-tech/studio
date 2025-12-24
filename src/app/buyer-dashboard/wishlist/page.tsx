@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,14 +8,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IndianRupee, Bed, Bath, ArrowLeft, Heart, X } from 'lucide-react';
 import placeholderImages from '@/lib/placeholder-images.json';
-import { cn } from '@/lib/utils';
+import { useCollection, useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { collection, query, where, doc, updateDoc, arrayRemove } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 
 interface Property {
   id: string;
   address: string;
   price: number;
   status: 'Listed' | 'Under Contract' | 'Sold';
-  image: {
+  image?: {
     src: string;
     'data-ai-hint': string;
   };
@@ -28,77 +29,39 @@ interface Property {
   location: string;
 }
 
-const mockProperties: Property[] = [
-  {
-    id: 'prop1',
-    address: '2 BHK Apartment, HSR Layout, Bengaluru',
-    price: 9500000,
-    status: 'Listed',
-    image: {
-      src: placeholderImages.properties[0].src,
-      'data-ai-hint': placeholderImages.properties[0].hint,
-    },
-    details: { bedrooms: 2, bathrooms: 2 },
-    type: 'Apartment',
-    location: 'Bengaluru',
-  },
-  {
-    id: 'prop2',
-    address: '3 BHK Villa, Jubilee Hills, Hyderabad',
-    price: 18000000,
-    status: 'Listed',
-    image: {
-      src: 'https://picsum.photos/seed/villa/600/400',
-      'data-ai-hint': 'modern house',
-    },
-    details: { bedrooms: 3, bathrooms: 3 },
-    type: 'Villa',
-    location: 'Hyderabad',
-  },
-  {
-    id: 'prop3',
-    address: '1 RK Studio, Bandra West, Mumbai',
-    price: 7200000,
-    status: 'Sold',
-    image: {
-      src: 'https://picsum.photos/seed/studio/600/400',
-      'data-ai-hint': 'apartment building',
-    },
-    details: { bedrooms: 1, bathrooms: 1 },
-    type: 'Studio',
-    location: 'Mumbai',
-  },
-  {
-    id: 'prop4',
-    address: '4 BHK Penthouse, DLF Phase 5, Gurgaon',
-    price: 25000000,
-    status: 'Listed',
-    image: {
-      src: 'https://picsum.photos/seed/penthouse/600/400',
-      'data-ai-hint': 'luxury condo',
-    },
-    details: { bedrooms: 4, bathrooms: 5 },
-    type: 'Penthouse',
-    location: 'Gurgaon',
-  },
-];
-
 export default function WishlistPage() {
-  const [wishlistItems, setWishlistItems] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const firestore = useFirestore();
+  const { user } = useUser();
 
-  useEffect(() => {
-    const savedWishlistIds = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    const items = mockProperties.filter(prop => savedWishlistIds.includes(prop.id));
-    setWishlistItems(items);
-    setIsLoading(false);
-  }, []);
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+  const { data: userData, isLoading: isUserLoading } = useDoc<{wishlist?: string[]}>(userDocRef);
+  
+  const wishlistIds = userData?.wishlist;
 
-  const removeFromWishlist = (propertyId: string) => {
-    const updatedWishlistIds = wishlistItems.map(item => item.id).filter(id => id !== propertyId);
-    localStorage.setItem('wishlist', JSON.stringify(updatedWishlistIds));
-    setWishlistItems(wishlistItems.filter(item => item.id !== propertyId));
+  const wishlistQuery = useMemoFirebase(() => {
+    if (!firestore || !wishlistIds || wishlistIds.length === 0) return null;
+    return query(collection(firestore, 'properties'), where('__name__', 'in', wishlistIds));
+  }, [firestore, wishlistIds]);
+  
+  const { data: wishlistItems, isLoading: isWishlistLoading } = useCollection<Property>(wishlistQuery);
+
+  const isLoading = isUserLoading || (wishlistIds && wishlistIds.length > 0 && isWishlistLoading);
+
+  const removeFromWishlist = async (propertyId: string) => {
+    if (!userDocRef) return;
+    try {
+        await updateDoc(userDocRef, {
+            wishlist: arrayRemove(propertyId)
+        });
+        toast.success("Removed from wishlist");
+    } catch (error) {
+        console.error("Error removing from wishlist:", error);
+        toast.error("Could not remove from wishlist.");
+    }
   };
 
   return (
@@ -126,18 +89,18 @@ export default function WishlistPage() {
             </Card>
           ))}
         </div>
-      ) : wishlistItems.length > 0 ? (
+      ) : wishlistItems && wishlistItems.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {wishlistItems.map(prop => (
             <Card key={prop.id} className="overflow-hidden shadow-lg hover:shadow-primary/20 transition-shadow duration-300 group">
               <div className="relative">
                 <Image
-                  src={prop.image.src}
+                  src={prop.image?.src || placeholderImages.properties[0].src}
                   alt={prop.address}
                   width={600}
                   height={400}
                   className="w-full h-48 object-cover"
-                  data-ai-hint={prop.image['data-ai-hint']}
+                  data-ai-hint={prop.image?.['data-ai-hint'] || 'modern apartment'}
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <Button asChild>

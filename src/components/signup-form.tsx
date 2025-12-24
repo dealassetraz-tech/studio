@@ -97,6 +97,7 @@ export function SignUpForm() {
         role: values.role,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        wishlist: [],
       });
 
       toast.success("Account created successfully!", { id: toastId });
