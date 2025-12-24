@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Handshake, Search, ShieldCheck, FileUp, Bot, Settings, KeyRound } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FileUp, Bot, Settings, KeyRound, FileSearch, Signature, TriangleAlert, CalendarClock, Info } from "lucide-react";
 
-const subSteps = [
+const registrationSteps = [
   {
     icon: <FileUp className="w-6 h-6 text-primary" />,
     title: "Document Upload",
@@ -24,6 +25,29 @@ const subSteps = [
   },
 ];
 
+const verificationSteps = [
+  {
+    icon: <FileSearch className="w-6 h-6 text-primary" />,
+    title: "Document Review",
+    description: "Admin verifies authenticity, checks compliance with network standards, and validates all parties.",
+  },
+  {
+    icon: <Signature className="w-6 h-6 text-primary" />,
+    title: "Signature Collection",
+    description: "Buyer, seller, and required parties digitally sign. Each signature updates the token lock state.",
+  },
+  {
+    icon: <TriangleAlert className="w-6 h-6 text-primary" />,
+    title: "Contingency Tracking",
+    description: "Monitor inspection, financing, and title contingencies. Lock remains until all conditions satisfied.",
+  },
+    {
+    icon: <CalendarClock className="w-6 h-6 text-primary" />,
+    title: "Milestone Updates",
+    description: "Real-time status updates notify all parties. Automated reminders prevent delays.",
+  },
+];
+
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="py-12 md:py-20 bg-muted/30">
@@ -34,12 +58,14 @@ export function HowItWorks() {
             Complete deal lifecycle management with multi-layer verification and enforcement.
           </p>
         </div>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-8">
+            {/* Step 1 */}
             <div className="flex items-start gap-8">
                 <div className="flex flex-col items-center">
                     <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold border-4 border-background ring-4 ring-primary">
                         1
                     </div>
+                    <div className="w-px h-full bg-border my-4" />
                 </div>
                 <div className="flex-1 pb-8">
                     <h3 className="text-2xl font-headline font-semibold text-foreground mb-2">Deal Registration & Initial Submission</h3>
@@ -47,7 +73,7 @@ export function HowItWorks() {
                         Brokers initiate the deal process through our secure platform, submitting comprehensive documentation and deal parameters.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {subSteps.map((step, index) => (
+                        {registrationSteps.map((step, index) => (
                             <Card key={index} className="bg-background/70 shadow-md hover:shadow-primary/10 transition-shadow duration-300">
                                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
                                     {step.icon}
@@ -59,6 +85,39 @@ export function HowItWorks() {
                             </Card>
                         ))}
                     </div>
+                </div>
+            </div>
+            {/* Step 2 */}
+            <div className="flex items-start gap-8">
+                <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold border-4 border-background ring-4 ring-primary">
+                        2
+                    </div>
+                </div>
+                <div className="flex-1 pb-8">
+                    <h3 className="text-2xl font-headline font-semibold text-foreground mb-2">Multi-Party Verification & Approval Workflow</h3>
+                    <p className="text-muted-foreground mb-8">
+                        Administrator and designated parties review all deal components. Token lock ensures funds remain secured throughout the verification process.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {verificationSteps.map((step, index) => (
+                            <Card key={index} className="bg-background/70 shadow-md hover:shadow-primary/10 transition-shadow duration-300">
+                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                    {step.icon}
+                                    <CardTitle className="font-headline text-lg text-foreground">{step.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                     <Alert className="mt-8 bg-blue-900/10 border-blue-500/20 text-blue-300">
+                        <Info className="h-4 w-4 text-blue-400" />
+                        <AlertDescription>
+                           <span className="font-bold text-blue-300">Key Protection:</span> Token lock mechanism ensures funds cannot be released without explicit administrator approval AND completion of all required signatures. No premature payouts possible.
+                        </AlertDescription>
+                    </Alert>
                 </div>
             </div>
         </div>
