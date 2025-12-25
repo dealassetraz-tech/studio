@@ -17,73 +17,41 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DealLockLogo } from "./deallock-logo";
 import Link from "next/link";
-import { useAuth, useFirestore } from "@/firebase";
+import { useAuth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { doc, getDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
-export function SignInForm() {
+export function AdminSignInForm() {
   const auth = useAuth();
-  const firestore = useFirestore();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
       password: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const toastId = toast.loading('Signing in...');
+    if (values.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+        toast.error("This is not a valid admin email address.");
+        return;
+    }
+
+    const toastId = toast.loading('Signing in as admin...');
     try {
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
-
-      if (user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-        toast.success("Admin signed in successfully!", { id: toastId });
-        router.push("/admin-dashboard");
-        return;
-      }
-
-      // Fetch user role from Firestore
-      const userDocRef = doc(firestore, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        toast.success("Signed in successfully!", { id: toastId });
-
-        // Redirect based on role
-        if (userData.role === 'buyer') {
-          router.push("/buyer-dashboard");
-        } else if (userData.role === 'broker') {
-          router.push("/broker-dashboard");
-        } else if (userData.role === 'seller') {
-          router.push("/dashboard"); 
-        } else {
-           // Fallback for any other roles or if role is not set
-          router.push("/dashboard");
-        }
-      } else {
-        // Fallback if user doc doesn't exist for some reason
-        toast.error("User data not found. Redirecting to default dashboard.", { id: toastId });
-        router.push("/dashboard");
-      }
-
+      toast.success("Admin signed in successfully!", { id: toastId });
+      router.push("/admin-dashboard");
     } catch (error: any) {
-      console.error("Sign in error:", error);
-      if (error.code === 'auth/invalid-credential') {
-        toast.error("Invalid email or password. If you are an admin, please use the admin sign-in page.", { id: toastId });
-      } else {
-        toast.error(error.message || "Failed to sign in.", { id: toastId });
-      }
+      console.error("Admin sign in error:", error);
+      toast.error(error.message || "Failed to sign in.", { id: toastId });
     }
   }
 
@@ -93,8 +61,8 @@ export function SignInForm() {
         <div className="mx-auto mb-4">
             <DealLockLogo className="w-16 h-16 p-4" />
         </div>
-        <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
-        <p className="text-muted-foreground">Sign in to continue to DealLock</p>
+        <CardTitle className="text-2xl font-headline">Admin Portal</CardTitle>
+        <p className="text-muted-foreground">Sign in to access the administrator dashboard</p>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -104,9 +72,9 @@ export function SignInForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Admin Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="john.doe@example.com" {...field} />
+                    <Input placeholder="admin@deallock.com" {...field} readOnly={!!process.env.NEXT_PUBLIC_ADMIN_EMAIL} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,11 +93,15 @@ export function SignInForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">Sign In</Button>
+            <Button type="submit" className="w-full">Sign In as Admin</Button>
             <div className="text-center text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link href="/signup" className="text-primary hover:underline">
-                    Sign Up
+                Not an admin?{" "}
+                <Link href="/signin" className="text-primary hover:underline">
+                    User Sign In
+                </Link>
+                {" or "}
+                <Link href="/admin/signup" className="text-primary hover:underline">
+                    Admin Sign Up
                 </Link>
             </div>
           </form>
