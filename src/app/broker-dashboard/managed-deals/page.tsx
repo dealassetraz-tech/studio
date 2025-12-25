@@ -47,13 +47,14 @@ interface Deal {
   commission: number;
 }
 
-const mockDeals: Deal[] = [
+const initialMockDeals: Deal[] = [
     { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, offerPrice: 148000000, status: 'Active', commission: 2 },
     { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
     { id: 'deal3', property: { address: '45, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/prop4/100/100' }, seller: { name: 'Rohan M.', avatar: 'https://picsum.photos/seed/seller3/100/100' }, buyer: { name: 'Suresh P.', avatar: 'https://picsum.photos/seed/buyerC/100/100' }, offerPrice: 119000000, status: 'Closed', commission: 2.5 },
     { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
 ];
 
+const SESSION_STORAGE_KEY = 'managedDealsMockData';
 
 export default function ManagedDealsPage() {
   const router = useRouter();
@@ -64,10 +65,19 @@ export default function ManagedDealsPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    setTimeout(() => {
-        setDeals(mockDeals);
-        setIsLoading(false);
-    }, 1000);
+    try {
+      const storedDeals = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      if (storedDeals) {
+        setDeals(JSON.parse(storedDeals));
+      } else {
+        setDeals(initialMockDeals);
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(initialMockDeals));
+      }
+    } catch (error) {
+      console.error("Could not load deals from session storage", error);
+      setDeals(initialMockDeals);
+    }
+    setIsLoading(false);
   }, []);
   
   const handleOpenUploadDialog = (deal: Deal) => {
@@ -92,15 +102,16 @@ export default function ManagedDealsPage() {
 
   const handleAssignmentResponse = async (dealId: string, status: 'Active' | 'Rejected') => {
     const toastId = toast.loading(`Updating assignment to ${status}...`);
-    setTimeout(() => {
-        setDeals(currentDeals => 
-            currentDeals.map(d => d.id === dealId ? {...d, status: status} : d)
-        );
-        toast.success('Assignment updated!', { id: toastId });
-        if (status === 'Active') {
-          router.push(`/broker-dashboard/managed-deals/${dealId}`);
-        }
-    }, 500);
+    
+    const updatedDeals = deals.map(d => d.id === dealId ? {...d, status: status} : d);
+    setDeals(updatedDeals);
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedDeals));
+    
+    toast.success('Assignment updated!', { id: toastId });
+    
+    if (status === 'Active') {
+      router.push(`/broker-dashboard/managed-deals/${dealId}`);
+    }
   };
 
 
@@ -227,16 +238,7 @@ export default function ManagedDealsPage() {
                                 Reject
                               </Button>
                             </>
-                           ) : deal.status === 'Active' ? (
-                             <>
-                              <Button variant="outline" size="sm" asChild>
-                                  <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
-                                      <Info className="w-4 h-4 mr-1" />
-                                      Details
-                                  </Link>
-                              </Button>
-                             </>
-                           ) : (deal.status === 'Closed' || deal.status === 'Accepted') ? (
+                           ) : (deal.status === 'Active' || deal.status === 'Closed' || deal.status === 'Accepted') ? (
                               <Button variant="outline" size="sm" asChild>
                                 <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
                                     <Info className="w-4 h-4 mr-1" />
@@ -268,4 +270,6 @@ export default function ManagedDealsPage() {
 
     
     
+    
+
     
