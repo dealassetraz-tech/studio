@@ -2,7 +2,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, Building, User as UserIcon, IndianRupee, Briefcase, Clock, MessageSquare, CheckCircle, FileUp } from 'lucide-react';
@@ -12,6 +12,8 @@ import { format } from 'date-fns';
 import { useMemo, useState, useEffect } from 'react';
 import { useUser } from '@/firebase';
 import { cn } from '@/lib/utils';
+import { BuyerDealTimeline, type BuyerDealStatus } from '@/components/buyer-deal-timeline';
+
 
 interface Deal {
   id: string;
@@ -112,6 +114,18 @@ export default function SellerDealTrackingPage() {
     return 'seller'; // Default for generic /deals/[dealId] path
   }, [user, deal]);
 
+  const buyerTimelineStatus = useMemo((): BuyerDealStatus => {
+    if (!deal) return 'Registered Interest';
+    switch (deal.status) {
+        case 'Pending': return 'Offer Placed';
+        case 'Active': return 'Deal Review';
+        case 'Accepted': return 'Approval Granted';
+        case 'Closed': return 'Deal Closed';
+        default: return 'Registered Interest';
+    }
+  }, [deal]);
+
+
   const renderSkeleton = () => (
     <div className="space-y-8">
         <Card>
@@ -169,7 +183,7 @@ export default function SellerDealTrackingPage() {
       
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className={cn("space-y-8", userRole === 'buyer' ? 'lg:col-span-3' : 'lg:col-span-2')}>
+        <div className="lg:col-span-3 space-y-8">
             <Card>
                 <CardHeader>
                     <CardTitle>Deal Overview</CardTitle>
@@ -231,9 +245,20 @@ export default function SellerDealTrackingPage() {
                     </div>
                 </CardContent>
             </Card>
-        </div>
-        {userRole !== 'buyer' && (
-            <div className="lg:col-span-1">
+
+             {userRole === 'buyer' && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Deal Progress</CardTitle>
+                        <CardDescription>Follow the journey of your deal from start to finish.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <BuyerDealTimeline currentStatus={buyerTimelineStatus} />
+                    </CardContent>
+                </Card>
+            )}
+
+            {userRole !== 'buyer' && (
                 <Card>
                     <CardHeader>
                         <CardTitle>Activity Log</CardTitle>
@@ -267,8 +292,8 @@ export default function SellerDealTrackingPage() {
                         )}
                     </CardContent>
                 </Card>
-            </div>
-        )}
+            )}
+        </div>
       </div>
     </div>
   );
