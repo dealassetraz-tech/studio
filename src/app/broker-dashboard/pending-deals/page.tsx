@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -18,11 +19,12 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User, Check, X, Bell } from 'lucide-react';
+import { ArrowLeft, Building, User, Check, X, Bell, Info } from 'lucide-react';
 import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers, updateDocumentNonBlocking } from '@/firebase';
 import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { useMemo } from 'react';
+import Link from 'next/link';
 
 interface Property {
   id: string;
@@ -151,6 +153,12 @@ export default function PendingDealsPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex gap-2 justify-center">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href="/broker-dashboard">
+                                <Info className="w-4 h-4 mr-1" />
+                                Details
+                            </Link>
+                        </Button>
                         <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(prop.id, 'accepted')}>
                           <Check className="w-4 h-4 mr-1" />
                           Accept
