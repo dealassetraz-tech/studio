@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -11,6 +10,8 @@ import { ArrowLeft, Building, User as UserIcon, IndianRupee, Briefcase, Clock, M
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { DealTimeline, DealStatus as TimelineDealStatus } from '@/components/deal-timeline';
+import { useMemo } from 'react';
 
 interface Deal {
   id: string;
@@ -35,7 +36,7 @@ interface Deal {
   commission: number;
 }
 
-type LogEvent = "Assigned to deal" | "Communicated with seller" | "Communicated with buyer" | "Requested closure" | "Uploaded closure proof";
+type LogEvent = "Assigned to deal" | "Communicated with seller" | "Communicated with buyer" | "Requested closure" | "Uploaded closure proof" | "Deal approved";
 
 interface DealLog {
     id: string;
@@ -53,7 +54,21 @@ const logIcons: Record<LogEvent, React.ReactElement> = {
     "Communicated with buyer": <MessageSquare className="w-5 h-5 text-green-500" />,
     "Requested closure": <CheckCircle className="w-5 h-5 text-amber-500" />,
     "Uploaded closure proof": <FileUp className="w-5 h-5 text-purple-500" />,
+    "Deal approved": <CheckCircle className="w-5 h-5 text-emerald-500" />,
 };
+
+const getTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): TimelineDealStatus => {
+    if (!logs) return 'Property Posted';
+    const events = logs.map(log => log.event);
+
+    if (dealStatus === 'Closed') return 'Deal Closed';
+    if (events.includes('Deal approved')) return 'Approval Granted';
+    if (events.includes('Requested closure') || events.includes('Uploaded closure proof')) return 'Deal Closure Approval';
+    if (dealStatus === 'Active') return 'Got Buyer';
+    if (events.includes('Assigned to deal')) return 'Broker Assigned';
+
+    return 'Property Posted';
+}
 
 
 export default function SellerDealTrackingPage() {
@@ -82,6 +97,9 @@ export default function SellerDealTrackingPage() {
   const { data: logs, isLoading: areLogsLoading } = useCollection<DealLog>(logsQuery);
 
   const isLoading = isDealLoading || areLogsLoading;
+  
+  const timelineStatus = useMemo(() => getTimelineStatus(logs, deal?.status), [logs, deal?.status]);
+
 
   const renderSkeleton = () => (
     <div className="space-y-8">
@@ -137,6 +155,15 @@ export default function SellerDealTrackingPage() {
           Back to Deals
         </Button>
       </div>
+      
+       <Card className="mb-8">
+            <CardHeader>
+                <CardTitle>Deal Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <DealTimeline currentStatus={timelineStatus} />
+            </CardContent>
+        </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
@@ -241,4 +268,3 @@ export default function SellerDealTrackingPage() {
     </div>
   );
 }
-
