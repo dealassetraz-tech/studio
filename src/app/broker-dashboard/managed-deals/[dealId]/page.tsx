@@ -94,8 +94,8 @@ const mockDeal: Deal = {
 };
 
 const mockLogs: DealLog[] = [
-    { id: 'log1', event: 'Assigned to deal', timestamp: { seconds: 1679310000, nanoseconds: 0 }, userId: 'broker1' },
-    { id: 'log2', event: 'Communicated with seller', timestamp: { seconds: 1679396400, nanoseconds: 0 }, userId: 'broker1' },
+    { id: 'log1', event: 'Communicated with seller', timestamp: { seconds: 1766699280, nanoseconds: 0 }, userId: 'broker1' }, // Dec 25, 2025
+    { id: 'log2', event: 'Communicated with seller', timestamp: { seconds: 1679396400, nanoseconds: 0 }, userId: 'broker1' }, // Mar 21, 2023
 ];
 
 const mockBuyerRequests: BuyerRequest[] = [
@@ -135,10 +135,16 @@ export default function DealDetailsPage() {
     setIsLoading(true);
     setTimeout(() => {
         setDeal(mockDeal);
-        setLogs(mockLogs.sort((a,b) => b.timestamp.seconds - a.timestamp.seconds));
+        setLogs(mockLogs);
         setIsLoading(false);
     }, 1000);
   }, []);
+
+  const sortedLogs = useMemo(() => {
+    if (!logs) return [];
+    return [...logs].sort((a,b) => b.timestamp.seconds - a.timestamp.seconds);
+  }, [logs]);
+
 
   const potentialMatches = useMemo(() => findMatches(deal, mockBuyerRequests), [deal]);
 
@@ -366,15 +372,15 @@ export default function DealDetailsPage() {
                     <CardTitle>Activity Log</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {logs && logs.length > 0 ? (
+                    {sortedLogs && sortedLogs.length > 0 ? (
                         <div className="space-y-6">
-                            {logs.map(log => (
+                            {sortedLogs.map((log, index) => (
                                 <div key={log.id} className="flex gap-4">
                                     <div className="flex flex-col items-center">
                                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                                             {logIcons[log.event]}
                                         </span>
-                                        {logs[logs.length-1].id !== log.id && <div className="h-full w-px bg-border my-2" />}
+                                        {index < sortedLogs.length -1 && <div className="h-full w-px bg-border my-2" />}
                                     </div>
                                     <div>
                                         <p className="font-semibold text-foreground">{log.event}</p>
