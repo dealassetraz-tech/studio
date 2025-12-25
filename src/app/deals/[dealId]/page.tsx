@@ -205,7 +205,7 @@ export default function SellerDealTrackingPage() {
         </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+        <div className={cn("space-y-8", userRole === 'buyer' ? 'lg:col-span-3' : 'lg:col-span-2')}>
             <Card>
                 <CardHeader>
                     <CardTitle>Deal Overview</CardTitle>
@@ -268,42 +268,46 @@ export default function SellerDealTrackingPage() {
                 </CardContent>
             </Card>
         </div>
-        <div className="lg:col-span-1">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Activity Log</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {logs && logs.length > 0 ? (
-                        <div className="space-y-6">
-                            {logs.map(log => (
-                                <div key={log.id} className="flex gap-4">
-                                    <div className="flex flex-col items-center">
-                                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                                            {logIcons[log.event]}
-                                        </span>
-                                        {logs[logs.length-1].id !== log.id && <div className="h-full w-px bg-border my-2" />}
+        {userRole !== 'buyer' && (
+            <div className="lg:col-span-1">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Activity Log</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {logs && logs.length > 0 ? (
+                            <div className="space-y-6">
+                                {logs.map(log => (
+                                    <div key={log.id} className="flex gap-4">
+                                        <div className="flex flex-col items-center">
+                                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                                                {logIcons[log.event]}
+                                            </span>
+                                            {logs[logs.length-1].id !== log.id && <div className="h-full w-px bg-border my-2" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-foreground">{log.event}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {format(new Date(log.timestamp.seconds * 1000), "MMM d, yyyy 'at' h:mm a")}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-semibold text-foreground">{log.event}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {format(new Date(log.timestamp.seconds * 1000), "MMM d, yyyy 'at' h:mm a")}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                         <div className="h-40 flex flex-col items-center justify-center text-center">
-                            <Clock className="w-10 h-10 text-muted-foreground mb-3" />
-                            <h3 className="font-semibold">No Activity Yet</h3>
-                            <p className="text-sm text-muted-foreground">Deal activities will appear here.</p>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+                                ))}
+                            </div>
+                        ) : (
+                             <div className="h-40 flex flex-col items-center justify-center text-center">
+                                <Clock className="w-10 h-10 text-muted-foreground mb-3" />
+                                <h3 className="font-semibold">No Activity Yet</h3>
+                                <p className="text-sm text-muted-foreground">Deal activities will appear here.</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        )}
       </div>
     </div>
   );
 }
+
+    
