@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion, Shuffle, Bed, Link as LinkIcon, MapPin, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion, Shuffle, Bed, Link as LinkIcon, MapPin, ShieldCheck, Bath } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
@@ -94,6 +94,20 @@ const mockDeal: Deal = {
     commission: 2,
 };
 
+const acceptedMockDeal: Deal = {
+    ...mockDeal,
+    id: 'deal4',
+     property: {
+        address: 'Villa, ECR, Chennai',
+        image: 'https://picsum.photos/seed/prop5/100/100',
+        price: 98000000,
+        bedrooms: 4,
+        bathrooms: 4,
+        type: 'Villa'
+    },
+    status: 'Accepted',
+}
+
 const closedMockDeal: Deal = {
     ...mockDeal,
     id: 'deal3',
@@ -119,6 +133,11 @@ const mockBuyerRequests: BuyerRequest[] = [
         id: 'req2', 
         buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerN/100/100' }, 
         requirements: { location: 'Bandra, Mumbai', type: 'Apartment', bedrooms: 3, budget: 140000000 } 
+    },
+     { 
+        id: 'req3', 
+        buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, 
+        requirements: { location: 'Chennai', type: 'Villa', bedrooms: 4, budget: 100000000 } 
     },
 ];
 
@@ -151,7 +170,7 @@ export default function DealDetailsPage() {
     setIsLoading(true);
     // Simulate loading data from sessionStorage or initial mock
     const allDealsStr = sessionStorage.getItem('managedDealsMockData');
-    const allDeals = allDealsStr ? JSON.parse(allDealsStr) : [mockDeal, closedMockDeal];
+    const allDeals = allDealsStr ? JSON.parse(allDealsStr) : [mockDeal, acceptedMockDeal, closedMockDeal];
     const currentDeal = allDeals.find((d: Deal) => d.id === dealId);
 
     setTimeout(() => {
@@ -306,6 +325,16 @@ export default function DealDetailsPage() {
                             <IndianRupee className="w-5 h-5" />
                             <span className="font-bold">{deal.offerPrice.toLocaleString('en-IN')}</span>
                         </div>
+                         <div className="flex items-center text-muted-foreground mt-2 gap-4 text-sm">
+                            <div className="flex items-center gap-1.5">
+                                <Bed className="w-4 h-4"/>
+                                <span>{deal.property.bedrooms} Beds</span>
+                            </div>
+                             <div className="flex items-center gap-1.5">
+                                <Bath className="w-4 h-4"/>
+                                <span>{deal.property.bathrooms} Baths</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <Separator />
@@ -334,7 +363,11 @@ export default function DealDetailsPage() {
                             deal.status === "Closed" ? "secondary" :
                             "secondary"
                         }
-                        className={deal.status === 'Closed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : ''}
+                        className={
+                            deal.status === 'Closed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
+                            deal.status === 'Accepted' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
+                            ''
+                        }
                         >
                             {deal.status}
                         </Badge>
@@ -409,3 +442,5 @@ export default function DealDetailsPage() {
     </div>
   );
 }
+
+    
