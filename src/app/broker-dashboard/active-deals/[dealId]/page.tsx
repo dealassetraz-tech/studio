@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -148,12 +149,13 @@ export default function DealDetailsPage() {
 
   useEffect(() => {
     setIsLoading(true);
+    // Simulate loading data from sessionStorage or initial mock
+    const allDealsStr = sessionStorage.getItem('managedDealsMockData');
+    const allDeals = allDealsStr ? JSON.parse(allDealsStr) : [mockDeal, closedMockDeal];
+    const currentDeal = allDeals.find((d: Deal) => d.id === dealId);
+
     setTimeout(() => {
-        if(dealId === 'deal3') {
-            setDeal(closedMockDeal);
-        } else {
-            setDeal(mockDeal);
-        }
+        setDeal(currentDeal || null);
         setLogs(mockLogs);
         setIsLoading(false);
     }, 1000);
@@ -407,5 +409,3 @@ export default function DealDetailsPage() {
     </div>
   );
 }
-
-    
