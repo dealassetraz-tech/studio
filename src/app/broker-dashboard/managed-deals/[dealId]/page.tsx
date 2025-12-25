@@ -361,23 +361,14 @@ export default function DealDetailsPage() {
                     <CardDescription>Log your activities and manage this deal.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {deal.status === 'Active' ? (
-                        <>
-                            <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
-                            <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
-                            <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
-                            <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
-                        </>
-                    ) : deal.status === 'Accepted' ? (
-                        <Button onClick={handleRequestApproval}>
-                            <ShieldQuestion className="w-4 h-4 mr-2" />
-                            Request Approval
-                        </Button>
-                    ) : (
-                        <p className="text-sm text-muted-foreground col-span-full">
-                            Actions will be available once the deal is approved and active.
-                        </p>
-                    )}
+                    <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
+                    <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
+                    <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
+                    <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
+                    <Button onClick={handleRequestApproval}>
+                        <ShieldQuestion className="w-4 h-4 mr-2" />
+                        Request Approval
+                    </Button>
                 </CardContent>
             </Card>
         </div>
