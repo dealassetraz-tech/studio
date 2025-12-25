@@ -94,8 +94,8 @@ const mockDeal: Deal = {
 };
 
 const mockLogs: DealLog[] = [
-    { id: 'log1', event: 'Communicated with seller', timestamp: { seconds: 1766699280, nanoseconds: 0 }, userId: 'broker1' }, // Dec 25, 2025
-    { id: 'log2', event: 'Communicated with seller', timestamp: { seconds: 1679396400, nanoseconds: 0 }, userId: 'broker1' }, // Mar 21, 2023
+    { id: 'log1', event: 'Communicated with seller', timestamp: { seconds: 1735111200, nanoseconds: 0 }, userId: 'broker1' }, // Dec 25, 2024
+    { id: 'log2', event: 'Communicated with buyer', timestamp: { seconds: 1735024800, nanoseconds: 0 }, userId: 'broker1' }, // Dec 24, 2024
 ];
 
 const mockBuyerRequests: BuyerRequest[] = [
@@ -222,173 +222,120 @@ export default function DealDetailsPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-            {/* Deal Details */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Deal Overview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex items-center gap-4 mb-6">
-                        <Avatar className="h-20 w-20 rounded-md">
-                            <AvatarImage src={deal.property.image} />
-                            <AvatarFallback className="rounded-md"><Building className="w-8 h-8" /></AvatarFallback>
-                        </Avatar>
+      <div className="space-y-8">
+        {/* Deal Details */}
+        <Card>
+            <CardHeader>
+                <CardTitle>Deal Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center gap-4 mb-6">
+                    <Avatar className="h-20 w-20 rounded-md">
+                        <AvatarImage src={deal.property.image} />
+                        <AvatarFallback className="rounded-md"><Building className="w-8 h-8" /></AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="text-xl font-semibold text-foreground">{deal.property.address}</p>
+                        <div className="flex items-center gap-2 text-lg text-muted-foreground">
+                            <IndianRupee className="w-5 h-5" />
+                            <span className="font-bold">{deal.offerPrice.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10"><AvatarImage src={deal.seller.avatar} /><AvatarFallback>{deal.seller.name.charAt(0)}</AvatarFallback></Avatar>
                         <div>
-                            <p className="text-xl font-semibold text-foreground">{deal.property.address}</p>
-                            <div className="flex items-center gap-2 text-lg text-muted-foreground">
-                                <IndianRupee className="w-5 h-5" />
-                                <span className="font-bold">{deal.offerPrice.toLocaleString('en-IN')}</span>
-                            </div>
+                            <p className="text-sm text-muted-foreground">Seller</p>
+                            <p className="font-semibold text-foreground">{deal.seller.name}</p>
                         </div>
                     </div>
-                    <Separator />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                         <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10"><AvatarImage src={deal.seller.avatar} /><AvatarFallback>{deal.seller.name.charAt(0)}</AvatarFallback></Avatar>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Seller</p>
-                                <p className="font-semibold text-foreground">{deal.seller.name}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10"><AvatarImage src={deal.buyer.avatar} /><AvatarFallback>{deal.buyer.name.charAt(0)}</AvatarFallback></Avatar>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Buyer</p>
-                                <p className="font-semibold text-foreground">{deal.buyer.name}</p>
-                            </div>
-                        </div>
-                    </div>
-                     <div className="mt-6 flex justify-between items-center bg-muted/50 p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10"><AvatarImage src={deal.buyer.avatar} /><AvatarFallback>{deal.buyer.name.charAt(0)}</AvatarFallback></Avatar>
                         <div>
-                            <p className="text-sm text-muted-foreground">Status</p>
-                            <Badge variant={
-                                deal.status === "Active" ? "default" : 
-                                deal.status === "Pending Approval" ? "outline" :
-                                "secondary"
-                            }>
-                                {deal.status}
-                            </Badge>
-                        </div>
-                         <div>
-                            <p className="text-sm text-muted-foreground">Commission</p>
-                            <p className="font-bold text-lg text-foreground">{deal.commission}%</p>
+                            <p className="text-sm text-muted-foreground">Buyer</p>
+                            <p className="font-semibold text-foreground">{deal.buyer.name}</p>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+                  <div className="mt-6 flex justify-between items-center bg-muted/50 p-4 rounded-lg">
+                    <div>
+                        <p className="text-sm text-muted-foreground">Status</p>
+                        <Badge variant={
+                            deal.status === "Active" ? "default" : 
+                            deal.status === "Pending Approval" ? "outline" :
+                            "secondary"
+                        }>
+                            {deal.status}
+                        </Badge>
+                    </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Commission</p>
+                        <p className="font-bold text-lg text-foreground">{deal.commission}%</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
 
-             {/* Potential Matches */}
-            {potentialMatches.length > 0 && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Shuffle className="w-5 h-5 text-primary" />
-                        Potential Buyer Matches
-                    </CardTitle>
-                    <CardDescription>Buyers whose requirements may fit this property.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {potentialMatches.map((match) => (
-                        <Card key={match.id} className="bg-muted/30">
-                            <CardHeader>
-                                <CardTitle className="text-lg flex items-center gap-3">
-                                    <Avatar className="h-9 w-9">
-                                        <AvatarImage src={match.buyer.avatar} />
-                                        <AvatarFallback>{match.buyer.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <span>{match.buyer.name}</span>
-                                        <CardDescription>Is looking for...</CardDescription>
-                                    </div>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2 text-sm">
-                                 <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.location}</span></div>
-                                <div className="flex items-center gap-2"><Building className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.type}</span></div>
-                                <div className="flex items-center gap-2"><Bed className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.bedrooms} Bedrooms</span></div>
-                                <div className="flex items-center gap-2"><IndianRupee className="w-4 h-4 text-muted-foreground" /> <span>Budget: ~₹{match.requirements.budget.toLocaleString('en-IN')}</span></div>
-                            </CardContent>
-                            <div className="p-4 pt-0 text-right">
-                                <Button size="sm">
-                                    <LinkIcon className="w-4 h-4 mr-2" />
-                                    Initiate Contact
-                                </Button>
-                            </div>
-                        </Card>
-                    ))}
-                </CardContent>
-            </Card>
-            )}
-
-             {deal.closureProof && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Closure Proof</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex items-center gap-3 p-3 rounded-md bg-muted">
-                            <Paperclip className="w-5 h-5 text-primary" />
-                            <a href={deal.closureProof.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:underline">
-                                {deal.closureProof.fileName}
-                            </a>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {/* Broker Actions */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Broker Actions</CardTitle>
-                    <CardDescription>Log your activities and manage this deal.</CardDescription>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                    <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
-                    <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
-                    <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
-                    <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
-                </CardContent>
-            </Card>
-        </div>
-
-        {/* Activity Log */}
-        <div className="lg:col-span-1">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Activity Log</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {sortedLogs && sortedLogs.length > 0 ? (
-                        <div className="space-y-6">
-                            {sortedLogs.map((log, index) => (
-                                <div key={log.id} className="flex gap-4">
-                                    <div className="flex flex-col items-center">
-                                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                                            {logIcons[log.event]}
-                                        </span>
-                                        {index < sortedLogs.length -1 && <div className="h-full w-px bg-border my-2" />}
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-foreground">{log.event}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {format(new Date(log.timestamp.seconds * 1000), "MMM d, yyyy 'at' h:mm a")}
-                                        </p>
-                                    </div>
+          {/* Potential Matches */}
+        {potentialMatches.length > 0 && (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Shuffle className="w-5 h-5 text-primary" />
+                    Potential Buyer Matches
+                </CardTitle>
+                <CardDescription>Buyers whose requirements may fit this property.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {potentialMatches.map((match) => (
+                    <Card key={match.id} className="bg-muted/30">
+                        <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-3">
+                                <Avatar className="h-9 w-9">
+                                    <AvatarImage src={match.buyer.avatar} />
+                                    <AvatarFallback>{match.buyer.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <span>{match.buyer.name}</span>
+                                    <CardDescription>Is looking for...</CardDescription>
                                 </div>
-                            ))}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2 text-sm">
+                              <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.location}</span></div>
+                            <div className="flex items-center gap-2"><Building className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.type}</span></div>
+                            <div className="flex items-center gap-2"><Bed className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.bedrooms} Bedrooms</span></div>
+                            <div className="flex items-center gap-2"><IndianRupee className="w-4 h-4 text-muted-foreground" /> <span>Budget: ~₹{match.requirements.budget.toLocaleString('en-IN')}</span></div>
+                        </CardContent>
+                        <div className="p-4 pt-0 text-right">
+                            <Button size="sm">
+                                <LinkIcon className="w-4 h-4 mr-2" />
+                                Initiate Contact
+                            </Button>
                         </div>
-                    ) : (
-                         <div className="h-40 flex flex-col items-center justify-center text-center">
-                            <Clock className="w-10 h-10 text-muted-foreground mb-3" />
-                            <h3 className="font-semibold">No Activity Yet</h3>
-                            <p className="text-sm text-muted-foreground">Broker actions will appear here.</p>
-                        </div>
-                    )}
+                    </Card>
+                ))}
+            </CardContent>
+        </Card>
+        )}
+
+          {deal.closureProof && (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Closure Proof</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center gap-3 p-3 rounded-md bg-muted">
+                        <Paperclip className="w-5 h-5 text-primary" />
+                        <a href={deal.closureProof.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:underline">
+                            {deal.closureProof.fileName}
+                        </a>
+                    </div>
                 </CardContent>
             </Card>
-        </div>
+        )}
       </div>
     </div>
   );
