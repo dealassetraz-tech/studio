@@ -9,8 +9,10 @@ import { ArrowLeft, Building, User as UserIcon, IndianRupee, Briefcase, Clock, M
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { DealTimeline, DealStatus as TimelineDealStatus } from '@/components/deal-timeline';
+import { DealTimeline, DealStatus as SellerDealStatus } from '@/components/deal-timeline';
+import { BuyerDealTimeline, BuyerDealStatus } from '@/components/buyer-deal-timeline';
 import { useMemo, useState, useEffect } from 'react';
+import { useUser } from '@/firebase';
 
 interface Deal {
   id: string;
@@ -35,7 +37,7 @@ interface Deal {
   commission: number;
 }
 
-type LogEvent = "Assigned to deal" | "Communicated with seller" | "Communicated with buyer" | "Requested closure" | "Uploaded closure proof" | "Deal approved";
+type LogEvent = "Assigned to deal" | "Communicated with seller" | "Communicated with buyer" | "Requested closure" | "Uploaded closure proof" | "Deal approved" | "Offer made";
 
 interface DealLog {
     id: string;
@@ -59,6 +61,7 @@ const mockDeal: Deal = {
 };
 
 const mockLogs: DealLog[] = [
+    { id: 'log0', event: 'Offer made', timestamp: { seconds: 1679223600, nanoseconds: 0 }, userId: 'buyer-id' }, // Added for buyer timeline
     { id: 'log1', event: 'Assigned to deal', timestamp: { seconds: 1679310000, nanoseconds: 0 }, userId: 'broker2' },
     { id: 'log2', event: 'Communicated with seller', timestamp: { seconds: 1679396400, nanoseconds: 0 }, userId: 'broker2' },
     { id: 'log3', event: 'Communicated with buyer', timestamp: { seconds: 1679482800, nanoseconds: 0 }, userId: 'broker2' },
@@ -66,6 +69,7 @@ const mockLogs: DealLog[] = [
 ];
 
 const logIcons: Record<LogEvent, React.ReactElement> = {
+    "Offer made": <Briefcase className="w-5 h-5 text-primary" />,
     "Assigned to deal": <Briefcase className="w-5 h-5 text-primary" />,
     "Communicated with seller": <MessageSquare className="w-5 h-5 text-blue-500" />,
     "Communicated with buyer": <MessageSquare className="w-5 h-5 text-green-500" />,
@@ -74,7 +78,7 @@ const logIcons: Record<LogEvent, React.ReactElement> = {
     "Deal approved": <CheckCircle className="w-5 h-5 text-emerald-500" />,
 };
 
-const getTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): TimelineDealStatus => {
+const getSellerTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): SellerDealStatus => {
     if (!logs) return 'Property Posted';
     const events = logs.map(log => log.event).reverse(); // Oldest first
 
@@ -87,9 +91,26 @@ const getTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): 
     return 'Property Posted';
 }
 
+const getBuyerTimelineStatus = (dealStatus: Deal['status']): BuyerDealStatus => {
+    switch (dealStatus) {
+        case 'Closed':
+            return 'Deal Closed';
+        case 'Active':
+            return 'Due diligence';
+        case 'Accepted':
+            return 'Offer Accepted';
+        case 'Pending':
+        case 'Pending Approval':
+            return 'Offer Made';
+        default:
+            return 'Offer Made';
+    }
+}
+
 
 export default function SellerDealTrackingPage() {
   const router = useRouter();
+  const { user } = useUser();
   const [deal, setDeal] = useState<Deal | null>(null);
   const [logs, setLogs] = useState<DealLog[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +124,16 @@ export default function SellerDealTrackingPage() {
     }, 1000);
   }, []);
   
-  const timelineStatus = useMemo(() => getTimelineStatus(logs, deal?.status), [logs, deal?.status]);
+  const userRole = useMemo(() => {
+    if (!user || !deal) return 'unknown';
+    if (user.displayName === deal.buyer.name) return 'buyer';
+    if (user.displayName === deal.seller.name) return 'seller';
+    if (user.displayName === deal.broker.name) return 'broker';
+    return 'seller'; // Default to seller/broker view
+  }, [user, deal]);
+
+  const sellerTimelineStatus = useMemo(() => getSellerTimelineStatus(logs, deal?.status), [logs, deal?.status]);
+  const buyerTimelineStatus = useMemo(() => getBuyerTimelineStatus(deal?.status), [deal?.status]);
 
 
   const renderSkeleton = () => (
@@ -155,7 +185,7 @@ export default function SellerDealTrackingPage() {
             Track Deal: {deal.property.address}
           </h1>
         </div>
-        <Button variant="outline" onClick={() => router.push('/deals')}>
+        <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Deals
         </Button>
@@ -166,7 +196,11 @@ export default function SellerDealTrackingPage() {
                 <CardTitle>Deal Progress</CardTitle>
             </CardHeader>
             <CardContent>
-                <DealTimeline currentStatus={timelineStatus} />
+                {userRole === 'buyer' ? (
+                     <BuyerDealTimeline currentStatus={buyerTimelineStatus} />
+                ) : (
+                    <DealTimeline currentStatus={sellerTimelineStatus} />
+                )}
             </CardContent>
         </Card>
 
