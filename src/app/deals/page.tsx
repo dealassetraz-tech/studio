@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -217,7 +218,10 @@ export default function DealsPage() {
                             {deal.broker.name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <span>{deal.broker.name}</span>
+                        <div>
+                          <p className="font-semibold">{deal.broker.name}</p>
+                          <Badge variant="secondary">Assigned</Badge>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-semibold text-foreground">
