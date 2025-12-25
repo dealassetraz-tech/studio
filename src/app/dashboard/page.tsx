@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 interface Property {
   id: string;
@@ -239,13 +240,21 @@ export default function SellerDashboard() {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        {prop.brokerAssignmentStatus && getStatusBadge(prop.brokerAssignmentStatus)}
-                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                            prop.status === 'Listed' ? 'bg-primary/10 text-primary' :
-                            prop.status === 'Under Contract' ? 'bg-amber-500/10 text-amber-500' :
-                            'bg-emerald-500/10 text-emerald-500'
-                        }`}>{prop.status}</span>
+                    <div className="flex items-center gap-4 w-48 justify-end">
+                        {prop.brokerAssignmentStatus && (
+                            <div className="text-center">
+                                {getStatusBadge(prop.brokerAssignmentStatus)}
+                                <p className="text-xs text-muted-foreground mt-1">Assignment</p>
+                            </div>
+                        )}
+                        <div className="text-center">
+                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                                prop.status === 'Listed' ? 'bg-primary/10 text-primary' :
+                                prop.status === 'Under Contract' ? 'bg-amber-500/10 text-amber-500' :
+                                'bg-emerald-500/10 text-emerald-500'
+                            }`}>{prop.status}</span>
+                            <p className="text-xs text-muted-foreground mt-1">Property</p>
+                        </div>
                     </div>
                   </div>
                 </li>

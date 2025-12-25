@@ -23,6 +23,7 @@ import { ArrowLeft, Building, User, Info } from 'lucide-react';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -32,7 +33,7 @@ interface Deal {
     address: string;
     image: string;
   };
-  broker: {
+  broker?: {
     name: string;
     avatar: string;
   };
@@ -63,7 +64,7 @@ export default function BuyerDealsPage() {
       case 'Rejected':
         return <Badge variant="destructive" className="bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/50">Rejected by Seller</Badge>;
        case 'Active':
-        return <Badge variant="secondary">Active</Badge>;
+        return <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 border-blue-500/20">Active</Badge>;
        case 'Closed':
         return <Badge className="bg-emerald-500/10 text-emerald-500">Closed</Badge>;
       default:
@@ -128,19 +129,23 @@ export default function BuyerDealsPage() {
                             <Building className="w-5 h-5" />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium text-foreground truncate">{deal.property.address}</span>
+                        <span className="font-medium text-foreground truncate max-w-xs">{deal.property.address}</span>
                       </div>
                     </TableCell>
                      <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={deal.broker.avatar} />
-                           <AvatarFallback>
-                            {deal.broker.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{deal.broker.name}</span>
-                      </div>
+                      {deal.broker ? (
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={deal.broker.avatar} />
+                             <AvatarFallback>
+                              {deal.broker.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{deal.broker.name}</span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Not Assigned</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-foreground">
                       ₹{deal.offerPrice.toLocaleString('en-IN')}
