@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, User, Info } from 'lucide-react';
-import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -33,15 +33,17 @@ interface Deal {
     address: string;
     image: string;
   };
-  broker?: {
-    name: string;
-    avatar: string;
-  };
+  brokerId?: string;
   offerPrice: number;
   status: DealStatus;
   date: string;
 }
 
+interface Broker {
+    id: string;
+    fullName: string;
+    photoURL?: string;
+}
 
 export default function BuyerDealsPage() {
   const router = useRouter();
@@ -53,7 +55,21 @@ export default function BuyerDealsPage() {
     return query(collection(firestore, 'deals'), where('buyerId', '==', user.uid));
   }, [firestore, user]);
 
-  const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
+  const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
+
+  const brokerIds = useMemo(() => {
+    if (!deals) return [];
+    return [...new Set(deals.map(d => d.brokerId).filter(Boolean) as string[])];
+  }, [deals]);
+
+  const { data: brokers, isLoading: brokersLoading } = useUsers(brokerIds);
+
+  const brokersMap = useMemo(() => {
+    if (!brokers) return new Map<string, Broker>();
+    return new Map(brokers.map(b => [b.id, b]));
+  }, [brokers]);
+
+  const isLoading = dealsLoading || (brokerIds.length > 0 && brokersLoading);
 
   const getStatusBadge = (status: DealStatus) => {
     switch (status) {
@@ -133,15 +149,15 @@ export default function BuyerDealsPage() {
                       </div>
                     </TableCell>
                      <TableCell>
-                      {deal.broker ? (
+                      {deal.brokerId && brokersMap.has(deal.brokerId) ? (
                         <div className="flex items-center gap-3">
                           <Avatar className="h-9 w-9">
-                            <AvatarImage src={deal.broker.avatar} />
+                            <AvatarImage src={brokersMap.get(deal.brokerId)?.photoURL} />
                              <AvatarFallback>
-                              {deal.broker.name.charAt(0)}
+                              {brokersMap.get(deal.brokerId)?.fullName?.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
-                          <span>{deal.broker.name}</span>
+                          <span>{brokersMap.get(deal.brokerId)?.fullName}</span>
                         </div>
                       ) : (
                         <span className="text-muted-foreground text-sm">Not Assigned</span>
