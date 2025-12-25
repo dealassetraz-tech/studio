@@ -54,16 +54,16 @@ export default function SellerDashboard() {
   }, [brokers]);
 
 
-  const dealIds = useMemo(() => properties?.map(p => p.id) || [], [properties]);
+  const propertyIds = useMemo(() => properties?.map(p => p.id) || [], [properties]);
 
   const dealsQuery = useMemoFirebase(() => {
-    if (!firestore || dealIds.length === 0) return null;
-    return query(collection(firestore, "deals"), where("propertyId", "in", dealIds));
-  }, [firestore, dealIds]);
+    if (!firestore || propertyIds.length === 0) return null;
+    return query(collection(firestore, "deals"), where("propertyId", "in", propertyIds));
+  }, [firestore, propertyIds]);
 
   const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
 
-  const isLoading = propertiesLoading || (dealIds.length > 0 && dealsLoading) || (brokerIds.length > 0 && brokersLoading);
+  const isLoading = propertiesLoading || (propertyIds.length > 0 && dealsLoading) || (brokerIds.length > 0 && brokersLoading);
 
   const [priceFilter, setPriceFilter] = useState<number[]>([200000000]);
   const [brokerageFilter, setBrokerageFilter] = useState<number[]>([5]);

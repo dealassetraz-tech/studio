@@ -22,10 +22,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowUpDown, Building, User, Check, X, ArrowLeft, AreaChart } from 'lucide-react';
-import { useCollection, useFirestore, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from '@/firebase';
 import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { useMemo } from 'react';
+
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -35,10 +37,7 @@ interface Deal {
     address: string;
     image: string;
   };
-   broker: {
-    name: string;
-    avatar: string;
-  };
+  brokerId?: string;
   offerPrice: number;
   status: DealStatus;
   date: string;
@@ -58,6 +57,19 @@ export default function DealsPage() {
   }, [firestore, user]);
 
   const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
+
+  const brokerIds = useMemo(() => {
+    if (!deals) return [];
+    return [...new Set(deals.map(d => d.brokerId).filter(Boolean) as string[])];
+  }, [deals]);
+
+  const { data: brokers, isLoading: brokersLoading } = useUsers(brokerIds);
+
+  const brokersMap = useMemo(() => {
+    if (!brokers) return new Map();
+    return new Map(brokers.map(b => [b.id, b]));
+  }, [brokers]);
+
 
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
@@ -198,7 +210,7 @@ export default function DealsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? renderSkeleton() : sortedDeals.map((deal) => (
+                {isLoading || brokersLoading ? renderSkeleton() : sortedDeals.map((deal) => (
                   <TableRow key={deal.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -212,18 +224,22 @@ export default function DealsPage() {
                       </div>
                     </TableCell>
                      <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={deal.broker.avatar} />
-                           <AvatarFallback>
-                            {deal.broker.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-semibold">{deal.broker.name}</p>
-                          <Badge variant="secondary">Assigned</Badge>
+                      {deal.brokerId && brokersMap.has(deal.brokerId) ? (
+                        <div className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9">
+                            <AvatarImage src={brokersMap.get(deal.brokerId)?.photoURL} />
+                            <AvatarFallback>
+                                {brokersMap.get(deal.brokerId)?.fullName?.charAt(0)}
+                            </AvatarFallback>
+                            </Avatar>
+                            <div>
+                            <p className="font-semibold">{brokersMap.get(deal.brokerId)?.fullName}</p>
+                            <Badge variant="secondary">Assigned</Badge>
+                            </div>
                         </div>
-                      </div>
+                        ) : (
+                           <span className="text-muted-foreground text-sm">Not Assigned</span>
+                        )}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-foreground">
                       ₹{deal.offerPrice.toLocaleString('en-IN')}

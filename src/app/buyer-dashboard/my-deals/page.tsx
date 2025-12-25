@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -168,9 +169,11 @@ export default function BuyerDealsPage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
-                        <Button variant="outline" size="sm">
-                            <Info className="w-4 h-4 mr-1" />
-                            Details
+                        <Button variant="outline" size="sm" asChild>
+                           <Link href={`/deals/${deal.id}`}>
+                                <Info className="w-4 h-4 mr-1" />
+                                Details
+                           </Link>
                         </Button>
                     </TableCell>
                   </TableRow>

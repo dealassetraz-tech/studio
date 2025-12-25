@@ -20,7 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, User, Check, X, Bell, Info } from 'lucide-react';
-import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers, updateDocumentNonBlocking } from '@/firebase';
+import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from '@/firebase';
 import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { useMemo } from 'react';
@@ -154,7 +154,7 @@ export default function NewDealsPage() {
                     <TableCell className="text-center">
                       <div className="flex gap-2 justify-center">
                         <Button variant="outline" size="sm" asChild>
-                            <Link href="/broker-dashboard">
+                            <Link href={`/broker-dashboard/managed-deals/${prop.id}`}>
                                 <Info className="w-4 h-4 mr-1" />
                                 Details
                             </Link>
