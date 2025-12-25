@@ -96,6 +96,9 @@ export default function ManagedDealsPage() {
             currentDeals.map(d => d.id === dealId ? {...d, status: status} : d)
         );
         toast.success('Assignment updated!', { id: toastId });
+        if (status === 'Active') {
+          router.push(`/broker-dashboard/managed-deals/${dealId}`);
+        }
     }, 500);
   };
 
@@ -212,12 +215,6 @@ export default function ManagedDealsPage() {
                         <div className='flex items-center justify-center gap-2'>
                            {deal.status === 'Pending Approval' ? (
                             <>
-                              <Button variant="outline" size="sm" asChild>
-                                <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
-                                  <Info className="w-4 h-4 mr-1" />
-                                  Details
-                                </Link>
-                              </Button>
                               <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(deal.id, 'Active')}>
                                 <Check className="w-4 h-4 mr-1" />
                                 Accept
