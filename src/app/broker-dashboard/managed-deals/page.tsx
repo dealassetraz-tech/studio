@@ -51,6 +51,7 @@ const mockDeals: Deal[] = [
     { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, offerPrice: 148000000, status: 'Active', commission: 2 },
     { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
     { id: 'deal3', property: { address: '45, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/prop4/100/100' }, seller: { name: 'Rohan M.', avatar: 'https://picsum.photos/seed/seller3/100/100' }, buyer: { name: 'Suresh P.', avatar: 'https://picsum.photos/seed/buyerC/100/100' }, offerPrice: 119000000, status: 'Closed', commission: 2.5 },
+    { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
 ];
 
 
@@ -113,6 +114,8 @@ export default function ManagedDealsPage() {
         return <Badge variant="outline" className="text-amber-500 border-amber-500/50">Pending</Badge>;
       case 'Pending Approval':
         return <Badge variant="outline" className="text-orange-500 border-orange-500/50">Pending Approval</Badge>;
+      case 'Accepted':
+        return <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border border-primary/50">Accepted</Badge>;
       default:
          return <Badge variant="secondary">{status}</Badge>;
     }
@@ -237,7 +240,7 @@ export default function ManagedDealsPage() {
                                   Upload Proof
                               </Button>
                              </>
-                           ) : deal.status === 'Closed' ? (
+                           ) : (deal.status === 'Closed' || deal.status === 'Accepted') ? (
                               <Button variant="outline" size="sm" asChild>
                                 <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
                                     <Info className="w-4 h-4 mr-1" />
@@ -266,3 +269,5 @@ export default function ManagedDealsPage() {
     </div>
   );
 }
+
+    
