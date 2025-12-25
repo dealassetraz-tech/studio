@@ -18,15 +18,17 @@ interface FileUploadProps {
   isOpen: boolean;
   onClose: () => void;
   onUploadComplete: (fileName: string, fileUrl: string) => void;
+  disabled?: boolean;
 }
 
-export function FileUpload({ isOpen, onClose, onUploadComplete }: FileUploadProps) {
+export function FileUpload({ isOpen, onClose, onUploadComplete, disabled = false }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const files = event.target.files;
     if (files && files.length > 0) {
       setFile(files[0]);
@@ -34,7 +36,7 @@ export function FileUpload({ isOpen, onClose, onUploadComplete }: FileUploadProp
   };
 
   const handleUpload = () => {
-    if (!file) return;
+    if (!file || disabled) return;
 
     setIsUploading(true);
     setUploadProgress(0);
@@ -95,7 +97,7 @@ export function FileUpload({ isOpen, onClose, onUploadComplete }: FileUploadProp
           ) : (
             <div
               className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => !disabled && fileInputRef.current?.click()}
             >
               <UploadCloud className="w-12 h-12 text-muted-foreground" />
               <p className="mt-4 text-sm font-medium text-foreground">Click or drag file to this area to upload</p>
@@ -106,16 +108,17 @@ export function FileUpload({ isOpen, onClose, onUploadComplete }: FileUploadProp
                 className="hidden"
                 onChange={handleFileChange}
                 accept=".pdf,.png,.jpg,.jpeg"
+                disabled={disabled}
               />
             </div>
           )}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isUploading}>
+          <Button variant="outline" onClick={handleClose} disabled={isUploading || disabled}>
             Cancel
           </Button>
-          <Button onClick={handleUpload} disabled={!file || isUploading}>
+          <Button onClick={handleUpload} disabled={!file || isUploading || disabled}>
             {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             {isUploading ? 'Uploading...' : 'Upload & Attach'}
           </Button>

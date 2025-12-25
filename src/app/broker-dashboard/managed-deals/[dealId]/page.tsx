@@ -5,13 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion, Shuffle, Bed, Link as LinkIcon, MapPin } from 'lucide-react';
+import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion, Shuffle, Bed, Link as LinkIcon, MapPin, ShieldCheck } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { useState, useMemo, useEffect } from 'react';
 import { FileUpload } from '@/components/file-upload';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface Deal {
   id: string;
@@ -93,6 +94,16 @@ const mockDeal: Deal = {
     commission: 2,
 };
 
+const closedMockDeal: Deal = {
+    ...mockDeal,
+    id: 'deal3',
+    status: 'Closed',
+    closureProof: {
+        fileName: 'final_agreement.pdf',
+        url: '#',
+    }
+}
+
 const mockLogs: DealLog[] = [
     { id: 'log1', event: 'Communicated with seller', timestamp: { seconds: 1735111200, nanoseconds: 0 }, userId: 'broker1' }, // Dec 25, 2024
     { id: 'log2', event: 'Communicated with buyer', timestamp: { seconds: 1735024800, nanoseconds: 0 }, userId: 'broker1' }, // Dec 24, 2024
@@ -126,6 +137,9 @@ const findMatches = (deal: Deal | null, buyerRequests: BuyerRequest[]) => {
 
 export default function DealDetailsPage() {
   const router = useRouter();
+  const params = useParams();
+  const dealId = params.dealId as string;
+
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [deal, setDeal] = useState<Deal | null>(null);
   const [logs, setLogs] = useState<DealLog[] | null>(null);
@@ -134,11 +148,15 @@ export default function DealDetailsPage() {
   useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
-        setDeal(mockDeal);
+        if(dealId === 'deal3') {
+            setDeal(closedMockDeal);
+        } else {
+            setDeal(mockDeal);
+        }
         setLogs(mockLogs);
         setIsLoading(false);
     }, 1000);
-  }, []);
+  }, [dealId]);
 
   const sortedLogs = useMemo(() => {
     if (!logs) return [];
@@ -202,6 +220,8 @@ export default function DealDetailsPage() {
       </div>
     );
   }
+  
+  const isDealClosed = deal.status === 'Closed';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -209,6 +229,7 @@ export default function DealDetailsPage() {
         isOpen={isUploadDialogOpen}
         onClose={() => setIsUploadDialogOpen(false)}
         onUploadComplete={handleUploadComplete}
+        disabled={isDealClosed}
       />
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -223,6 +244,17 @@ export default function DealDetailsPage() {
       </div>
 
       <div className="space-y-8">
+
+        {isDealClosed && (
+            <Alert variant="default" className="bg-emerald-500/10 border-emerald-500/20 text-emerald-500">
+                <ShieldCheck className="h-4 w-4 !text-emerald-500" />
+                <AlertTitle>Deal Closed</AlertTitle>
+                <AlertDescription>
+                    This deal has been successfully closed. No further actions can be taken.
+                </AlertDescription>
+            </Alert>
+        )}
+        
         {/* Deal Details */}
         <Card>
             <CardHeader>
@@ -265,8 +297,11 @@ export default function DealDetailsPage() {
                         <Badge variant={
                             deal.status === "Active" ? "default" : 
                             deal.status === "Pending Approval" ? "outline" :
+                            deal.status === "Closed" ? "secondary" :
                             "secondary"
-                        }>
+                        }
+                        className={deal.status === 'Closed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : ''}
+                        >
                             {deal.status}
                         </Badge>
                     </div>
@@ -279,7 +314,7 @@ export default function DealDetailsPage() {
         </Card>
 
           {/* Potential Matches */}
-        {potentialMatches.length > 0 && (
+        {!isDealClosed && potentialMatches.length > 0 && (
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
