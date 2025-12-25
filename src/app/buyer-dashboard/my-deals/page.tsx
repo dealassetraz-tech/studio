@@ -21,10 +21,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, User, Info } from 'lucide-react';
-import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -46,31 +44,35 @@ interface Broker {
     photoURL?: string;
 }
 
+const mockDeals: Deal[] = [
+    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, brokerId: 'broker1', offerPrice: 148000000, status: 'Pending', date: '2024-07-20T10:00:00Z' },
+    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, brokerId: 'broker2', offerPrice: 84000000, status: 'Active', date: '2024-07-19T15:30:00Z' },
+];
+
+const mockBrokers: Broker[] = [
+    { id: 'broker1', fullName: 'Rajesh Sharma', photoURL: 'https://picsum.photos/seed/broker1/100/100' },
+    { id: 'broker2', fullName: 'Sunita Singh', photoURL: 'https://picsum.photos/seed/broker2/100/100' },
+];
+
 export default function BuyerDealsPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user } = useUser();
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [brokers, setBrokers] = useState<Broker[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const dealsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(collection(firestore, 'deals'), where('buyerId', '==', user.uid));
-  }, [firestore, user]);
-
-  const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
-
-  const brokerIds = useMemo(() => {
-    if (!deals) return [];
-    return [...new Set(deals.map(d => d.brokerId).filter(Boolean) as string[])];
-  }, [deals]);
-
-  const { data: brokers, isLoading: brokersLoading } = useUsers(brokerIds);
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setDeals(mockDeals);
+        setBrokers(mockBrokers);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const brokersMap = useMemo(() => {
     if (!brokers) return new Map<string, Broker>();
     return new Map(brokers.map(b => [b.id, b]));
   }, [brokers]);
-
-  const isLoading = dealsLoading || (brokerIds.length > 0 && brokersLoading);
 
   const getStatusBadge = (status: DealStatus) => {
     switch (status) {

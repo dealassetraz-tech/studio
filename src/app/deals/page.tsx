@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -22,8 +22,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowUpDown, Building, User, Check, X, ArrowLeft, AreaChart } from 'lucide-react';
-import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from '@/firebase';
-import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -37,33 +35,44 @@ interface Deal {
     address: string;
     image: string;
   };
+  buyer: {
+    name: string;
+    avatar: string;
+  };
   brokerId?: string;
   offerPrice: number;
   status: DealStatus;
   date: string;
 }
 
+const mockDeals: Deal[] = [
+    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, buyer: { name: 'Aarav Singh', avatar: 'https://picsum.photos/seed/buyer1/100/100' }, brokerId: 'broker1', offerPrice: 148000000, status: 'Pending', date: '2024-07-20T10:00:00Z' },
+    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, buyer: { name: 'Priya Patel', avatar: 'https://picsum.photos/seed/buyer2/100/100' }, brokerId: 'broker2', offerPrice: 84000000, status: 'Accepted', date: '2024-07-19T15:30:00Z' },
+    { id: 'deal3', property: { address: 'Penthouse, The Imperial, Tardeo, Mumbai', image: 'https://picsum.photos/seed/prop3/100/100' }, buyer: { name: 'Rohan Mehta', avatar: 'https://picsum.photos/seed/buyer3/100/100' }, brokerId: 'broker1', offerPrice: 295000000, status: 'Rejected', date: '2024-07-18T12:00:00Z' },
+];
+
+const mockBrokers = [
+    { id: 'broker1', fullName: 'Rajesh Sharma', photoURL: 'https://picsum.photos/seed/broker1/100/100' },
+    { id: 'broker2', fullName: 'Sunita Singh', photoURL: 'https://picsum.photos/seed/broker2/100/100' },
+];
+
 
 type SortKey = 'property.address' | 'offerPrice' | 'status' | 'date';
 
 export default function DealsPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user } = useUser();
-  
-  const dealsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(collection(firestore, 'deals'), where('sellerId', '==', user.uid));
-  }, [firestore, user]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [brokers, setBrokers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: deals, isLoading } = useCollection<Deal>(dealsQuery);
-
-  const brokerIds = useMemo(() => {
-    if (!deals) return [];
-    return [...new Set(deals.map(d => d.brokerId).filter(Boolean) as string[])];
-  }, [deals]);
-
-  const { data: brokers, isLoading: brokersLoading } = useUsers(brokerIds);
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setDeals(mockDeals);
+        setBrokers(mockBrokers);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const brokersMap = useMemo(() => {
     if (!brokers) return new Map();
@@ -78,16 +87,11 @@ export default function DealsPage() {
 
 
   const handleDealStatusChange = async (dealId: string, newStatus: 'Accepted' | 'Rejected') => {
-    if(!firestore) return;
     const toastId = toast.loading("Updating status...");
-    try {
-        const dealDocRef = doc(firestore, 'deals', dealId);
-        await updateDoc(dealDocRef, { status: newStatus });
+    setTimeout(() => {
+        setDeals(currentDeals => currentDeals.map(d => d.id === dealId ? {...d, status: newStatus} : d));
         toast.success(`Deal ${newStatus.toLowerCase()}`, { id: toastId });
-    } catch(error) {
-        console.error("Error updating deal status", error);
-        toast.error("Failed to update status", { id: toastId });
-    }
+    }, 500);
   }
 
   const sortedDeals = [...(deals || [])].sort((a, b) => {
@@ -210,7 +214,7 @@ export default function DealsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading || brokersLoading ? renderSkeleton() : sortedDeals.map((deal) => (
+                {isLoading ? renderSkeleton() : sortedDeals.map((deal) => (
                   <TableRow key={deal.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -246,29 +250,22 @@ export default function DealsPage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
-                      {deal.status === 'Pending' ? (
-                        <div className="flex gap-2 justify-center">
-                          <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleDealStatusChange(deal.id, 'Accepted')}>
+                      <div className="flex gap-2 justify-center">
+                        <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleDealStatusChange(deal.id, 'Accepted')}>
                             <Check className="w-4 h-4 mr-1" />
                             Accept
-                          </Button>
-                          <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDealStatusChange(deal.id, 'Rejected')}>
+                        </Button>
+                        <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDealStatusChange(deal.id, 'Rejected')}>
                             <X className="w-4 h-4 mr-1" />
                             Reject
-                          </Button>
-                        </div>
-                      ) : deal.status === 'Accepted' || deal.status === 'Active' || deal.status === 'Closed' ? (
+                        </Button>
                         <Button variant="outline" size="sm" asChild>
                           <Link href={`/deals/${deal.id}`}>
                             <AreaChart className="w-4 h-4 mr-1" />
                             Track Deal
                           </Link>
                         </Button>
-                      ) : (
-                         <Button variant="outline" size="sm" disabled>
-                          Viewed
-                        </Button>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

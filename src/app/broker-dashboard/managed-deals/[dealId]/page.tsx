@@ -2,8 +2,6 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
-import { doc, collection, addDoc, serverTimestamp, query, orderBy, updateDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -12,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { FileUpload } from '@/components/file-upload';
 
 interface Deal {
@@ -38,7 +36,7 @@ interface Deal {
   commission: number;
   closureProof?: {
     fileName: string;
-    url: string; // In a real app, this would be a URL to the uploaded file in cloud storage
+    url: string; 
   };
 }
 
@@ -78,17 +76,38 @@ const logIcons: Record<LogEvent, React.ReactElement> = {
     "Uploaded closure proof": <FileUp className="w-5 h-5 text-purple-500" />,
 };
 
-// This is mock data. In a real app, you would fetch this and run matching logic.
+const mockDeal: Deal = {
+    id: 'deal1',
+    property: {
+        address: '101, Ocean View, Marine Drive, Mumbai',
+        image: 'https://picsum.photos/seed/prop1/600/400',
+        price: 150000000,
+        bedrooms: 3,
+        bathrooms: 3,
+        type: 'Apartment'
+    },
+    seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' },
+    buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' },
+    offerPrice: 148000000,
+    status: 'Active',
+    commission: 2,
+};
+
+const mockLogs: DealLog[] = [
+    { id: 'log1', event: 'Assigned to deal', timestamp: { seconds: 1679310000, nanoseconds: 0 }, userId: 'broker1' },
+    { id: 'log2', event: 'Communicated with seller', timestamp: { seconds: 1679396400, nanoseconds: 0 }, userId: 'broker1' },
+];
+
 const mockBuyerRequests: BuyerRequest[] = [
     { 
         id: 'req1', 
-        buyer: { name: 'Suresh G.', avatar: 'https://picsum.photos/seed/buyer1/100/100' }, 
-        requirements: { location: 'HSR Layout, Bengaluru', type: 'Apartment', bedrooms: 2, budget: 10000000 } 
+        buyer: { name: 'Suresh G.', avatar: 'https://picsum.photos/seed/buyerS/100/100' }, 
+        requirements: { location: 'Marine Drive, Mumbai', type: 'Apartment', bedrooms: 3, budget: 160000000 } 
     },
     { 
         id: 'req2', 
-        buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyer2/100/100' }, 
-        requirements: { location: 'Jubilee Hills, Hyderabad', type: 'Villa', bedrooms: 3, budget: 18500000 } 
+        buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerN/100/100' }, 
+        requirements: { location: 'Bandra, Mumbai', type: 'Apartment', bedrooms: 3, budget: 140000000 } 
     },
 ];
 
@@ -107,86 +126,53 @@ const findMatches = (deal: Deal | null, buyerRequests: BuyerRequest[]) => {
 
 export default function DealDetailsPage() {
   const router = useRouter();
-  const params = useParams();
-  const dealId = params.dealId as string;
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [deal, setDeal] = useState<Deal | null>(null);
+  const [logs, setLogs] = useState<DealLog[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const firestore = useFirestore();
-  const { user } = useUser();
-
-  const dealDocRef = useMemoFirebase(() => {
-    if (!firestore || !dealId) return null;
-    return doc(firestore, 'deals', dealId);
-  }, [firestore, dealId]);
-
-  const logsCollectionRef = useMemoFirebase(() => {
-    if(!dealDocRef) return null;
-    return collection(dealDocRef, 'logs');
-  }, [dealDocRef]);
-  
-  const logsQuery = useMemoFirebase(() => {
-    if (!logsCollectionRef) return null;
-    return query(logsCollectionRef, orderBy('timestamp', 'desc'));
-  }, [logsCollectionRef]);
-
-  const { data: deal, isLoading: isDealLoading } = useDoc<Deal>(dealDocRef);
-  const { data: logs, isLoading: areLogsLoading } = useCollection<DealLog>(logsQuery);
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setDeal(mockDeal);
+        setLogs(mockLogs.sort((a,b) => b.timestamp.seconds - a.timestamp.seconds));
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const potentialMatches = useMemo(() => findMatches(deal, mockBuyerRequests), [deal]);
 
-  const isLoading = isDealLoading || areLogsLoading;
-  
   const addLogEntry = async (event: LogEvent) => {
-    if (!user || !logsCollectionRef) {
-        toast.error("You must be logged in to add a log entry.");
-        return;
-    }
-    
     const toastId = toast.loading(`Adding log: "${event}"...`);
 
-    try {
-        await addDoc(logsCollectionRef, {
+    setTimeout(() => {
+        const newLog: DealLog = {
+            id: `log${(logs?.length || 0) + 1}`,
             event,
-            timestamp: serverTimestamp(),
-            userId: user.uid,
-        });
+            timestamp: { seconds: Math.floor(Date.now()/1000), nanoseconds: 0 },
+            userId: 'broker1',
+        };
+        setLogs(currentLogs => [newLog, ...(currentLogs || [])]);
         toast.success("Log added successfully!", { id: toastId });
-    } catch (error) {
-        console.error("Error adding log:", error);
-        toast.error("Failed to add log.", { id: toastId });
-    }
+    }, 500);
   };
 
    const handleUploadComplete = async (fileName: string, fileUrl: string) => {
-    if (!dealDocRef) return;
-    
     const toastId = toast.loading("Attaching proof to deal...");
-    try {
-        await updateDoc(dealDocRef, {
-            closureProof: {
-                fileName,
-                url: fileUrl,
-            }
-        });
-        await addLogEntry("Uploaded closure proof");
+    setTimeout(() => {
+        setDeal(d => d ? { ...d, closureProof: { fileName, url: fileUrl } } : null);
+        addLogEntry("Uploaded closure proof");
         toast.success("Closure proof attached!", { id: toastId });
         setIsUploadDialogOpen(false);
-    } catch (error) {
-        console.error("Error attaching proof:", error);
-        toast.error("Failed to attach proof.", { id: toastId });
-    }
+    }, 500);
   };
 
   const handleRequestApproval = async () => {
-    if (!dealDocRef) return;
     const toastId = toast.loading("Requesting approval...");
-    try {
-      await updateDoc(dealDocRef, { status: "Pending Approval" });
-      toast.success("Approval requested!", { id: toastId });
-    } catch (error) {
-      console.error("Error requesting approval:", error);
-      toast.error("Failed to request approval.", { id: toastId });
-    }
+    setTimeout(() => {
+        setDeal(d => d ? { ...d, status: "Pending Approval" } : null);
+        toast.success("Approval requested!", { id: toastId });
+    }, 500);
   };
 
   const renderSkeleton = () => (
@@ -413,5 +399,3 @@ export default function DealDetailsPage() {
     </div>
   );
 }
-
-    

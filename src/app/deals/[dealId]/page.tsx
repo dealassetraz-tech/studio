@@ -1,8 +1,7 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { doc, collection, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -11,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { DealTimeline, DealStatus as TimelineDealStatus } from '@/components/deal-timeline';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface Deal {
   id: string;
@@ -48,6 +47,24 @@ interface DealLog {
     userId: string;
 }
 
+const mockDeal: Deal = {
+    id: 'deal2',
+    property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' },
+    seller: { name: 'Vikram Singh', avatar: 'https://picsum.photos/seed/seller1/100/100' },
+    buyer: { name: 'Priya Patel', avatar: 'https://picsum.photos/seed/buyer2/100/100' },
+    broker: { name: 'Sunita Singh', avatar: 'https://picsum.photos/seed/broker2/100/100' },
+    offerPrice: 84000000,
+    status: 'Active',
+    commission: 1.5,
+};
+
+const mockLogs: DealLog[] = [
+    { id: 'log1', event: 'Assigned to deal', timestamp: { seconds: 1679310000, nanoseconds: 0 }, userId: 'broker2' },
+    { id: 'log2', event: 'Communicated with seller', timestamp: { seconds: 1679396400, nanoseconds: 0 }, userId: 'broker2' },
+    { id: 'log3', event: 'Communicated with buyer', timestamp: { seconds: 1679482800, nanoseconds: 0 }, userId: 'broker2' },
+    { id: 'log4', event: 'Deal approved', timestamp: { seconds: 1679569200, nanoseconds: 0 }, userId: 'admin' },
+];
+
 const logIcons: Record<LogEvent, React.ReactElement> = {
     "Assigned to deal": <Briefcase className="w-5 h-5 text-primary" />,
     "Communicated with seller": <MessageSquare className="w-5 h-5 text-blue-500" />,
@@ -59,7 +76,7 @@ const logIcons: Record<LogEvent, React.ReactElement> = {
 
 const getTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): TimelineDealStatus => {
     if (!logs) return 'Property Posted';
-    const events = logs.map(log => log.event);
+    const events = logs.map(log => log.event).reverse(); // Oldest first
 
     if (dealStatus === 'Closed') return 'Deal Closed';
     if (events.includes('Deal approved')) return 'Approval Granted';
@@ -73,30 +90,18 @@ const getTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): 
 
 export default function SellerDealTrackingPage() {
   const router = useRouter();
-  const params = useParams();
-  const dealId = params.dealId as string;
+  const [deal, setDeal] = useState<Deal | null>(null);
+  const [logs, setLogs] = useState<DealLog[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const firestore = useFirestore();
-
-  const dealDocRef = useMemoFirebase(() => {
-    if (!firestore || !dealId) return null;
-    return doc(firestore, 'deals', dealId);
-  }, [firestore, dealId]);
-
-  const logsCollectionRef = useMemoFirebase(() => {
-    if(!dealDocRef) return null;
-    return collection(dealDocRef, 'logs');
-  }, [dealDocRef]);
-  
-  const logsQuery = useMemoFirebase(() => {
-    if (!logsCollectionRef) return null;
-    return query(logsCollectionRef, orderBy('timestamp', 'desc'));
-  }, [logsCollectionRef]);
-
-  const { data: deal, isLoading: isDealLoading } = useDoc<Deal>(dealDocRef);
-  const { data: logs, isLoading: areLogsLoading } = useCollection<DealLog>(logsQuery);
-
-  const isLoading = isDealLoading || areLogsLoading;
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setDeal(mockDeal);
+        setLogs(mockLogs.sort((a,b) => b.timestamp.seconds - a.timestamp.seconds)); // Descending
+        setIsLoading(false);
+    }, 1000);
+  }, []);
   
   const timelineStatus = useMemo(() => getTimelineStatus(logs, deal?.status), [logs, deal?.status]);
 

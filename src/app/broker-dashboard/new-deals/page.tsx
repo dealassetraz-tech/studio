@@ -20,10 +20,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, User, Check, X, Bell, Info } from 'lucide-react';
-import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from '@/firebase';
-import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface Property {
@@ -34,47 +32,52 @@ interface Property {
   ownerId: string;
 }
 
+interface Owner {
+    id: string;
+    fullName: string;
+    photoURL?: string;
+}
+
+const mockProperties: Property[] = [
+    { id: 'prop3', address: 'Penthouse, The Imperial, Tardeo, Mumbai', price: 300000000, brokerage: 1, ownerId: 'owner1' },
+    { id: 'prop4', address: '45, Jubilee Hills, Hyderabad', price: 120000000, brokerage: 2.5, ownerId: 'owner2' },
+];
+
+const mockOwners: Owner[] = [
+    { id: 'owner1', fullName: 'Anjali Sharma', photoURL: 'https://picsum.photos/seed/owner1/100/100' },
+    { id: 'owner2', fullName: 'Vikram Reddy', photoURL: 'https://picsum.photos/seed/owner2/100/100' },
+];
+
+
 export default function NewDealsPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [owners, setOwners] = useState<Owner[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const propertiesQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(
-      collection(firestore, "properties"),
-      where("brokerId", "==", user.uid),
-      where("brokerAssignmentStatus", "==", "pending")
-    );
-  }, [firestore, user]);
-
-  const { data: properties, isLoading: propertiesLoading } = useCollection<Property>(propertiesQuery);
-
-  const ownerIds = useMemo(() => {
-    if (!properties) return [];
-    return [...new Set(properties.map(p => p.ownerId))];
-  }, [properties]);
-
-  const { data: owners, isLoading: ownersLoading } = useUsers(ownerIds);
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setProperties(mockProperties);
+        setOwners(mockOwners);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const ownersMap = useMemo(() => {
     if (!owners) return new Map();
     return new Map(owners.map(o => [o.id, o]));
   }, [owners]);
 
-  const isLoading = isUserLoading || propertiesLoading || (ownerIds.length > 0 && ownersLoading);
 
   const handleAssignmentResponse = async (propertyId: string, status: 'accepted' | 'rejected') => {
-    if (!firestore) return;
     const toastId = toast.loading(`Updating assignment to ${status}...`);
-    try {
-      const propertyDocRef = doc(firestore, 'properties', propertyId);
-      await updateDoc(propertyDocRef, { brokerAssignmentStatus: status });
-      toast.success('Assignment updated!', { id: toastId });
-    } catch (error) {
-      console.error('Error responding to assignment:', error);
-      toast.error('Failed to update assignment.', { id: toastId });
-    }
+    setTimeout(() => {
+        if(status === 'accepted') {
+             setProperties(currentProps => currentProps.filter(p => p.id !== propertyId));
+        }
+        toast.success('Assignment updated!', { id: toastId });
+    }, 500);
   };
 
   const renderSkeleton = () => (

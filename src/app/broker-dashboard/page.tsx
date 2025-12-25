@@ -1,12 +1,11 @@
+
 'use client';
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Handshake, Wallet, Percent, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface Property {
   id: string;
@@ -16,20 +15,23 @@ interface Property {
   brokerage: number;
 }
 
+const mockProperties: Property[] = [
+    { id: 'prop1', address: '101, Ocean View, Marine Drive, Mumbai', price: 150000000, status: 'Under Contract', brokerage: 2, },
+    { id: 'prop2', address: '2B, Green Park, Hauz Khas, Delhi', price: 85000000, status: 'Listed', brokerage: 1.5 },
+];
+
+
 export default function BrokerDashboard() {
-  const firestore = useFirestore();
-  const { user } = useUser();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const propertiesQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(
-      collection(firestore, "properties"), 
-      where("brokerId", "==", user.uid), 
-      where("brokerAssignmentStatus", "==", "accepted")
-    );
-  }, [firestore, user]);
-
-  const { data: properties, isLoading } = useCollection<Property>(propertiesQuery);
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setProperties(mockProperties);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const stats = useMemo(() => {
     const activeDeals = properties?.filter(p => p.status === 'Listed' || p.status === 'Under Contract').length || 0;

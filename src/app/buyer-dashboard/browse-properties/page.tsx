@@ -14,8 +14,6 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useCollection, useDoc, useFirestore, useUser, useMemoFirebase } from "@/firebase";
-import { collection, doc, query, updateDoc, where, arrayUnion, arrayRemove } from "firebase/firestore";
 import toast from "react-hot-toast";
 
 
@@ -36,46 +34,40 @@ interface Property {
   location: string;
 }
 
+const mockProperties: Property[] = [
+    { id: 'prop1', address: '101, Ocean View, Marine Drive, Mumbai', price: 150000000, status: 'Listed', image: placeholderImages.properties[0], details: { bedrooms: 3, bathrooms: 3 }, type: 'Apartment', location: 'Mumbai' },
+    { id: 'prop2', address: '2B, Green Park, Hauz Khas, Delhi', price: 85000000, status: 'Listed', image: { src: "https://picsum.photos/seed/property2/600/400", "data-ai-hint": "luxury villa"}, details: { bedrooms: 4, bathrooms: 5 }, type: 'Villa', location: 'Delhi' },
+    { id: 'prop3', address: 'Penthouse, The Imperial, Tardeo, Mumbai', price: 300000000, status: 'Listed', image: { src: "https://picsum.photos/seed/property3/600/400", "data-ai-hint": "modern penthouse"}, details: { bedrooms: 5, bathrooms: 6 }, type: 'Penthouse', location: 'Mumbai' },
+    { id: 'prop5', address: 'Modern Studio, Koramangala, Bengaluru', price: 9000000, status: 'Listed', image: { src: "https://picsum.photos/seed/property5/600/400", "data-ai-hint": "compact studio"}, details: { bedrooms: 1, bathrooms: 1 }, type: 'Studio', location: 'Bengaluru' },
+];
+
 export default function BrowsePropertiesPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user } = useUser();
-  
-  const propertiesQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'properties'), where('status', '==', 'Listed'));
-  }, [firestore]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [wishlist, setWishlist] = useState<string[]>(['prop2']);
 
-  const { data: properties, isLoading } = useCollection<Property>(propertiesQuery);
-  
-  const userDocRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
-
-  const { data: userData } = useDoc<{wishlist: string[]}>(userDocRef);
-  const wishlist = userData?.wishlist || [];
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setProperties(mockProperties);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
   
   const [propertyTypeFilter, setPropertyTypeFilter] = useState('All');
   const [priceRangeFilter, setPriceRangeFilter] = useState([200000000]);
   const [locationFilter, setLocationFilter] = useState('');
 
   const toggleWishlist = async (propertyId: string) => {
-    if (!user || !userDocRef) {
-        toast.error("You must be logged in to manage your wishlist.");
-        return;
-    }
-    
     const isWishlisted = wishlist.includes(propertyId);
     
-    try {
-        await updateDoc(userDocRef, {
-            wishlist: isWishlisted ? arrayRemove(propertyId) : arrayUnion(propertyId)
-        });
-        toast.success(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
-    } catch (error) {
-        console.error("Error updating wishlist:", error);
-        toast.error("Could not update wishlist.");
+    if (isWishlisted) {
+        setWishlist(wishlist.filter(id => id !== propertyId));
+        toast.success("Removed from wishlist");
+    } else {
+        setWishlist([...wishlist, propertyId]);
+        toast.success("Added to wishlist");
     }
   };
 

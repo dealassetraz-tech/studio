@@ -1,31 +1,26 @@
+
 'use client';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Handshake, Heart, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useCollection, useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, where, doc } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
 
 export default function BuyerDashboard() {
-  const firestore = useFirestore();
-  const { user } = useUser();
+    const [dealsLoading, setDealsLoading] = useState(true);
+    const [userLoading, setUserLoading] = useState(true);
+    const [wishlistCount, setWishlistCount] = useState(0);
+    const [activeOffersCount, setActiveOffersCount] = useState(0);
 
-  const dealsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(collection(firestore, 'deals'), where('buyerId', '==', user.uid));
-  }, [firestore, user]);
-  const { data: deals, isLoading: dealsLoading } = useCollection(dealsQuery);
-
-  const userDocRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
-  const { data: userData, isLoading: userLoading } = useDoc<{wishlist: string[]}>(userDocRef);
-
-  const wishlistCount = userData?.wishlist?.length || 0;
-  const activeOffersCount = deals?.length || 0;
-
+    useEffect(() => {
+        setTimeout(() => {
+            setWishlistCount(3);
+            setActiveOffersCount(2);
+            setUserLoading(false);
+            setDealsLoading(false);
+        }, 1000);
+    }, []);
 
   const stats = [
     {

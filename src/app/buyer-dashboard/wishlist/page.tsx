@@ -8,9 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IndianRupee, Bed, Bath, ArrowLeft, Heart, X } from 'lucide-react';
 import placeholderImages from '@/lib/placeholder-images.json';
-import { useCollection, useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, where, doc, updateDoc, arrayRemove } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { useState, useEffect } from 'react';
 
 interface Property {
   id: string;
@@ -29,39 +28,27 @@ interface Property {
   location: string;
 }
 
+const mockWishlistItems: Property[] = [
+    { id: 'prop2', address: '2B, Green Park, Hauz Khas, Delhi', price: 85000000, status: 'Listed', image: { src: "https://picsum.photos/seed/property2/600/400", "data-ai-hint": "luxury villa"}, details: { bedrooms: 4, bathrooms: 5 }, type: 'Villa', location: 'Delhi' },
+    { id: 'prop3', address: 'Penthouse, The Imperial, Tardeo, Mumbai', price: 300000000, status: 'Listed', image: { src: "https://picsum.photos/seed/property3/600/400", "data-ai-hint": "modern penthouse"}, details: { bedrooms: 5, bathrooms: 6 }, type: 'Penthouse', location: 'Mumbai' },
+];
+
 export default function WishlistPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user } = useUser();
-
-  const userDocRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
-  const { data: userData, isLoading: isUserLoading } = useDoc<{wishlist?: string[]}>(userDocRef);
+  const [wishlistItems, setWishlistItems] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const wishlistIds = userData?.wishlist;
-
-  const wishlistQuery = useMemoFirebase(() => {
-    if (!firestore || !wishlistIds || wishlistIds.length === 0) return null;
-    return query(collection(firestore, 'properties'), where('__name__', 'in', wishlistIds));
-  }, [firestore, wishlistIds]);
-  
-  const { data: wishlistItems, isLoading: isWishlistLoading } = useCollection<Property>(wishlistQuery);
-
-  const isLoading = isUserLoading || (wishlistIds && wishlistIds.length > 0 && isWishlistLoading);
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setWishlistItems(mockWishlistItems);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const removeFromWishlist = async (propertyId: string) => {
-    if (!userDocRef) return;
-    try {
-        await updateDoc(userDocRef, {
-            wishlist: arrayRemove(propertyId)
-        });
-        toast.success("Removed from wishlist");
-    } catch (error) {
-        console.error("Error removing from wishlist:", error);
-        toast.error("Could not remove from wishlist.");
-    }
+    setWishlistItems(currentItems => currentItems.filter(item => item.id !== propertyId));
+    toast.success("Removed from wishlist");
   };
 
   return (

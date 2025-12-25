@@ -1,8 +1,7 @@
 
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -23,8 +22,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, Info, Handshake, FileUp } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, where, doc, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { FileUpload } from '@/components/file-upload';
 import toast from 'react-hot-toast';
@@ -50,21 +47,27 @@ interface Deal {
   commission: number;
 }
 
+const mockDeals: Deal[] = [
+    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, offerPrice: 148000000, status: 'Active', commission: 2 },
+    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
+    { id: 'deal3', property: { address: '45, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/prop4/100/100' }, seller: { name: 'Rohan M.', avatar: 'https://picsum.photos/seed/seller3/100/100' }, buyer: { name: 'Suresh P.', avatar: 'https://picsum.photos/seed/buyerC/100/100' }, offerPrice: 119000000, status: 'Closed', commission: 2.5 },
+];
+
+
 export default function ManagedDealsPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
 
-
-  const dealsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(collection(firestore, 'deals'), where('brokerId', '==', user.uid));
-  }, [firestore, user]);
-
-  const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
-  const isLoading = isUserLoading || dealsLoading;
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setDeals(mockDeals);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
   
   const handleOpenUploadDialog = (deal: Deal) => {
     setSelectedDeal(deal);
@@ -76,47 +79,14 @@ export default function ManagedDealsPage() {
     setIsUploadDialogOpen(false);
   };
 
-   const addLogEntry = async (dealId: string, event: "Uploaded closure proof") => {
-    if (!user || !firestore) {
-        toast.error("You must be logged in to add a log entry.");
-        return;
-    }
-    
-    const toastId = toast.loading(`Adding log: "${event}"...`);
-    const logsCollectionRef = collection(firestore, 'deals', dealId, 'logs');
-
-    try {
-        await addDoc(logsCollectionRef, {
-            event,
-            timestamp: serverTimestamp(),
-            userId: user.uid,
-        });
-        toast.success("Log added successfully!", { id: toastId });
-    } catch (error) {
-        console.error("Error adding log:", error);
-        toast.error("Failed to add log.", { id: toastId });
-    }
-  };
-
   const handleUploadComplete = async (fileName: string, fileUrl: string) => {
-    if (!selectedDeal || !firestore) return;
+    if (!selectedDeal) return;
     
     const toastId = toast.loading("Attaching proof to deal...");
-    try {
-        const dealDocRef = doc(firestore, 'deals', selectedDeal.id);
-        await updateDoc(dealDocRef, {
-            closureProof: {
-                fileName,
-                url: fileUrl,
-            }
-        });
-        await addLogEntry(selectedDeal.id, "Uploaded closure proof");
+    setTimeout(() => {
         toast.success("Closure proof attached!", { id: toastId });
         handleCloseUploadDialog();
-    } catch (error) {
-        console.error("Error attaching proof:", error);
-        toast.error("Failed to attach proof.", { id: toastId });
-    }
+    }, 1000);
   };
 
 

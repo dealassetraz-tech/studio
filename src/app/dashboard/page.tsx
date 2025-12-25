@@ -4,13 +4,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Home, Briefcase, Building, Filter, User } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { IndianRupee } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
-import { useCollection, useFirestore, useUser, useMemoFirebase, useUsers } from "@/firebase";
-import { collection, query, where } from "firebase/firestore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
@@ -30,40 +28,48 @@ interface Deal {
   status: 'Active' | 'Closed' | 'Cancelled';
 }
 
+const mockProperties: Property[] = [
+    { id: 'prop1', address: '101, Ocean View, Marine Drive, Mumbai', price: 150000000, status: 'Listed', brokerage: 2, brokerId: 'broker1', brokerAssignmentStatus: 'accepted' },
+    { id: 'prop2', address: '2B, Green Park, Hauz Khas, Delhi', price: 85000000, status: 'Under Contract', brokerage: 1.5, brokerId: 'broker2', brokerAssignmentStatus: 'accepted' },
+    { id: 'prop3', address: 'Penthouse, The Imperial, Tardeo, Mumbai', price: 300000000, status: 'Listed', brokerage: 1, brokerId: 'broker1', brokerAssignmentStatus: 'pending' },
+    { id: 'prop4', address: '45, Jubilee Hills, Hyderabad', price: 120000000, status: 'Sold', brokerage: 2.5, brokerId: 'broker3', brokerAssignmentStatus: 'accepted' },
+];
+
+const mockDeals: Deal[] = [
+    { id: 'deal1', propertyId: 'prop1', status: 'Active' },
+    { id: 'deal2', propertyId: 'prop2', status: 'Active' },
+    { id: 'deal3', propertyId: 'prop4', status: 'Closed' },
+];
+
+const mockBrokers = [
+    { id: 'broker1', fullName: 'Rajesh Sharma', photoURL: 'https://picsum.photos/seed/broker1/100/100' },
+    { id: 'broker2', fullName: 'Sunita Singh', photoURL: 'https://picsum.photos/seed/broker2/100/100' },
+    { id: 'broker3', fullName: 'Amit Patel', photoURL: 'https://picsum.photos/seed/broker3/100/100' },
+];
+
+
 export default function SellerDashboard() {
-  const firestore = useFirestore();
-  const { user } = useUser();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [brokers, setBrokers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate fetching data
+    setTimeout(() => {
+        setProperties(mockProperties);
+        setDeals(mockDeals);
+        setBrokers(mockBrokers);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
+
   
-  const propertiesQuery = useMemoFirebase(() => {
-      if (!firestore || !user) return null;
-      return query(collection(firestore, "properties"), where("ownerId", "==", user.uid));
-  }, [firestore, user]);
-
-  const { data: properties, isLoading: propertiesLoading } = useCollection<Property>(propertiesQuery);
-
-  const brokerIds = useMemo(() => {
-    if (!properties) return [];
-    return [...new Set(properties.map(p => p.brokerId).filter(Boolean) as string[])];
-  }, [properties]);
-  
-  const { data: brokers, isLoading: brokersLoading } = useUsers(brokerIds);
-
   const brokersMap = useMemo(() => {
     if (!brokers) return new Map();
     return new Map(brokers.map(b => [b.id, b]));
   }, [brokers]);
 
-
-  const propertyIds = useMemo(() => properties?.map(p => p.id) || [], [properties]);
-
-  const dealsQuery = useMemoFirebase(() => {
-    if (!firestore || propertyIds.length === 0) return null;
-    return query(collection(firestore, "deals"), where("propertyId", "in", propertyIds));
-  }, [firestore, propertyIds]);
-
-  const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
-
-  const isLoading = propertiesLoading || (propertyIds.length > 0 && dealsLoading) || (brokerIds.length > 0 && brokersLoading);
 
   const [priceFilter, setPriceFilter] = useState<number[]>([200000000]);
   const [brokerageFilter, setBrokerageFilter] = useState<number[]>([5]);

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,6 @@ import { IndianRupee, Tag, ArrowLeft } from "lucide-react";
 import placeholderImages from "@/lib/placeholder-images.json";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
-import { collection, query, where } from "firebase/firestore";
 
 interface Property {
   id: string;
@@ -23,18 +21,26 @@ interface Property {
   };
 }
 
+const mockProperties: Property[] = [
+    { id: 'prop1', address: '101, Ocean View, Marine Drive, Mumbai', price: 150000000, status: 'Listed', image: placeholderImages.properties[0] },
+    { id: 'prop2', address: '2B, Green Park, Hauz Khas, Delhi', price: 85000000, status: 'Under Contract', image: { src: "https://picsum.photos/seed/property2/600/400", "data-ai-hint": "luxury villa"} },
+    { id: 'prop3', address: 'Penthouse, The Imperial, Tardeo, Mumbai', price: 300000000, status: 'Listed', image: { src: "https://picsum.photos/seed/property3/600/400", "data-ai-hint": "modern penthouse"} },
+    { id: 'prop4', address: '45, Jubilee Hills, Hyderabad', price: 120000000, status: 'Sold', image: { src: "https://picsum.photos/seed/property4/600/400", "data-ai-hint": "spacious house"} },
+];
+
 
 export default function MyPropertiesPage() {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user } = useUser();
-
-  const propertiesQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(collection(firestore, 'properties'), where('ownerId', '==', user.uid));
-  }, [firestore, user]);
-
-  const { data: properties, isLoading } = useCollection<Property>(propertiesQuery);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+        setProperties(mockProperties);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
