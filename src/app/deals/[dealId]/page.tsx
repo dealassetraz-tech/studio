@@ -126,11 +126,20 @@ export default function SellerDealTrackingPage() {
   }, []);
   
   const userRole = useMemo(() => {
+    // This is a simplified role detection for mock purposes.
+    // In a real app, this would come from the user's profile in the database.
+    const path = window.location.pathname;
+    if (path.includes('buyer-dashboard')) return 'buyer';
+    if (path.includes('broker-dashboard')) return 'broker';
+    if (path.includes('dashboard')) return 'seller';
+    
+    // Fallback based on mock data if path is not specific
     if (!user || !deal) return 'unknown';
     if (user.displayName === deal.buyer.name) return 'buyer';
     if (user.displayName === deal.seller.name) return 'seller';
     if (user.displayName === deal.broker.name) return 'broker';
-    return 'seller'; // Default to seller/broker view
+    
+    return 'seller'; // Default for generic /deals/[dealId] path
   }, [user, deal]);
 
   const sellerTimelineStatus = useMemo(() => getSellerTimelineStatus(logs, deal?.status), [logs, deal?.status]);
