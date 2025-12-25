@@ -60,7 +60,7 @@ export default function ManagedDealsPage() {
 
   const dealsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return query(collection(firestore, 'deals'));
+    return query(collection(firestore, 'deals'), where('brokerId', '==', user.uid));
   }, [firestore, user]);
 
   const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
