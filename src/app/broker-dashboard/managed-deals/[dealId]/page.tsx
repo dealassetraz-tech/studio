@@ -7,7 +7,7 @@ import { doc, collection, addDoc, serverTimestamp, query, orderBy, updateDoc } f
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip } from 'lucide-react';
+import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
@@ -30,7 +30,7 @@ interface Deal {
     avatar: string;
   },
   offerPrice: number;
-  status: 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
+  status: 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled' | 'Pending Approval';
   commission: number;
   closureProof?: {
     fileName: string;
@@ -128,6 +128,18 @@ export default function DealDetailsPage() {
     }
   };
 
+  const handleRequestApproval = async () => {
+    if (!dealDocRef) return;
+    const toastId = toast.loading("Requesting approval...");
+    try {
+      await updateDoc(dealDocRef, { status: "Pending Approval" });
+      toast.success("Approval requested!", { id: toastId });
+    } catch (error) {
+      console.error("Error requesting approval:", error);
+      toast.error("Failed to request approval.", { id: toastId });
+    }
+  };
+
   const renderSkeleton = () => (
     <Card>
       <CardHeader><div className="h-8 w-3/4 bg-muted animate-pulse rounded-md" /></CardHeader>
@@ -218,7 +230,13 @@ export default function DealDetailsPage() {
                      <div className="mt-6 flex justify-between items-center bg-muted/50 p-4 rounded-lg">
                         <div>
                             <p className="text-sm text-muted-foreground">Status</p>
-                            <Badge variant={deal.status === "Active" ? "default" : "secondary"}>{deal.status}</Badge>
+                            <Badge variant={
+                                deal.status === "Active" ? "default" : 
+                                deal.status === "Pending Approval" ? "outline" :
+                                "secondary"
+                            }>
+                                {deal.status}
+                            </Badge>
                         </div>
                          <div>
                             <p className="text-sm text-muted-foreground">Commission</p>
@@ -247,13 +265,26 @@ export default function DealDetailsPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Broker Actions</CardTitle>
-                    <CardDescription>Log your activities for this deal.</CardDescription>
+                    <CardDescription>Log your activities and manage this deal.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
-                    <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
-                    <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
-                    <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
+                    {deal.status === 'Active' ? (
+                        <>
+                            <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
+                            <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
+                            <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
+                            <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
+                        </>
+                    ) : deal.status === 'Accepted' ? (
+                        <Button onClick={handleRequestApproval}>
+                            <ShieldQuestion className="w-4 h-4 mr-2" />
+                            Request Approval
+                        </Button>
+                    ) : (
+                        <p className="text-sm text-muted-foreground col-span-full">
+                            Actions will be available once the deal is approved and active.
+                        </p>
+                    )}
                 </CardContent>
             </Card>
         </div>

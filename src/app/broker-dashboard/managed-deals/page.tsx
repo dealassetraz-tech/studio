@@ -29,7 +29,7 @@ import Link from 'next/link';
 import { FileUpload } from '@/components/file-upload';
 import toast from 'react-hot-toast';
 
-type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
+type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled' | 'Pending Approval';
 
 interface Deal {
   id: string;
@@ -128,6 +128,8 @@ export default function ManagedDealsPage() {
         return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Closed</Badge>;
       case 'Pending':
         return <Badge variant="outline" className="text-amber-500 border-amber-500/50">Pending</Badge>;
+      case 'Pending Approval':
+        return <Badge variant="outline" className="text-orange-500 border-orange-500/50">Pending Approval</Badge>;
       default:
          return <Badge variant="secondary">{status}</Badge>;
     }

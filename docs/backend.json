@@ -156,6 +156,51 @@
             }
         },
         "required": ["event", "timestamp", "userId"]
+    },
+    "Deal": {
+        "title": "Deal",
+        "type": "object",
+        "description": "Represents a deal between a buyer and a seller for a property, facilitated by a broker.",
+        "properties": {
+            "property": {
+                "type": "object",
+                "properties": {
+                    "address": { "type": "string" },
+                    "image": { "type": "string" }
+                }
+            },
+            "seller": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "avatar": { "type": "string" }
+                }
+            },
+            "buyer": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "avatar": { "type": "string" }
+                }
+            },
+            "offerPrice": {
+                "type": "number"
+            },
+            "status": {
+                "type": "string",
+                "enum": ["Pending", "Accepted", "Rejected", "Active", "Closed", "Cancelled", "Pending Approval"]
+            },
+            "commission": {
+                "type": "number"
+            },
+            "closureProof": {
+                "type": "object",
+                "properties": {
+                    "fileName": { "type": "string" },
+                    "url": { "type": "string" }
+                }
+            }
+        }
     }
   },
   "auth": {
@@ -232,6 +277,22 @@
               "description": "The unique identifier for the buyer request."
             }
           ]
+        }
+      },
+      {
+        "path": "/deals/{dealId}",
+        "definition": {
+            "entityName": "Deal",
+            "schema": {
+                "$ref": "#/backend/entities/Deal"
+            },
+            "description": "Stores information about a specific deal.",
+            "params": [
+                {
+                    "name": "dealId",
+                    "description": "The unique identifier for the deal."
+                }
+            ]
         }
       },
       {
