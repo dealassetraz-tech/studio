@@ -93,6 +93,20 @@ service cloud.firestore {
       return request.resource.data.authorId == resource.data.authorId;
     }
 
+    /**
+     * @description Checks if the user is the assigned broker for a property.
+     */
+    function isAssignedBroker() {
+      return isSignedIn() && request.auth.uid == request.resource.data.brokerId;
+    }
+
+    /**
+     * @description Checks if the user is the assigned broker on an existing property document.
+     */
+    function isExistingAssignedBroker() {
+      return isSignedIn() && resource != null && request.auth.uid == resource.data.brokerId;
+    }
+
     // --------------------------------------------------------------------------------
     // Collection Rules
     // --------------------------------------------------------------------------------
@@ -106,7 +120,7 @@ service cloud.firestore {
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow list: if false; // CRITICAL: Prevent listing all users.
+      allow list: if isSignedIn();
       allow create: if isOwner(userId) && hasMatchingUserIdOnCreate(userId);
       allow update: if isExistingOwner(userId) && userIdIsImmutable();
       allow delete: if isExistingOwner(userId);
@@ -143,7 +157,10 @@ service cloud.firestore {
      match /properties/{propertyId} {
       allow read, list: if isSignedIn();
       allow create: if isCreatingOwnContent();
-      allow update: if isContentOwner() && authorIsImmutable();
+      // Allow the owner to update the property
+      // Allow the assigned broker to update the assignment status
+      allow update: if (isContentOwner() && authorIsImmutable()) ||
+                      (isExistingAssignedBroker() && request.resource.data.brokerAssignmentStatus != resource.data.brokerAssignmentStatus);
       allow delete: if isContentOwner();
     }
     match /deals/{dealId} {
