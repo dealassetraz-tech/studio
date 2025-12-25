@@ -22,10 +22,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, Info, Handshake } from 'lucide-react';
+import { ArrowLeft, Building, Info, Handshake, FileUp } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
+import { collection, query, where, doc, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
+import { FileUpload } from '@/components/file-upload';
+import toast from 'react-hot-toast';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -52,6 +54,9 @@ export default function ManagedDealsPage() {
   const router = useRouter();
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
+
 
   const dealsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -60,6 +65,60 @@ export default function ManagedDealsPage() {
 
   const { data: deals, isLoading: dealsLoading } = useCollection<Deal>(dealsQuery);
   const isLoading = isUserLoading || dealsLoading;
+  
+  const handleOpenUploadDialog = (deal: Deal) => {
+    setSelectedDeal(deal);
+    setIsUploadDialogOpen(true);
+  };
+
+  const handleCloseUploadDialog = () => {
+    setSelectedDeal(null);
+    setIsUploadDialogOpen(false);
+  };
+
+   const addLogEntry = async (dealId: string, event: "Uploaded closure proof") => {
+    if (!user || !firestore) {
+        toast.error("You must be logged in to add a log entry.");
+        return;
+    }
+    
+    const toastId = toast.loading(`Adding log: "${event}"...`);
+    const logsCollectionRef = collection(firestore, 'deals', dealId, 'logs');
+
+    try {
+        await addDoc(logsCollectionRef, {
+            event,
+            timestamp: serverTimestamp(),
+            userId: user.uid,
+        });
+        toast.success("Log added successfully!", { id: toastId });
+    } catch (error) {
+        console.error("Error adding log:", error);
+        toast.error("Failed to add log.", { id: toastId });
+    }
+  };
+
+  const handleUploadComplete = async (fileName: string, fileUrl: string) => {
+    if (!selectedDeal || !firestore) return;
+    
+    const toastId = toast.loading("Attaching proof to deal...");
+    try {
+        const dealDocRef = doc(firestore, 'deals', selectedDeal.id);
+        await updateDoc(dealDocRef, {
+            closureProof: {
+                fileName,
+                url: fileUrl,
+            }
+        });
+        await addLogEntry(selectedDeal.id, "Uploaded closure proof");
+        toast.success("Closure proof attached!", { id: toastId });
+        handleCloseUploadDialog();
+    } catch (error) {
+        console.error("Error attaching proof:", error);
+        toast.error("Failed to attach proof.", { id: toastId });
+    }
+  };
+
 
   const getStatusBadge = (status: DealStatus) => {
     switch (status) {
@@ -89,6 +148,11 @@ export default function ManagedDealsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+       <FileUpload
+        isOpen={isUploadDialogOpen}
+        onClose={handleCloseUploadDialog}
+        onUploadComplete={handleUploadComplete}
+      />
       <div className="flex justify-between items-center mb-8">
         <div>
             <h1 className="text-3xl font-bold font-headline">Managed Deals</h1>
@@ -163,12 +227,18 @@ export default function ManagedDealsPage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
-                        <Button variant="outline" size="sm" asChild>
-                           <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
-                                <Info className="w-4 h-4 mr-1" />
-                                Details
-                            </Link>
-                        </Button>
+                        <div className='flex items-center justify-center gap-2'>
+                             <Button variant="outline" size="sm" asChild>
+                                <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
+                                    <Info className="w-4 h-4 mr-1" />
+                                    Details
+                                </Link>
+                            </Button>
+                             <Button variant="outline" size="sm" onClick={() => handleOpenUploadDialog(deal)}>
+                                <FileUp className="w-4 h-4 mr-1" />
+                                Upload Proof
+                            </Button>
+                        </div>
                     </TableCell>
                   </TableRow>
                 ))}
