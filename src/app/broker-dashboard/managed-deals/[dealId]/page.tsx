@@ -2,16 +2,18 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { doc, collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { doc, collection, addDoc, serverTimestamp, query, orderBy, updateDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+import { useState } from 'react';
+import { FileUpload } from '@/components/file-upload';
 
 interface Deal {
   id: string;
@@ -30,6 +32,10 @@ interface Deal {
   offerPrice: number;
   status: 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
   commission: number;
+  closureProof?: {
+    fileName: string;
+    url: string; // In a real app, this would be a URL to the uploaded file in cloud storage
+  };
 }
 
 type LogEvent = "Assigned to deal" | "Communicated with seller" | "Communicated with buyer" | "Requested closure" | "Uploaded closure proof";
@@ -56,6 +62,7 @@ export default function DealDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const dealId = params.dealId as string;
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   const firestore = useFirestore();
   const { user } = useUser();
@@ -101,6 +108,26 @@ export default function DealDetailsPage() {
     }
   };
 
+   const handleUploadComplete = async (fileName: string, fileUrl: string) => {
+    if (!dealDocRef) return;
+    
+    const toastId = toast.loading("Attaching proof to deal...");
+    try {
+        await updateDoc(dealDocRef, {
+            closureProof: {
+                fileName,
+                url: fileUrl,
+            }
+        });
+        await addLogEntry("Uploaded closure proof");
+        toast.success("Closure proof attached!", { id: toastId });
+        setIsUploadDialogOpen(false);
+    } catch (error) {
+        console.error("Error attaching proof:", error);
+        toast.error("Failed to attach proof.", { id: toastId });
+    }
+  };
+
   const renderSkeleton = () => (
     <Card>
       <CardHeader><div className="h-8 w-3/4 bg-muted animate-pulse rounded-md" /></CardHeader>
@@ -133,6 +160,11 @@ export default function DealDetailsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <FileUpload
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+        onUploadComplete={handleUploadComplete}
+      />
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold font-headline truncate max-w-xl">
@@ -195,6 +227,21 @@ export default function DealDetailsPage() {
                     </div>
                 </CardContent>
             </Card>
+             {deal.closureProof && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Closure Proof</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center gap-3 p-3 rounded-md bg-muted">
+                            <Paperclip className="w-5 h-5 text-primary" />
+                            <a href={deal.closureProof.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:underline">
+                                {deal.closureProof.fileName}
+                            </a>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Broker Actions */}
             <Card>
@@ -206,7 +253,7 @@ export default function DealDetailsPage() {
                     <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
                     <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
                     <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
-                    <Button variant="outline" onClick={() => addLogEntry("Uploaded closure proof")}>Upload Proof</Button>
+                    <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
                 </CardContent>
             </Card>
         </div>
