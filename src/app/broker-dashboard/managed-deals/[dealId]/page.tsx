@@ -347,7 +347,7 @@ export default function DealDetailsPage() {
                         <div className="p-4 pt-0 text-right">
                             <Button size="sm">
                                 <LinkIcon className="w-4 h-4 mr-2" />
-                                Initiate Contact
+                                Initiate Deal
                             </Button>
                         </div>
                     </Card>
