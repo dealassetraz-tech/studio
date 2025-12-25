@@ -96,14 +96,14 @@ const getBuyerTimelineStatus = (dealStatus: Deal['status']): BuyerDealStatus => 
         case 'Closed':
             return 'Deal Closed';
         case 'Active':
-            return 'Due diligence';
+            return 'Approval Granted';
         case 'Accepted':
-            return 'Offer Accepted';
+            return 'Deal Review';
         case 'Pending':
         case 'Pending Approval':
-            return 'Offer Made';
+            return 'Offer Placed';
         default:
-            return 'Offer Made';
+            return 'Registered Interest';
     }
 }
 
