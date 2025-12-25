@@ -173,14 +173,6 @@ export default function DealDetailsPage() {
     }, 500);
   };
 
-  const handleRequestApproval = async () => {
-    const toastId = toast.loading("Requesting approval...");
-    setTimeout(() => {
-        setDeal(d => d ? { ...d, status: "Pending Approval" } : null);
-        toast.success("Approval requested!", { id: toastId });
-    }, 500);
-  };
-
   const renderSkeleton = () => (
     <Card>
       <CardHeader><div className="h-8 w-3/4 bg-muted animate-pulse rounded-md" /></CardHeader>
@@ -352,15 +344,11 @@ export default function DealDetailsPage() {
                     <CardTitle>Broker Actions</CardTitle>
                     <CardDescription>Log your activities and manage this deal.</CardDescription>
                 </CardHeader>
-                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <CardContent className="grid grid-cols-2 md:grid-cols-2 gap-4">
                     <Button variant="outline" onClick={() => addLogEntry("Communicated with seller")}>Log Seller Talk</Button>
                     <Button variant="outline" onClick={() => addLogEntry("Communicated with buyer")}>Log Buyer Talk</Button>
                     <Button variant="outline" onClick={() => addLogEntry("Requested closure")}>Request Closure</Button>
                     <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)}>Upload Proof</Button>
-                    <Button onClick={handleRequestApproval}>
-                        <ShieldQuestion className="w-4 h-4 mr-2" />
-                        Request Approval
-                    </Button>
                 </CardContent>
             </Card>
         </div>
