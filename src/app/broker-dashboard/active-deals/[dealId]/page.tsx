@@ -153,6 +153,8 @@ const findMatches = (deal: Deal | null, buyerRequests: BuyerRequest[]) => {
     });
 };
 
+const INITIATED_DEALS_KEY = 'initiatedDeals';
+const MANAGED_DEALS_KEY = 'managedDealsMockData';
 
 export default function DealDetailsPage() {
   const router = useRouter();
@@ -168,10 +170,12 @@ export default function DealDetailsPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    // Simulate loading data from sessionStorage or initial mock
-    const allDealsStr = sessionStorage.getItem('managedDealsMockData');
+    const allDealsStr = sessionStorage.getItem(MANAGED_DEALS_KEY);
     const allDeals = allDealsStr ? JSON.parse(allDealsStr) : [mockDeal, acceptedMockDeal, closedMockDeal];
     const currentDeal = allDeals.find((d: Deal) => d.id === dealId);
+
+    const initiatedDealsStr = sessionStorage.getItem(INITIATED_DEALS_KEY);
+    setInitiatedDeals(initiatedDealsStr ? JSON.parse(initiatedDealsStr) : []);
 
     setTimeout(() => {
         setDeal(currentDeal || null);
@@ -218,9 +222,10 @@ export default function DealDetailsPage() {
 
     const toastId = toast.loading(`Initiating deal for ${buyerName}...`);
     
-    // Simulate API call
     setTimeout(() => {
-      setInitiatedDeals(prev => [...prev, matchId]);
+      const newInitiated = [...initiatedDeals, matchId];
+      setInitiatedDeals(newInitiated);
+      sessionStorage.setItem(INITIATED_DEALS_KEY, JSON.stringify(newInitiated));
       
       const newDeal = {
         id: `deal${Date.now()}`,
@@ -233,9 +238,9 @@ export default function DealDetailsPage() {
       };
 
       try {
-        const storedDeals = JSON.parse(sessionStorage.getItem('managedDealsMockData') || '[]');
+        const storedDeals = JSON.parse(sessionStorage.getItem(MANAGED_DEALS_KEY) || '[]');
         const updatedDeals = [...storedDeals, newDeal];
-        sessionStorage.setItem('managedDealsMockData', JSON.stringify(updatedDeals));
+        sessionStorage.setItem(MANAGED_DEALS_KEY, JSON.stringify(updatedDeals));
         toast.success("Deal submitted for admin approval.", { id: toastId });
       } catch (error) {
         toast.error("Could not save new deal.", { id: toastId });
@@ -442,5 +447,7 @@ export default function DealDetailsPage() {
     </div>
   );
 }
+
+    
 
     
