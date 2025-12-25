@@ -7,12 +7,12 @@ import { doc, collection, addDoc, serverTimestamp, query, orderBy, updateDoc } f
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion } from 'lucide-react';
+import { ArrowLeft, Building, User as UserIcon, IndianRupee, MessageSquare, Briefcase, FileUp, CheckCircle, Clock, Paperclip, ShieldQuestion, Shuffle, Bed, Link as LinkIcon, MapPin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FileUpload } from '@/components/file-upload';
 
 interface Deal {
@@ -20,6 +20,10 @@ interface Deal {
   property: {
       address: string;
       image: string;
+      price: number;
+      bedrooms: number;
+      bathrooms: number;
+      type: string;
   };
   seller: {
     name: string;
@@ -50,6 +54,22 @@ interface DealLog {
     userId: string;
 }
 
+interface Requirement {
+    location: string;
+    type: string;
+    bedrooms: number;
+    budget: number;
+}
+
+interface BuyerRequest {
+    id: string;
+    buyer: {
+        name: string;
+        avatar: string;
+    },
+    requirements: Requirement;
+}
+
 const logIcons: Record<LogEvent, React.ReactElement> = {
     "Assigned to deal": <Briefcase className="w-5 h-5 text-primary" />,
     "Communicated with seller": <MessageSquare className="w-5 h-5 text-blue-500" />,
@@ -57,6 +77,33 @@ const logIcons: Record<LogEvent, React.ReactElement> = {
     "Requested closure": <CheckCircle className="w-5 h-5 text-amber-500" />,
     "Uploaded closure proof": <FileUp className="w-5 h-5 text-purple-500" />,
 };
+
+// This is mock data. In a real app, you would fetch this and run matching logic.
+const mockBuyerRequests: BuyerRequest[] = [
+    { 
+        id: 'req1', 
+        buyer: { name: 'Suresh G.', avatar: 'https://picsum.photos/seed/buyer1/100/100' }, 
+        requirements: { location: 'HSR Layout, Bengaluru', type: 'Apartment', bedrooms: 2, budget: 10000000 } 
+    },
+    { 
+        id: 'req2', 
+        buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyer2/100/100' }, 
+        requirements: { location: 'Jubilee Hills, Hyderabad', type: 'Villa', bedrooms: 3, budget: 18500000 } 
+    },
+];
+
+const findMatches = (deal: Deal | null, buyerRequests: BuyerRequest[]) => {
+    if (!deal) return [];
+    
+    return buyerRequests.filter(req => {
+        const priceMatch = deal.property.price <= req.requirements.budget * 1.1 && deal.property.price >= req.requirements.budget * 0.9;
+        const typeMatch = deal.property.type === req.requirements.type;
+        const bedroomMatch = deal.property.bedrooms === req.requirements.bedrooms;
+        const locationMatch = deal.property.address.toLowerCase().includes(req.requirements.location.toLowerCase().split(',')[0]);
+        return priceMatch && typeMatch && bedroomMatch && locationMatch;
+    });
+};
+
 
 export default function DealDetailsPage() {
   const router = useRouter();
@@ -84,6 +131,8 @@ export default function DealDetailsPage() {
 
   const { data: deal, isLoading: isDealLoading } = useDoc<Deal>(dealDocRef);
   const { data: logs, isLoading: areLogsLoading } = useCollection<DealLog>(logsQuery);
+
+  const potentialMatches = useMemo(() => findMatches(deal, mockBuyerRequests), [deal]);
 
   const isLoading = isDealLoading || areLogsLoading;
   
@@ -245,6 +294,50 @@ export default function DealDetailsPage() {
                     </div>
                 </CardContent>
             </Card>
+
+             {/* Potential Matches */}
+            {potentialMatches.length > 0 && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Shuffle className="w-5 h-5 text-primary" />
+                        Potential Buyer Matches
+                    </CardTitle>
+                    <CardDescription>Buyers whose requirements may fit this property.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {potentialMatches.map((match) => (
+                        <Card key={match.id} className="bg-muted/30">
+                            <CardHeader>
+                                <CardTitle className="text-lg flex items-center gap-3">
+                                    <Avatar className="h-9 w-9">
+                                        <AvatarImage src={match.buyer.avatar} />
+                                        <AvatarFallback>{match.buyer.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <span>{match.buyer.name}</span>
+                                        <CardDescription>Is looking for...</CardDescription>
+                                    </div>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2 text-sm">
+                                 <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.location}</span></div>
+                                <div className="flex items-center gap-2"><Building className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.type}</span></div>
+                                <div className="flex items-center gap-2"><Bed className="w-4 h-4 text-muted-foreground" /> <span>{match.requirements.bedrooms} Bedrooms</span></div>
+                                <div className="flex items-center gap-2"><IndianRupee className="w-4 h-4 text-muted-foreground" /> <span>Budget: ~₹{match.requirements.budget.toLocaleString('en-IN')}</span></div>
+                            </CardContent>
+                            <div className="p-4 pt-0 text-right">
+                                <Button size="sm">
+                                    <LinkIcon className="w-4 h-4 mr-2" />
+                                    Initiate Contact
+                                </Button>
+                            </div>
+                        </Card>
+                    ))}
+                </CardContent>
+            </Card>
+            )}
+
              {deal.closureProof && (
                 <Card>
                     <CardHeader>
