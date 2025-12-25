@@ -2,7 +2,7 @@
 'use client';
 
 import { cn } from "@/lib/utils";
-import { Check, Circle, Sparkles, User, FileText, Search } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 
 export type DealStatus = 
   | 'Property Posted'
@@ -13,10 +13,10 @@ export type DealStatus =
   | 'Deal Closed';
 
 const timelineSteps: {step: DealStatus, icon: React.ReactNode}[] = [
-  { step: 'Property Posted', icon: <FileText className="w-5 h-5" /> },
-  { step: 'Broker Assigned', icon: <User className="w-5 h-5" /> },
-  { step: 'Got Buyer', icon: <User className="w-5 h-5" /> },
-  { step: 'Deal Closure Approval', icon: <Search className="w-5 h-5" /> },
+  { step: 'Property Posted', icon: <Check className="w-5 h-5" /> },
+  { step: 'Broker Assigned', icon: <Check className="w-5 h-5" /> },
+  { step: 'Got Buyer', icon: <Check className="w-5 h-5" /> },
+  { step: 'Deal Closure Approval', icon: <Check className="w-5 h-5" /> },
   { step: 'Approval Granted', icon: <Sparkles className="w-5 h-5" /> },
   { step: 'Deal Closed', icon: <Check className="w-5 h-5" /> },
 ];
@@ -44,10 +44,10 @@ export function DealTimeline({ currentStatus }: DealTimelineProps) {
                 return (
                     <div key={step} className="relative z-10 flex flex-col items-center text-center px-2">
                         <div className={cn(
-                            "w-8 h-8 rounded-full flex items-center justify-center text-white border-2 transition-all duration-300",
-                            isCompleted && "bg-primary border-primary",
-                            isCurrent && "bg-primary border-primary ring-4 ring-primary/30",
-                            isFuture && "bg-background border-border"
+                            "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300",
+                            isCompleted && "bg-primary border-primary text-primary-foreground",
+                            isCurrent && "bg-primary border-primary ring-4 ring-primary/30 text-primary-foreground",
+                            isFuture && "bg-background border-border text-muted-foreground"
                         )}>
                              {isCompleted ? <Check className="w-5 h-5" /> : icon }
                         </div>
