@@ -21,7 +21,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, Info, Handshake, FileUp } from 'lucide-react';
+import { ArrowLeft, Building, Info, Handshake, FileUp, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { FileUpload } from '@/components/file-upload';
 import toast from 'react-hot-toast';
@@ -87,6 +87,16 @@ export default function ManagedDealsPage() {
         toast.success("Closure proof attached!", { id: toastId });
         handleCloseUploadDialog();
     }, 1000);
+  };
+
+  const handleAssignmentResponse = async (dealId: string, status: 'Active' | 'Rejected') => {
+    const toastId = toast.loading(`Updating assignment to ${status}...`);
+    setTimeout(() => {
+        setDeals(currentDeals => 
+            currentDeals.map(d => d.id === dealId ? {...d, status: status} : d)
+        );
+        toast.success('Assignment updated!', { id: toastId });
+    }, 500);
   };
 
 
@@ -200,16 +210,39 @@ export default function ManagedDealsPage() {
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
                         <div className='flex items-center justify-center gap-2'>
-                             <Button variant="outline" size="sm" asChild>
+                           {deal.status === 'Pending Approval' ? (
+                            <>
+                              <Button variant="outline" size="sm" asChild>
                                 <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
-                                    <Info className="w-4 h-4 mr-1" />
-                                    Details
+                                  <Info className="w-4 h-4 mr-1" />
+                                  Details
                                 </Link>
-                            </Button>
-                             <Button variant="outline" size="sm" onClick={() => handleOpenUploadDialog(deal)}>
-                                <FileUp className="w-4 h-4 mr-1" />
-                                Upload Proof
-                            </Button>
+                              </Button>
+                              <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(deal.id, 'Active')}>
+                                <Check className="w-4 h-4 mr-1" />
+                                Accept
+                              </Button>
+                              <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleAssignmentResponse(deal.id, 'Rejected')}>
+                                <X className="w-4 h-4 mr-1" />
+                                Reject
+                              </Button>
+                            </>
+                           ) : (
+                             <>
+                              <Button variant="outline" size="sm" asChild>
+                                  <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
+                                      <Info className="w-4 h-4 mr-1" />
+                                      Details
+                                  </Link>
+                              </Button>
+                              {deal.status !== 'Closed' && (
+                                <Button variant="outline" size="sm" onClick={() => handleOpenUploadDialog(deal)}>
+                                    <FileUp className="w-4 h-4 mr-1" />
+                                    Upload Proof
+                                </Button>
+                              )}
+                             </>
+                           )}
                         </div>
                     </TableCell>
                   </TableRow>
