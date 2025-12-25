@@ -229,7 +229,7 @@ export default function DealsPage() {
                     </TableCell>
                      <TableCell>
                       {deal.brokerId && brokersMap.has(deal.brokerId) ? (
-                        <div className="flex items-center gap-3">
+                        <Link href={`/broker/${deal.brokerId}`} className="flex items-center gap-3 group">
                             <Avatar className="h-9 w-9">
                             <AvatarImage src={brokersMap.get(deal.brokerId)?.photoURL} />
                             <AvatarFallback>
@@ -237,10 +237,10 @@ export default function DealsPage() {
                             </AvatarFallback>
                             </Avatar>
                             <div>
-                            <p className="font-semibold">{brokersMap.get(deal.brokerId)?.fullName}</p>
+                            <p className="font-semibold group-hover:text-primary group-hover:underline">{brokersMap.get(deal.brokerId)?.fullName}</p>
                             <Badge variant="secondary">Assigned</Badge>
                             </div>
-                        </div>
+                        </Link>
                         ) : (
                            <span className="text-muted-foreground text-sm">Not Assigned</span>
                         )}
@@ -286,5 +286,3 @@ export default function DealsPage() {
     </div>
   );
 }
-
-    
