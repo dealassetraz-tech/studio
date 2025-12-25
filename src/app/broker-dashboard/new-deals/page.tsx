@@ -156,17 +156,11 @@ export default function NewDealsPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex gap-2 justify-center">
-                        <Button variant="outline" size="sm" asChild>
-                            <Link href={`/broker-dashboard/managed-deals/${prop.id}`}>
-                                <Info className="w-4 h-4 mr-1" />
-                                Details
-                            </Link>
-                        </Button>
-                        <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(prop.id, 'accepted')}>
+                        <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(prop.id, 'accepted')}>
                           <Check className="w-4 h-4 mr-1" />
                           Accept
                         </Button>
-                        <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleAssignmentResponse(prop.id, 'rejected')}>
+                        <Button variant="outline" size="sm" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleAssignmentResponse(prop.id, 'rejected')}>
                           <X className="w-4 h-4 mr-1" />
                           Reject
                         </Button>

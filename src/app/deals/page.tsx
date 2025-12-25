@@ -140,13 +140,13 @@ export default function DealsPage() {
         );
       case 'Accepted':
         return (
-          <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border border-primary/50">
+          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
             Accepted
           </Badge>
         );
       case 'Rejected':
         return (
-          <Badge variant="destructive" className="bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/50">
+          <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/50">
             Rejected
           </Badge>
         );

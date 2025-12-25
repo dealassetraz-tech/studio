@@ -224,7 +224,7 @@ export default function ManagedDealsPage() {
                                 Reject
                               </Button>
                             </>
-                           ) : (
+                           ) : deal.status === 'Active' ? (
                              <>
                               <Button variant="outline" size="sm" asChild>
                                   <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
@@ -232,14 +232,19 @@ export default function ManagedDealsPage() {
                                       Details
                                   </Link>
                               </Button>
-                              {deal.status !== 'Closed' && (
-                                <Button variant="outline" size="sm" onClick={() => handleOpenUploadDialog(deal)}>
-                                    <FileUp className="w-4 h-4 mr-1" />
-                                    Upload Proof
-                                </Button>
-                              )}
+                              <Button variant="outline" size="sm" onClick={() => handleOpenUploadDialog(deal)}>
+                                  <FileUp className="w-4 h-4 mr-1" />
+                                  Upload Proof
+                              </Button>
                              </>
-                           )}
+                           ) : deal.status === 'Closed' ? (
+                              <Button variant="outline" size="sm" asChild>
+                                <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
+                                    <Info className="w-4 h-4 mr-1" />
+                                    Details
+                                </Link>
+                              </Button>
+                           ) : null }
                         </div>
                     </TableCell>
                   </TableRow>
