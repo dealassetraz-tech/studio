@@ -57,7 +57,7 @@ export default function BrowsePropertiesPage() {
   const wishlist = userData?.wishlist || [];
   
   const [propertyTypeFilter, setPropertyTypeFilter] = useState('All');
-  const [priceRangeFilter, setPriceRangeFilter] = useState([30000000]);
+  const [priceRangeFilter, setPriceRangeFilter] = useState([200000000]);
   const [locationFilter, setLocationFilter] = useState('');
 
   const toggleWishlist = async (propertyId: string) => {
@@ -148,8 +148,8 @@ export default function BrowsePropertiesPage() {
             <div className="flex items-center gap-4 pt-2">
                 <Slider
                     id="price-filter"
-                    min={5000000}
-                    max={30000000}
+                    min={2000000}
+                    max={200000000}
                     step={100000}
                     value={priceRangeFilter}
                     onValueChange={setPriceRangeFilter}
