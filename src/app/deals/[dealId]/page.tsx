@@ -13,6 +13,7 @@ import { DealTimeline, DealStatus as SellerDealStatus } from '@/components/deal-
 import { BuyerDealTimeline, BuyerDealStatus } from '@/components/buyer-deal-timeline';
 import { useMemo, useState, useEffect } from 'react';
 import { useUser } from '@/firebase';
+import { cn } from '@/lib/utils';
 
 interface Deal {
   id: string;
@@ -309,5 +310,3 @@ export default function SellerDealTrackingPage() {
     </div>
   );
 }
-
-    
