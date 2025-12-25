@@ -13,14 +13,14 @@ export type BuyerDealStatus =
   | 'Approval Granted'
   | 'Deal Closed';
 
-const timelineSteps: {step: BuyerDealStatus, icon: React.ReactNode}[] = [
-  { step: 'Registered Interest', icon: <Heart className="w-5 h-5" /> },
-  { step: 'Broker Contacted', icon: <Users className="w-5 h-5" /> },
-  { step: 'Property Shortlisted', icon: <ClipboardCheck className="w-5 h-5" /> },
-  { step: 'Offer Placed', icon: <Handshake className="w-5 h-5" /> },
-  { step: 'Deal Review', icon: <Search className="w-5 h-5" /> },
-  { step: 'Approval Granted', icon: <Sparkles className="w-5 h-5" /> },
-  { step: 'Deal Closed', icon: <KeyRound className="w-5 h-5" /> },
+const timelineSteps: {step: BuyerDealStatus, description: string, icon: React.ReactNode}[] = [
+  { step: 'Registered Interest', description: 'Buyer shows interest', icon: <Heart className="w-5 h-5" /> },
+  { step: 'Broker Contacted', description: 'Broker connects with buyer', icon: <Users className="w-5 h-5" /> },
+  { step: 'Property Shortlisted', description: 'Buyer confirms property', icon: <ClipboardCheck className="w-5 h-5" /> },
+  { step: 'Offer Placed', description: 'Buyer submits offer', icon: <Handshake className="w-5 h-5" /> },
+  { step: 'Deal Review', description: 'Parties validate deal', icon: <Search className="w-5 h-5" /> },
+  { step: 'Approval Granted', description: 'Approval success', icon: <Sparkles className="w-5 h-5" /> },
+  { step: 'Deal Closed', description: 'Payment and closure complete', icon: <KeyRound className="w-5 h-5" /> },
 ];
 
 interface BuyerDealTimelineProps {
