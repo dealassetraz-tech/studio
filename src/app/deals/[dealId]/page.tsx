@@ -9,8 +9,6 @@ import { ArrowLeft, Building, User as UserIcon, IndianRupee, Briefcase, Clock, M
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { DealTimeline, DealStatus as SellerDealStatus } from '@/components/deal-timeline';
-import { BuyerDealTimeline, BuyerDealStatus } from '@/components/buyer-deal-timeline';
 import { useMemo, useState, useEffect } from 'react';
 import { useUser } from '@/firebase';
 import { cn } from '@/lib/utils';
@@ -79,35 +77,6 @@ const logIcons: Record<LogEvent, React.ReactElement> = {
     "Deal approved": <CheckCircle className="w-5 h-5 text-emerald-500" />,
 };
 
-const getSellerTimelineStatus = (logs: DealLog[] | null, dealStatus: Deal['status']): SellerDealStatus => {
-    if (!logs) return 'Property Posted';
-    const events = logs.map(log => log.event).reverse(); // Oldest first
-
-    if (dealStatus === 'Closed') return 'Deal Closed';
-    if (events.includes('Deal approved')) return 'Approval Granted';
-    if (events.includes('Requested closure') || events.includes('Uploaded closure proof')) return 'Deal Closure Approval';
-    if (dealStatus === 'Active') return 'Got Buyer';
-    if (events.includes('Assigned to deal')) return 'Broker Assigned';
-
-    return 'Property Posted';
-}
-
-const getBuyerTimelineStatus = (dealStatus: Deal['status']): BuyerDealStatus => {
-    switch (dealStatus) {
-        case 'Closed':
-            return 'Deal Closed';
-        case 'Active':
-            return 'Approval Granted';
-        case 'Accepted':
-            return 'Deal Review';
-        case 'Pending':
-        case 'Pending Approval':
-            return 'Offer Placed';
-        default:
-            return 'Registered Interest';
-    }
-}
-
 
 export default function SellerDealTrackingPage() {
   const router = useRouter();
@@ -128,6 +97,7 @@ export default function SellerDealTrackingPage() {
   const userRole = useMemo(() => {
     // This is a simplified role detection for mock purposes.
     // In a real app, this would come from the user's profile in the database.
+    if (typeof window === 'undefined') return 'seller';
     const path = window.location.pathname;
     if (path.includes('buyer-dashboard')) return 'buyer';
     if (path.includes('broker-dashboard')) return 'broker';
@@ -141,10 +111,6 @@ export default function SellerDealTrackingPage() {
     
     return 'seller'; // Default for generic /deals/[dealId] path
   }, [user, deal]);
-
-  const sellerTimelineStatus = useMemo(() => getSellerTimelineStatus(logs, deal?.status), [logs, deal?.status]);
-  const buyerTimelineStatus = useMemo(() => getBuyerTimelineStatus(deal?.status), [deal?.status]);
-
 
   const renderSkeleton = () => (
     <div className="space-y-8">
@@ -201,16 +167,6 @@ export default function SellerDealTrackingPage() {
         </Button>
       </div>
       
-       {userRole !== 'buyer' && (
-         <Card className="mb-8">
-              <CardHeader>
-                  <CardTitle>Deal Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                  <DealTimeline currentStatus={sellerTimelineStatus} />
-              </CardContent>
-          </Card>
-        )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className={cn("space-y-8", userRole === 'buyer' ? 'lg:col-span-3' : 'lg:col-span-2')}>
@@ -317,5 +273,3 @@ export default function SellerDealTrackingPage() {
     </div>
   );
 }
-
-    
