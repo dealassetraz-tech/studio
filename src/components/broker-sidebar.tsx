@@ -7,6 +7,9 @@ import {
   Handshake,
   LogOut,
   LayoutDashboard,
+  Clock,
+  CheckCircle,
+  Archive,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth, useUser } from '@/firebase';
@@ -17,7 +20,9 @@ import { useEffect, useState } from 'react';
 
 const navLinks = [
   { href: '/broker-dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-  { href: '/broker-dashboard/managed-deals', label: 'Manage Deals', icon: <Handshake className="w-5 h-5" /> },
+  { href: '/broker-dashboard/active-deals', label: 'Active Deals', icon: <Handshake className="w-5 h-5" /> },
+  { href: '/broker-dashboard/pending-deals', label: 'Pending Deals', icon: <Clock className="w-5 h-5" /> },
+  { href: '/broker-dashboard/closed-deals', label: 'Closed Deals', icon: <Archive className="w-5 h-5" /> },
 ];
 
 export function BrokerSidebar() {
@@ -70,7 +75,7 @@ export function BrokerSidebar() {
             href={link.href}
             className={cn(
               'flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-              pathname === link.href
+              pathname.startsWith(link.href)
                 ? 'bg-primary text-primary-foreground'
                 : 'text-muted-foreground hover:bg-accent'
             )}

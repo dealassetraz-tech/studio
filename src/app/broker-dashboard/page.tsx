@@ -72,7 +72,7 @@ export default function BrokerDashboard() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/broker-dashboard/managed-deals">
+          <Link href="/broker-dashboard/active-deals">
             <Handshake className="mr-2 h-4 w-4" /> Manage Deals
           </Link>
         </Button>

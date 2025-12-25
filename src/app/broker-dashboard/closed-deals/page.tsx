@@ -49,11 +49,12 @@ const initialMockDeals: Deal[] = [
     { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
     { id: 'deal3', property: { address: '45, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/prop4/100/100' }, seller: { name: 'Rohan M.', avatar: 'https://picsum.photos/seed/seller3/100/100' }, buyer: { name: 'Suresh P.', avatar: 'https://picsum.photos/seed/buyerC/100/100' }, offerPrice: 119000000, status: 'Closed', commission: 2.5 },
     { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
+    { id: 'deal5', property: { address: 'Independent House, Indiranagar, Bengaluru', image: 'https://picsum.photos/seed/prop6/100/100' }, seller: { name: 'Anjali R.', avatar: 'https://picsum.photos/seed/seller5/100/100' }, buyer: { name: 'Deepak S.', avatar: 'https://picsum.photos/seed/buyerE/100/100' }, offerPrice: 105000000, status: 'Rejected', commission: 2.0 },
 ];
 
 const SESSION_STORAGE_KEY = 'managedDealsMockData';
 
-export default function ActiveDealsPage() {
+export default function ClosedDealsPage() {
   const router = useRouter();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,20 +64,28 @@ export default function ActiveDealsPage() {
     try {
       const storedDeals = sessionStorage.getItem(SESSION_STORAGE_KEY);
       const allDeals = storedDeals ? JSON.parse(storedDeals) : initialMockDeals;
-      setDeals(allDeals.filter((d: Deal) => d.status === 'Active' || d.status === 'Accepted'));
-      
+      setDeals(allDeals.filter((d: Deal) => d.status === 'Closed' || d.status === 'Rejected' || d.status === 'Cancelled'));
       if (!storedDeals) {
         sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(initialMockDeals));
       }
     } catch (error) {
       console.error("Could not load deals from session storage", error);
-      setDeals(initialMockDeals.filter((d: Deal) => d.status === 'Active' || d.status === 'Accepted'));
+      setDeals(initialMockDeals.filter((d: Deal) => d.status === 'Closed' || d.status === 'Rejected' || d.status === 'Cancelled'));
     }
     setIsLoading(false);
   }, []);
 
   const getStatusBadge = (status: DealStatus) => {
-    return <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 border-blue-500/20">Active</Badge>;
+    switch (status) {
+      case 'Closed':
+        return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Closed</Badge>;
+      case 'Rejected':
+        return <Badge variant="destructive">Rejected</Badge>;
+      case 'Cancelled':
+         return <Badge variant="secondary">Cancelled</Badge>;
+      default:
+         return <Badge variant="secondary">{status}</Badge>;
+    }
   };
 
   const renderSkeleton = () => (
@@ -96,9 +105,9 @@ export default function ActiveDealsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-            <h1 className="text-3xl font-bold font-headline">Active Deals</h1>
+            <h1 className="text-3xl font-bold font-headline">Closed Deals</h1>
             <p className="text-muted-foreground">
-            Oversee and facilitate all your ongoing deals.
+              A historical record of your completed and terminated deals.
             </p>
         </div>
         <Button variant="outline" onClick={() => router.back()}>
@@ -109,9 +118,9 @@ export default function ActiveDealsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Deals</CardTitle>
+          <CardTitle>Deal History</CardTitle>
           <CardDescription>
-            A comprehensive list of deals you are actively brokering.
+            A comprehensive list of all past deals.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -169,7 +178,7 @@ export default function ActiveDealsPage() {
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
                         <div className='flex items-center justify-center gap-2'>
-                           <Button variant="outline" size="sm" asChild>
+                          <Button variant="outline" size="sm" asChild>
                             <Link href={`/broker-dashboard/active-deals/${deal.id}`}>
                                 <Info className="w-4 h-4 mr-1" />
                                 Details
@@ -184,9 +193,9 @@ export default function ActiveDealsPage() {
              {!isLoading && (!deals || deals.length === 0) && (
                 <div className="h-64 flex flex-col items-center justify-center text-center">
                     <Handshake className="w-12 h-12 text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-semibold text-foreground">No Active Deals Found</h3>
+                    <h3 className="text-xl font-semibold text-foreground">No Closed Deals Found</h3>
                     <p className="text-muted-foreground mt-2">
-                        You are not currently managing any active deals.
+                        You have not completed or terminated any deals yet.
                     </p>
                 </div>
             )}
