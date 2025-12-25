@@ -235,10 +235,6 @@ export default function ManagedDealsPage() {
                                       Details
                                   </Link>
                               </Button>
-                              <Button variant="outline" size="sm" onClick={() => handleOpenUploadDialog(deal)}>
-                                  <FileUp className="w-4 h-4 mr-1" />
-                                  Upload Proof
-                              </Button>
                              </>
                            ) : (deal.status === 'Closed' || deal.status === 'Accepted') ? (
                               <Button variant="outline" size="sm" asChild>
@@ -270,5 +266,6 @@ export default function ManagedDealsPage() {
   );
 }
 
+    
     
     
