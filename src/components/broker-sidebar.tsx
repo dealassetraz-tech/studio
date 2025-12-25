@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,7 +17,7 @@ import { useEffect, useState } from 'react';
 
 const navLinks = [
   { href: '/broker-dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-  { href: '/broker-dashboard/managed-deals', label: 'Managed Deals', icon: <Handshake className="w-5 h-5" /> },
+  { href: '/broker-dashboard/managed-deals', label: 'Manage Deals', icon: <Handshake className="w-5 h-5" /> },
 ];
 
 export function BrokerSidebar() {
