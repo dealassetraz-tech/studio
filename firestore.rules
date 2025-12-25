@@ -147,7 +147,19 @@ service cloud.firestore {
       allow delete: if isContentOwner();
     }
     match /deals/{dealId} {
-      allow list: if isSignedIn();
+      allow read, list: if isSignedIn();
+
+      /**
+       * @description Controls access to the logs for a specific deal.
+       * @path /deals/{dealId}/logs/{logId}
+       * @allow The assigned broker can read and create logs for the deal.
+       * @deny Other users cannot access the logs.
+       */
+      match /logs/{logId} {
+        allow read, create: if isSignedIn() && get(/databases/$(database)/documents/deals/$(dealId)).data.brokerId == request.auth.uid;
+        allow list: if isSignedIn() && get(/databases/$(database)/documents/deals/$(dealId)).data.brokerId == request.auth.uid;
+        allow update, delete: if false; // Logs should be immutable
+      }
     }
      match /buyer_requests/{requestId} {
       allow list: if isSignedIn();

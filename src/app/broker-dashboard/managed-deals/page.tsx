@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -24,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, Info, Handshake } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
+import Link from 'next/link';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -161,9 +163,11 @@ export default function ManagedDealsPage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
-                        <Button variant="outline" size="sm">
-                            <Info className="w-4 h-4 mr-1" />
-                            Details
+                        <Button variant="outline" size="sm" asChild>
+                           <Link href={`/broker-dashboard/managed-deals/${deal.id}`}>
+                                <Info className="w-4 h-4 mr-1" />
+                                Details
+                            </Link>
                         </Button>
                     </TableCell>
                   </TableRow>
