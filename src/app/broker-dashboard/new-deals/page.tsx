@@ -34,7 +34,7 @@ interface Property {
   ownerId: string;
 }
 
-export default function PendingDealsPage() {
+export default function NewDealsPage() {
   const router = useRouter();
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
@@ -93,7 +93,7 @@ export default function PendingDealsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline">Pending Deal Assignments</h1>
+          <h1 className="text-3xl font-bold font-headline">New Deal Assignments</h1>
           <p className="text-muted-foreground">
             Review and respond to new property brokerage requests.
           </p>
@@ -176,7 +176,7 @@ export default function PendingDealsPage() {
             {!isLoading && (!properties || properties.length === 0) && (
               <div className="h-64 flex flex-col items-center justify-center text-center">
                 <Bell className="w-12 h-12 text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold text-foreground">No Pending Assignments</h3>
+                <h3 className="text-xl font-semibold text-foreground">No New Assignments</h3>
                 <p className="text-muted-foreground mt-2">
                   You have no new brokerage requests at this time.
                 </p>
