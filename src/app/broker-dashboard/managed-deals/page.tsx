@@ -218,11 +218,11 @@ export default function ManagedDealsPage() {
                                   Details
                                 </Link>
                               </Button>
-                              <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(deal.id, 'Active')}>
+                              <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(deal.id, 'Active')}>
                                 <Check className="w-4 h-4 mr-1" />
                                 Accept
                               </Button>
-                              <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleAssignmentResponse(deal.id, 'Rejected')}>
+                              <Button variant="outline" size="sm" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleAssignmentResponse(deal.id, 'Rejected')}>
                                 <X className="w-4 h-4 mr-1" />
                                 Reject
                               </Button>

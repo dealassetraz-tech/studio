@@ -251,20 +251,26 @@ export default function DealsPage() {
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
                       <div className="flex gap-2 justify-center">
-                        <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleDealStatusChange(deal.id, 'Accepted')}>
-                            <Check className="w-4 h-4 mr-1" />
-                            Accept
-                        </Button>
-                        <Button variant="outline" size="sm" className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDealStatusChange(deal.id, 'Rejected')}>
-                            <X className="w-4 h-4 mr-1" />
-                            Reject
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/deals/${deal.id}`}>
-                            <AreaChart className="w-4 h-4 mr-1" />
-                            Track Deal
-                          </Link>
-                        </Button>
+                        {deal.status === 'Pending' && (
+                          <>
+                            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleDealStatusChange(deal.id, 'Accepted')}>
+                                <Check className="w-4 h-4 mr-1" />
+                                Accept
+                            </Button>
+                            <Button variant="outline" size="sm" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDealStatusChange(deal.id, 'Rejected')}>
+                                <X className="w-4 h-4 mr-1" />
+                                Reject
+                            </Button>
+                          </>
+                        )}
+                        {(deal.status === 'Accepted' || deal.status === 'Active' || deal.status === 'Closed') && (
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/deals/${deal.id}`}>
+                                <AreaChart className="w-4 h-4 mr-1" />
+                                Track Deal
+                              </Link>
+                            </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
