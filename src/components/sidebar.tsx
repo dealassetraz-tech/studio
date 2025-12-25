@@ -15,6 +15,7 @@ import { useAuth, useUser } from "@/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { DealLockLogo } from "./deallock-logo";
+import { useEffect, useState } from "react";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -27,6 +28,11 @@ export function Sidebar() {
   const auth = useAuth();
   const { user } = useUser();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -52,9 +58,11 @@ export function Sidebar() {
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
           </div>
-          <div className="mt-4">
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-500/10 text-green-500">Seller</span>
-          </div>
+          {isMounted && (
+            <div className="mt-4">
+                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-500/10 text-green-500">Seller</span>
+            </div>
+          )}
         </div>
       )}
 
