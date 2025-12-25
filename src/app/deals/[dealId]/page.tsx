@@ -192,18 +192,16 @@ export default function SellerDealTrackingPage() {
         </Button>
       </div>
       
-       <Card className="mb-8">
-            <CardHeader>
-                <CardTitle>Deal Progress</CardTitle>
-            </CardHeader>
-            <CardContent>
-                {userRole === 'buyer' ? (
-                     <BuyerDealTimeline currentStatus={buyerTimelineStatus} />
-                ) : (
-                    <DealTimeline currentStatus={sellerTimelineStatus} />
-                )}
-            </CardContent>
-        </Card>
+       {userRole !== 'buyer' && (
+         <Card className="mb-8">
+              <CardHeader>
+                  <CardTitle>Deal Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                  <DealTimeline currentStatus={sellerTimelineStatus} />
+              </CardContent>
+          </Card>
+        )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className={cn("space-y-8", userRole === 'buyer' ? 'lg:col-span-3' : 'lg:col-span-2')}>
@@ -310,3 +308,5 @@ export default function SellerDealTrackingPage() {
     </div>
   );
 }
+
+    
