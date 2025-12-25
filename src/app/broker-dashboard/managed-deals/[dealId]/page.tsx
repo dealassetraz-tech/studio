@@ -144,6 +144,8 @@ export default function DealDetailsPage() {
   const [deal, setDeal] = useState<Deal | null>(null);
   const [logs, setLogs] = useState<DealLog[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [initiatedDeals, setInitiatedDeals] = useState<string[]>([]);
+
 
   useEffect(() => {
     setIsLoading(true);
@@ -189,6 +191,37 @@ export default function DealDetailsPage() {
         toast.success("Closure proof attached!", { id: toastId });
         setIsUploadDialogOpen(false);
     }, 500);
+  };
+  
+  const handleInitiateDeal = (matchId: string, buyerName: string) => {
+    if (!deal) return;
+
+    const toastId = toast.loading(`Initiating deal for ${buyerName}...`);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setInitiatedDeals(prev => [...prev, matchId]);
+      
+      const newDeal = {
+        id: `deal${Date.now()}`,
+        property: deal.property,
+        seller: deal.seller,
+        buyer: { name: buyerName, avatar: 'https://picsum.photos/seed/newbuyer/100/100' },
+        offerPrice: deal.property.price,
+        status: 'Pending Approval',
+        commission: deal.commission,
+      };
+
+      try {
+        const storedDeals = JSON.parse(sessionStorage.getItem('managedDealsMockData') || '[]');
+        const updatedDeals = [...storedDeals, newDeal];
+        sessionStorage.setItem('managedDealsMockData', JSON.stringify(updatedDeals));
+        toast.success("Deal submitted for admin approval.", { id: toastId });
+      } catch (error) {
+        toast.error("Could not save new deal.", { id: toastId });
+      }
+
+    }, 1000);
   };
 
   const renderSkeleton = () => (
@@ -345,9 +378,9 @@ export default function DealDetailsPage() {
                             <div className="flex items-center gap-2"><IndianRupee className="w-4 h-4 text-muted-foreground" /> <span>Budget: ~₹{match.requirements.budget.toLocaleString('en-IN')}</span></div>
                         </CardContent>
                         <div className="p-4 pt-0 text-right">
-                            <Button size="sm">
+                            <Button size="sm" onClick={() => handleInitiateDeal(match.id, match.buyer.name)} disabled={initiatedDeals.includes(match.id)}>
                                 <LinkIcon className="w-4 h-4 mr-2" />
-                                Initiate Deal
+                                {initiatedDeals.includes(match.id) ? 'Pending Approval...' : 'Initiate Deal'}
                             </Button>
                         </div>
                     </Card>
@@ -375,3 +408,5 @@ export default function DealDetailsPage() {
     </div>
   );
 }
+
+    
