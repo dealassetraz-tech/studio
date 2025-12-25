@@ -46,6 +46,12 @@ export function SignInForm() {
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
+      if (user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+        toast.success("Admin signed in successfully!", { id: toastId });
+        router.push("/admin-dashboard");
+        return;
+      }
+
       // Fetch user role from Firestore
       const userDocRef = doc(firestore, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
