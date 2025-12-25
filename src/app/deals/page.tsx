@@ -21,10 +21,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowUpDown, Building, User, Check, X, ArrowLeft } from 'lucide-react';
+import { ArrowUpDown, Building, User, Check, X, ArrowLeft, AreaChart } from 'lucide-react';
 import { useCollection, useFirestore, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
 import { collection, query, where, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled';
 
@@ -240,8 +241,15 @@ export default function DealsPage() {
                             Reject
                           </Button>
                         </div>
+                      ) : deal.status === 'Accepted' || deal.status === 'Active' || deal.status === 'Closed' ? (
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/deals/${deal.id}`}>
+                            <AreaChart className="w-4 h-4 mr-1" />
+                            Track Deal
+                          </Link>
+                        </Button>
                       ) : (
-                        <Button variant="outline" size="sm" disabled>
+                         <Button variant="outline" size="sm" disabled>
                           Viewed
                         </Button>
                       )}
