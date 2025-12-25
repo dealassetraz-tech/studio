@@ -12,8 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Building, IndianRupee, Link as LinkIcon, Shuffle, Bed, Bath, MapPin } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query } from 'firebase/firestore';
+import { useUser } from '@/firebase';
 
 interface Requirement {
     location: string;
@@ -106,24 +105,10 @@ const findMatches = (buyers: BuyerRequest[], sellers: SellerListing[]): Match[] 
 
 export default function MatchingRequestsPage() {
     const router = useRouter();
-    const firestore = useFirestore();
     const { user } = useUser();
 
-    // In a real app, you would have collections for buyer_requests and seller_listings
-    const buyerRequestsQuery = useMemoFirebase(() => {
-        if (!firestore || !user) return null;
-        return collection(firestore, 'buyer_requests');
-    }, [firestore, user]);
-    const { data: buyers, isLoading: buyersLoading } = useCollection<BuyerRequest>(buyerRequestsQuery);
-
-    const sellerListingsQuery = useMemoFirebase(() => {
-        if (!firestore || !user) return null;
-        return collection(firestore, 'seller_listings');
-    }, [firestore, user]);
-    const { data: sellers, isLoading: sellersLoading } = useCollection<SellerListing>(sellerListingsQuery);
-    
-    // For demo, using mock data as Firestore collections are not populated.
-    const isLoading = false; // buyersLoading || sellersLoading;
+    // For this example, we'll use mock data directly instead of fetching from Firestore.
+    const isLoading = false;
     const matches = findMatches(mockBuyerRequests, mockSellerListings);
 
     const renderSkeleton = () => (
