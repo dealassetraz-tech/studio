@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Building, Handshake, Shield, User, Briefcase } from 'lucide-react';
+import { Building, Handshake, Shield, User, Briefcase, ArrowRightLeft } from 'lucide-react';
 import Link from 'next/link';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled' | 'Pending Approval';
@@ -130,11 +130,15 @@ export default function AdminDealsPage() {
                                 <Avatar className="h-8 w-8"><AvatarImage src={deal.seller.avatar} /><AvatarFallback>{deal.seller.name.charAt(0)}</AvatarFallback></Avatar>
                             </div>
                             <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
-                             <div className="flex items-center gap-2" title={`Broker: ${deal.broker.name}`}>
-                                <Briefcase className="w-4 h-4 text-muted-foreground" />
-                                <Avatar className="h-8 w-8"><AvatarImage src={deal.broker.avatar} /><AvatarFallback>{deal.broker.name.charAt(0)}</AvatarFallback></Avatar>
-                            </div>
-                             <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
+                             {deal.broker && (
+                                <>
+                                    <div className="flex items-center gap-2" title={`Broker: ${deal.broker.name}`}>
+                                        <Briefcase className="w-4 h-4 text-muted-foreground" />
+                                        <Avatar className="h-8 w-8"><AvatarImage src={deal.broker.avatar} /><AvatarFallback>{deal.broker.name.charAt(0)}</AvatarFallback></Avatar>
+                                    </div>
+                                    <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
+                                </>
+                             )}
                              <div className="flex items-center gap-2" title={`Buyer: ${deal.buyer.name}`}>
                                 <User className="w-4 h-4 text-muted-foreground" />
                                 <Avatar className="h-8 w-8"><AvatarImage src={deal.buyer.avatar} /><AvatarFallback>{deal.buyer.name.charAt(0)}</AvatarFallback></Avatar>
@@ -183,5 +187,3 @@ function ArrowRightLeft({className}: {className?: string}) {
       </svg>
     );
 }
-
-
