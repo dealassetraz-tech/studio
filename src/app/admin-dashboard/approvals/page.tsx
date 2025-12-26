@@ -52,14 +52,16 @@ export default function AdminApprovalsPage() {
     try {
       const storedDeals = sessionStorage.getItem(SESSION_STORAGE_KEY);
       const allDeals = storedDeals ? JSON.parse(storedDeals) : initialMockDeals;
-      setDeals(allDeals.filter((d: Deal) => d.status === 'Accepted'));
+      // Filter for accepted deals AND ensure broker exists
+      setDeals(allDeals.filter((d: Deal) => d.status === 'Accepted' && d.broker));
 
       if (!storedDeals) {
         sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(initialMockDeals));
       }
     } catch (error) {
       console.error("Could not load deals from session storage", error);
-      setDeals(initialMockDeals.filter((d: Deal) => d.status === 'Accepted'));
+      // Filter initial mock data as a fallback
+      setDeals(initialMockDeals.filter((d: Deal) => d.status === 'Accepted' && d.broker));
     }
     setIsLoading(false);
   }, []);
@@ -77,7 +79,8 @@ export default function AdminApprovalsPage() {
     
     const updatedDeals = allDeals.map(d => d.id === dealId ? {...d, status: newStatus} : d);
     
-    setDeals(updatedDeals.filter(d => d.status === 'Accepted'));
+    // After updating, filter again for the view
+    setDeals(updatedDeals.filter(d => d.status === 'Accepted' && d.broker));
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedDeals));
     
     toast.success(`Deal has been ${newStatus === 'Active' ? 'approved' : 'rejected'}.`, { id: toastId });
