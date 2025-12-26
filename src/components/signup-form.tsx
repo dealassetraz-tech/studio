@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Building, Home, User, CheckCircle } from "lucide-react";
+import { Building, Home, User, CheckCircle, Shield } from "lucide-react";
 import Link from "next/link";
 import { DealLockLogo } from "./deallock-logo";
 import { useAuth, useFirestore } from "@/firebase";
@@ -36,7 +36,7 @@ const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-  role: z.enum(["seller", "buyer", "broker"], {
+  role: z.enum(["seller", "buyer", "broker", "admin"], {
     required_error: "You need to select a role.",
   }),
 });
@@ -59,6 +59,12 @@ const roles = [
         label: "Broker",
         description: "Facilitate property transactions",
         icon: <User className="w-6 h-6 text-primary" />,
+    },
+    {
+        value: "admin",
+        label: "Admin",
+        description: "Manage the platform and users",
+        icon: <Shield className="w-6 h-6 text-primary" />,
     }
 ]
 
@@ -106,7 +112,10 @@ export function SignUpForm() {
         router.push("/buyer-dashboard");
       } else if (values.role === 'broker') {
         router.push("/broker-dashboard");
-      } else {
+      } else if (values.role === 'admin') {
+        router.push("/admin-dashboard");
+      }
+      else {
         router.push("/dashboard");
       }
 
