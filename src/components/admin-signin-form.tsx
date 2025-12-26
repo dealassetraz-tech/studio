@@ -51,7 +51,11 @@ export function AdminSignInForm() {
       router.push("/admin-dashboard");
     } catch (error: any) {
       console.error("Admin sign in error:", error);
-      toast.error(error.message || "Failed to sign in.", { id: toastId });
+      if (error.code === 'auth/invalid-credential') {
+        toast.error("Invalid credentials. Please check your email and password.", { id: toastId });
+      } else {
+        toast.error(error.message || "Failed to sign in.", { id: toastId });
+      }
     }
   }
 
