@@ -19,8 +19,10 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Building, Handshake, Shield, User, Briefcase, ArrowRightLeft } from 'lucide-react';
+import { Building, Handshake, Shield, User, Briefcase, ArrowRightLeft, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled' | 'Pending Approval';
 
@@ -45,6 +47,7 @@ const initialMockDeals: Deal[] = [
 const SESSION_STORAGE_KEY = 'managedDealsMockData';
 
 export default function AdminDealsPage() {
+  const router = useRouter();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -90,9 +93,15 @@ export default function AdminDealsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-headline">All Deals</h1>
-        <p className="text-muted-foreground">Monitor all deals across the platform.</p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold font-headline">All Deals</h1>
+          <p className="text-muted-foreground">Monitor all deals across the platform.</p>
+        </div>
+        <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+        </Button>
       </div>
 
       <Card>
