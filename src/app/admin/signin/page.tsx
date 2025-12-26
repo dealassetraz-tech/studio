@@ -1,26 +1,45 @@
-
 'use client';
 
 import { AdminSignInForm } from "@/components/admin-signin-form";
 import AuthLayout from "../../auth/layout";
-import { useUser } from "@/firebase";
+import { useFirestore, useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function AdminSignInPage() {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isCheckingRole, setIsCheckingRole] = useState(true);
 
   useEffect(() => {
-    // If user is loaded and they are the admin, redirect to dashboard
-    if (!isUserLoading && user && user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-      router.push('/admin-dashboard');
+    if (isUserLoading) {
+      return;
     }
-  }, [user, isUserLoading, router]);
+    if (!user) {
+      setIsCheckingRole(false);
+      return;
+    }
 
-  // If we are checking for user, or if user is admin and we are redirecting, show loading state
-  if (isUserLoading || (user && user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL)) {
+    const checkAdminRole = async () => {
+      const userDocRef = doc(firestore, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists() && userDoc.data().role === 'admin') {
+        setIsAdmin(true);
+        router.push('/admin-dashboard');
+      } else {
+        setIsAdmin(false);
+      }
+      setIsCheckingRole(false);
+    };
+
+    checkAdminRole();
+  }, [user, isUserLoading, router, firestore]);
+
+  if (isUserLoading || isCheckingRole || isAdmin) {
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="w-full max-w-md p-8 space-y-8">

@@ -17,10 +17,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DealLockLogo } from "./deallock-logo";
 import Link from "next/link";
-import { useAuth } from "@/firebase";
+import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { doc, getDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -29,26 +30,33 @@ const formSchema = z.object({
 
 export function AdminSignInForm() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
+      email: "",
       password: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (values.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-        toast.error("This is not a valid admin email address.");
-        return;
-    }
-
     const toastId = toast.loading('Signing in as admin...');
     try {
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      toast.success("Admin signed in successfully!", { id: toastId });
-      router.push("/admin-dashboard");
+      const user = userCredential.user;
+
+      const userDocRef = doc(firestore, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists() && userDoc.data().role === 'admin') {
+        toast.success("Admin signed in successfully!", { id: toastId });
+        router.push("/admin-dashboard");
+      } else {
+        await auth.signOut();
+        toast.error("This account does not have admin privileges.", { id: toastId });
+      }
+      
     } catch (error: any) {
       console.error("Admin sign in error:", error);
       if (error.code === 'auth/invalid-credential') {
@@ -78,7 +86,7 @@ export function AdminSignInForm() {
                 <FormItem>
                   <FormLabel>Admin Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="admin@deallock.com" {...field} readOnly={!!process.env.NEXT_PUBLIC_ADMIN_EMAIL} />
+                    <Input placeholder="admin@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
