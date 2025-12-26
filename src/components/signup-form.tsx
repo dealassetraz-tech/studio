@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Building, Home, User, CheckCircle, Shield } from "lucide-react";
+import { Building, Home, User, CheckCircle, Shield, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { DealLockLogo } from "./deallock-logo";
 import { useAuth, useFirestore } from "@/firebase";
@@ -36,7 +36,7 @@ const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-  role: z.enum(["seller", "buyer", "broker", "admin"], {
+  role: z.enum(["seller", "buyer", "broker"], {
     required_error: "You need to select a role.",
   }),
 });
@@ -60,12 +60,6 @@ const roles = [
         description: "Facilitate property transactions",
         icon: <User className="w-6 h-6 text-primary" />,
     },
-    {
-        value: "admin",
-        label: "Admin",
-        description: "Manage the platform and users",
-        icon: <Shield className="w-6 h-6 text-primary" />,
-    }
 ]
 
 export function SignUpForm() {
@@ -73,6 +67,7 @@ export function SignUpForm() {
   const firestore = useFirestore();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -112,10 +107,7 @@ export function SignUpForm() {
         router.push("/buyer-dashboard");
       } else if (values.role === 'broker') {
         router.push("/broker-dashboard");
-      } else if (values.role === 'admin') {
-        router.push("/admin-dashboard");
-      }
-      else {
+      } else {
         router.push("/dashboard");
       }
 
@@ -220,7 +212,20 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="********" {...field} />
+                     <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="********"
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
