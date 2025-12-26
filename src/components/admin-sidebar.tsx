@@ -31,10 +31,7 @@ export function AdminSidebar() {
 
   useEffect(() => {
     setIsMounted(true);
-    if (user && user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-        router.push('/admin/signin');
-    }
-  }, [user, router]);
+  }, []);
 
   const handleSignOut = async () => {
     await auth.signOut();
