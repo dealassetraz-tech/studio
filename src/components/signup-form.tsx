@@ -36,7 +36,7 @@ const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-  role: z.enum(["seller", "buyer", "broker"], {
+  role: z.enum(["seller", "buyer", "broker", "admin"], {
     required_error: "You need to select a role.",
   }),
 });
@@ -59,6 +59,12 @@ const roles = [
         label: "Broker",
         description: "Facilitate property transactions",
         icon: <User className="w-6 h-6 text-primary" />,
+    },
+    {
+        value: "admin",
+        label: "Admin",
+        description: "Manage the platform and users",
+        icon: <Shield className="w-6 h-6 text-primary" />,
     },
 ]
 
@@ -107,13 +113,19 @@ export function SignUpForm() {
         router.push("/buyer-dashboard");
       } else if (values.role === 'broker') {
         router.push("/broker-dashboard");
+      } else if (values.role === 'admin') {
+          router.push('/admin-dashboard');
       } else {
         router.push("/dashboard");
       }
 
     } catch (error: any) {
       console.error("Sign up error:", error);
-      toast.error(error.message || "Failed to create account.", { id: toastId });
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error("An account with this email already exists. Please sign in.", { id: toastId });
+      } else {
+        toast.error(error.message || "Failed to create account.", { id: toastId });
+      }
     }
   }
 
@@ -158,7 +170,7 @@ export function SignUpForm() {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="flex flex-col space-y-3"
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
                     >
                         {roles.map(role => (
                             <FormItem key={role.value}>
@@ -179,8 +191,8 @@ export function SignUpForm() {
                                     </div>
 
                                     {isMounted && field.value === role.value && 
-                                        <div className="absolute top-4 right-4">
-                                            <CheckCircle className="w-6 h-6 text-primary" />
+                                        <div className="absolute top-2 right-2">
+                                            <CheckCircle className="w-5 h-5 text-primary" />
                                         </div>
                                     }
                                 </Label>

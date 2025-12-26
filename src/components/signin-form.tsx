@@ -81,7 +81,7 @@ export function SignInForm() {
     } catch (error: any) {
       console.error("Sign in error:", error);
       if (error.code === 'auth/invalid-credential') {
-        toast.error("Invalid email or password. If you are an admin, please use the admin sign-in page.", { id: toastId });
+        toast.error("Invalid email or password. Please check your credentials.", { id: toastId });
       } else {
         toast.error(error.message || "Failed to sign in.", { id: toastId });
       }
