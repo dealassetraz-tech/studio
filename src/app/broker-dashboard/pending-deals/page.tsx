@@ -77,7 +77,7 @@ export default function PendingDealsPage() {
     setIsLoading(false);
   }, []);
   
-  const handleAssignmentResponse = async (dealId: string, status: 'Active' | 'Rejected') => {
+  const handleAssignmentResponse = async (dealId: string, status: 'Accepted' | 'Rejected') => {
     const toastId = toast.loading(`Updating assignment to ${status}...`);
     
     let allDeals: Deal[] = [];
@@ -93,11 +93,7 @@ export default function PendingDealsPage() {
     setDeals(updatedDeals.filter(d => d.status === 'Pending Approval'));
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedDeals));
     
-    toast.success('Assignment updated!', { id: toastId });
-    
-    if (status === 'Active') {
-      router.push(`/broker-dashboard/active-deals/${dealId}`);
-    }
+    toast.success('Assignment updated! The deal now requires admin approval.', { id: toastId });
   };
 
   const getStatusBadge = (status: DealStatus) => {
@@ -194,7 +190,7 @@ export default function PendingDealsPage() {
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="text-center">
                         <div className='flex items-center justify-center gap-2'>
-                           <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(deal.id, 'Active')}>
+                           <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={() => handleAssignmentResponse(deal.id, 'Accepted')}>
                             <Check className="w-4 h-4 mr-1" />
                             Accept
                           </Button>

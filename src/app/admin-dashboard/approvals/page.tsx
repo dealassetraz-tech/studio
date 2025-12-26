@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -37,6 +36,7 @@ interface Deal {
 const initialMockDeals: Deal[] = [
     { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, offerPrice: 148000000, status: 'Active' },
     { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval' },
+    { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
 ];
 
 const SESSION_STORAGE_KEY = 'managedDealsMockData';
@@ -50,14 +50,14 @@ export default function AdminApprovalsPage() {
     try {
       const storedDeals = sessionStorage.getItem(SESSION_STORAGE_KEY);
       const allDeals = storedDeals ? JSON.parse(storedDeals) : initialMockDeals;
-      setDeals(allDeals.filter((d: Deal) => d.status === 'Pending Approval'));
+      setDeals(allDeals.filter((d: Deal) => d.status === 'Accepted'));
 
       if (!storedDeals) {
         sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(initialMockDeals));
       }
     } catch (error) {
       console.error("Could not load deals from session storage", error);
-      setDeals(initialMockDeals.filter((d: Deal) => d.status === 'Pending Approval'));
+      setDeals(initialMockDeals.filter((d: Deal) => d.status === 'Accepted'));
     }
     setIsLoading(false);
   }, []);
@@ -75,7 +75,7 @@ export default function AdminApprovalsPage() {
     
     const updatedDeals = allDeals.map(d => d.id === dealId ? {...d, status: newStatus} : d);
     
-    setDeals(updatedDeals.filter(d => d.status === 'Pending Approval'));
+    setDeals(updatedDeals.filter(d => d.status === 'Accepted'));
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedDeals));
     
     toast.success(`Deal has been ${newStatus === 'Active' ? 'approved' : 'rejected'}.`, { id: toastId });
