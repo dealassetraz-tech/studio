@@ -6,32 +6,19 @@ import { Handshake, Building, Users } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
-
-interface Property {
-  id: string;
-}
-
-interface Deal {
-  id: string;
-}
-
-interface User {
-  id: string;
-}
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminDashboard() {
   const firestore = useFirestore();
-  const [propertiesCount, setPropertiesCount] = useState(0);
-  const [dealsCount, setDealsCount] = useState(0);
-  const [usersCount, setUsersCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [propertiesCount, setPropertiesCount] = useState<number | null>(null);
+  const [dealsCount, setDealsCount] = useState<number | null>(null);
+  const [usersCount, setUsersCount] = useState<number | null>(null);
 
   useEffect(() => {
-    setIsLoading(true);
+    if (!firestore) return;
 
     const unsubProperties = onSnapshot(collection(firestore, 'properties'), (snapshot) => {
       setPropertiesCount(snapshot.size);
-      setIsLoading(false);
     });
 
     const unsubDeals = onSnapshot(collection(firestore, 'deals'), (snapshot) => {
@@ -49,26 +36,28 @@ export default function AdminDashboard() {
     };
   }, [firestore]);
 
+  const isLoading = usersCount === null || propertiesCount === null || dealsCount === null;
+
   const stats = useMemo(() => [
     {
       title: "Total Users",
-      value: isLoading ? '...' : usersCount.toString(),
+      value: usersCount,
       icon: <Users className="w-6 h-6 text-primary" />,
       description: "All registered users.",
     },
     {
       title: "Total Properties",
-      value: isLoading ? '...' : propertiesCount.toString(),
+      value: propertiesCount,
       icon: <Building className="w-6 h-6 text-amber-500" />,
       description: "All listed properties.",
     },
     {
       title: "Total Deals",
-      value: isLoading ? '...' : dealsCount.toString(),
+      value: dealsCount,
       icon: <Handshake className="w-6 h-6 text-emerald-500" />,
       description: "All deals across the platform.",
     },
-  ], [usersCount, propertiesCount, dealsCount, isLoading]);
+  ], [usersCount, propertiesCount, dealsCount]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -89,7 +78,11 @@ export default function AdminDashboard() {
               {stat.icon}
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              {stat.value === null ? (
+                <Skeleton className="h-8 w-24" />
+              ) : (
+                <div className="text-2xl font-bold">{stat.value}</div>
+              )}
                <p className="text-xs text-muted-foreground">{stat.description}</p>
             </CardContent>
           </Card>
