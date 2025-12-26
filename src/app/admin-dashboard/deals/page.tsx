@@ -164,26 +164,3 @@ export default function AdminDealsPage() {
     </div>
   );
 }
-
-// A simple arrow component to show transaction direction
-function ArrowRightLeft({className}: {className?: string}) {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className={className}
-      >
-        <path
-          fillRule="evenodd"
-          d="M13.293 4.293a1 1 0 0 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L10 7.586l3.293-3.293z"
-          clipRule="evenodd"
-        />
-         <path
-          fillRule="evenodd"
-          d="M6.707 15.707a1 1 0 0 1-1.414-1.414l4-4a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1-1.414 1.414L10 12.414l-3.293 3.293z"
-          clipRule="evenodd"
-        />
-      </svg>
-    );
-}
