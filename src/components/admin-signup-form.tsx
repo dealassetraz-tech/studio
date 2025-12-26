@@ -83,7 +83,11 @@ export function AdminSignUpForm() {
 
     } catch (error: any) {
       console.error("Admin sign up error:", error);
-      toast.error(error.message || "Failed to create admin account.", { id: toastId });
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error("An admin account with this email already exists. Please sign in instead.", { id: toastId });
+      } else {
+        toast.error(error.message || "Failed to create admin account.", { id: toastId });
+      }
     }
   }
 
