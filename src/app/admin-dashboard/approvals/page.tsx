@@ -29,14 +29,16 @@ interface Deal {
   property: { address: string; image: string; };
   seller: { name: string; avatar: string; };
   buyer: { name: string; avatar: string; };
+  broker: { name: string; avatar: string };
   offerPrice: number;
   status: DealStatus;
+  commission: number;
 }
 
 const initialMockDeals: Deal[] = [
-    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, offerPrice: 148000000, status: 'Active' },
-    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval' },
-    { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
+    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, broker: { name: 'Rajesh K.', avatar: 'https://picsum.photos/seed/brokerR/100/100' }, offerPrice: 148000000, status: 'Active', commission: 2.0 },
+    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, broker: { name: 'Sunita P.', avatar: 'https://picsum.photos/seed/brokerS/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
+    { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, broker: { name: 'Deepa S.', avatar: 'https://picsum.photos/seed/brokerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
 ];
 
 const SESSION_STORAGE_KEY = 'managedDealsMockData';
@@ -89,6 +91,7 @@ export default function AdminApprovalsPage() {
             <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
             <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
             <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
+            <TableCell><div className="h-10 w-full bg-muted animate-pulse rounded-md" /></TableCell>
         </TableRow>
     ))
   )
@@ -111,6 +114,7 @@ export default function AdminApprovalsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Property</TableHead>
+                  <TableHead>Broker</TableHead>
                   <TableHead>Seller</TableHead>
                   <TableHead>Buyer</TableHead>
                   <TableHead className="text-right">Offer Price</TableHead>
@@ -124,6 +128,12 @@ export default function AdminApprovalsPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 rounded-md"><AvatarImage src={deal.property.image} /><AvatarFallback className="rounded-md"><Building className="w-5 h-5" /></AvatarFallback></Avatar>
                         <span className="font-medium text-foreground truncate max-w-xs">{deal.property.address}</span>
+                      </div>
+                    </TableCell>
+                     <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9"><AvatarImage src={deal.broker.avatar} /><AvatarFallback>{deal.broker.name.charAt(0)}</AvatarFallback></Avatar>
+                        <span>{deal.broker.name}</span>
                       </div>
                     </TableCell>
                     <TableCell>
