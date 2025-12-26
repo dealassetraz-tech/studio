@@ -56,13 +56,10 @@ export function SignInForm() {
         const userData = userDoc.data();
         toast.success("Signed in successfully!", { id: toastId });
 
+        // Redirect based on role
         if (userData.role === 'admin') {
           router.push("/admin-dashboard");
-          return;
-        }
-
-        // Redirect based on role
-        if (userData.role === 'buyer') {
+        } else if (userData.role === 'buyer') {
           router.push("/buyer-dashboard");
         } else if (userData.role === 'broker') {
           router.push("/broker-dashboard");

@@ -100,8 +100,8 @@ export default function MyPropertiesPage() {
                     {prop.price.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <Button variant="outline" className="w-full mt-4">
-                    View Details
+                <Button variant="outline" className="w-full mt-4" asChild>
+                    <Link href={`/deals/${prop.id}`}>View Details</Link>
                 </Button>
               </CardContent>
             </Card>
