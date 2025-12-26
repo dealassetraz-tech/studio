@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Building, Handshake, Shield, User } from 'lucide-react';
+import { Building, Handshake, Shield, User, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
 type DealStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Active' | 'Closed' | 'Cancelled' | 'Pending Approval';
@@ -29,16 +29,17 @@ interface Deal {
   property: { address: string; image: string };
   seller: { name: string; avatar: string };
   buyer: { name: string; avatar: string };
+  broker: { name: string; avatar: string };
   offerPrice: number;
   status: DealStatus;
   commission: number;
 }
 
 const initialMockDeals: Deal[] = [
-    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, offerPrice: 148000000, status: 'Active', commission: 2 },
-    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
-    { id: 'deal3', property: { address: '45, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/prop4/100/100' }, seller: { name: 'Rohan M.', avatar: 'https://picsum.photos/seed/seller3/100/100' }, buyer: { name: 'Suresh P.', avatar: 'https://picsum.photos/seed/buyerC/100/100' }, offerPrice: 119000000, status: 'Closed', commission: 2.5 },
-    { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
+    { id: 'deal1', property: { address: '101, Ocean View, Marine Drive, Mumbai', image: 'https://picsum.photos/seed/prop1/100/100' }, seller: { name: 'Vikram S.', avatar: 'https://picsum.photos/seed/seller1/100/100' }, buyer: { name: 'Aarav G.', avatar: 'https://picsum.photos/seed/buyerA/100/100' }, broker: { name: 'Rajesh K.', avatar: 'https://picsum.photos/seed/brokerR/100/100' }, offerPrice: 148000000, status: 'Active', commission: 2 },
+    { id: 'deal2', property: { address: '2B, Green Park, Hauz Khas, Delhi', image: 'https://picsum.photos/seed/prop2/100/100' }, seller: { name: 'Priya K.', avatar: 'https://picsum.photos/seed/seller2/100/100' }, buyer: { name: 'Nisha D.', avatar: 'https://picsum.photos/seed/buyerB/100/100' }, broker: { name: 'Sunita P.', avatar: 'https://picsum.photos/seed/brokerS/100/100' }, offerPrice: 84000000, status: 'Pending Approval', commission: 1.5 },
+    { id: 'deal3', property: { address: '45, Jubilee Hills, Hyderabad', image: 'https://picsum.photos/seed/prop4/100/100' }, seller: { name: 'Rohan M.', avatar: 'https://picsum.photos/seed/seller3/100/100' }, buyer: { name: 'Suresh P.', avatar: 'https://picsum.photos/seed/buyerC/100/100' }, broker: { name: 'Amit V.', avatar: 'https://picsum.photos/seed/brokerA/100/100' }, offerPrice: 119000000, status: 'Closed', commission: 2.5 },
+    { id: 'deal4', property: { address: 'Villa, ECR, Chennai', image: 'https://picsum.photos/seed/prop5/100/100' }, seller: { name: 'Meena R.', avatar: 'https://picsum.photos/seed/seller4/100/100' }, buyer: { name: 'Karthik V.', avatar: 'https://picsum.photos/seed/buyerD/100/100' }, broker: { name: 'Deepa S.', avatar: 'https://picsum.photos/seed/brokerD/100/100' }, offerPrice: 95000000, status: 'Accepted', commission: 2.0 },
 ];
 
 const SESSION_STORAGE_KEY = 'managedDealsMockData';
@@ -105,7 +106,7 @@ export default function AdminDealsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Property</TableHead>
-                  <TableHead>Seller & Buyer</TableHead>
+                  <TableHead>Parties Involved</TableHead>
                   <TableHead className="text-right">Price</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -125,10 +126,15 @@ export default function AdminDealsPage() {
                     <TableCell>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2" title={`Seller: ${deal.seller.name}`}>
-                                <Avatar className="h-8 w-8"><AvatarImage src={deal.seller.avatar} /><AvatarFallback>{deal.seller.name.charAt(0)}</AvatarFallback></Avatar>
                                 <User className="w-4 h-4 text-muted-foreground" />
+                                <Avatar className="h-8 w-8"><AvatarImage src={deal.seller.avatar} /><AvatarFallback>{deal.seller.name.charAt(0)}</AvatarFallback></Avatar>
                             </div>
                             <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
+                             <div className="flex items-center gap-2" title={`Broker: ${deal.broker.name}`}>
+                                <Briefcase className="w-4 h-4 text-muted-foreground" />
+                                <Avatar className="h-8 w-8"><AvatarImage src={deal.broker.avatar} /><AvatarFallback>{deal.broker.name.charAt(0)}</AvatarFallback></Avatar>
+                            </div>
+                             <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
                              <div className="flex items-center gap-2" title={`Buyer: ${deal.buyer.name}`}>
                                 <User className="w-4 h-4 text-muted-foreground" />
                                 <Avatar className="h-8 w-8"><AvatarImage src={deal.buyer.avatar} /><AvatarFallback>{deal.buyer.name.charAt(0)}</AvatarFallback></Avatar>
@@ -177,4 +183,5 @@ function ArrowRightLeft({className}: {className?: string}) {
       </svg>
     );
 }
+
 
